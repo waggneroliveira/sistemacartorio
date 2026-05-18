@@ -37,6 +37,9 @@ require __DIR__ . '/dashboard.php';
 Route::get('/', function () {
     return redirect()->route('index');
 });
+Route::get('/meus-pedidos', function () {
+    return view('client.blades.orders');
+})->name('orders');
 
 Route::get('produto/{category}/{slug}', [ProductPageController::class, 'productView'])->name('client.product');
 Route::get('produtos', [ProductPageController::class, 'productAll'])->name('products');

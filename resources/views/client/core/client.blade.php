@@ -63,73 +63,118 @@
     <link rel="preload" href="{{ asset('build/client/css/bootstrap-icons/bootstrap-icons.css') }}" as="style" onload="this.rel='stylesheet'">
     <link href="{{ asset('build/client/css/style.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('build/client/css/responsivo.css') }}" rel="stylesheet" type="text/css" />
-
-    <script type=application/ld+json>
-        {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "@id": "#organization",
-            "name": "Girollato",
-            "legalName": "Girollato",
-            "url": "https://girolato.com.br/",
-            "logo": "https://girolato.com.br/build/client/images/logo.svg",
-            "image": "https://girolato.com.br/build/client/images/logo.svg",
-            "description": "A Girollato é uma distribuidora especializada em rações, alimentos e artigos pet, oferecendo produtos de qualidade para cães, gatos e outros animais com variedade, cuidado e confiança.",
-            "foundingDate": "2010",
-            "email": "contato@girollato.com.br",
-            "telephone": "+55 71 9 9623-8037",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Alameda Maji, 144 - Quingoma",
-                "addressLocality": "Lauro de Freitas",
-                "addressRegion": "BA",
-                "postalCode": "42725-610",
-                "addressCountry": "BR"
-            },
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+55 71 9 9623-8037",
-                "contactType": "customer service",
-                "email": "contato@girollato.com.br",
-                "areaServed": "BR",
-                "availableLanguage": ["pt", "en"]
-            },
-            "openingHoursSpecification": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                "opens": "08:00",
-                "closes": "17:00"
-            },
-            "slogan": "Girollato",
-            "keywords": [
-                "distribuidora de rações",
-                "ração para cães",
-                "ração para gatos",
-                "artigos pet",
-                "produtos pet",
-                "acessórios para pets",
-                "pet shop",
-                "distribuidora pet",
-                "alimentos para animais",
-                "ração premium",
-                "ração super premium",
-                "produtos para cães e gatos",
-                "brinquedos para pets",
-                "higiene pet",
-                "areia para gatos",
-                "pet store",
-                "distribuidor de produtos pet",
-                "ração em Lauro de Freitas",
-                "produtos pet em Lauro de Freitas",
-                "distribuidora de rações Bahia",
-                "produtos para animais domésticos",
-                "suplementos pet",
-                "petshop online",
-                "casa de ração",
-                "loja pet"
-            ]
+    <style>
+        body {
+            background: #f0f2f5;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
         }
-    </script>
+        .navbar-custom {
+            background: #1a3e2f;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: white !important;
+        }
+        .card-service {
+            border: none;
+            border-radius: 24px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: white;
+            height: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        }
+        .card-service:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 28px rgba(0,0,0,0.08);
+            border-color: #d4e2dc;
+        }
+        .service-check {
+            background-color: #1a3e2f;
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .selected-card {
+            border: 2px solid #1a3e2f;
+            background: #f8fbf9;
+            box-shadow: 0 12px 24px rgba(26,62,47,0.12);
+        }
+        .badge-docs {
+            background: #eef2f0;
+            color: #1e4d3a;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
+            background: #fafcfb;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            background: #f0f6f2;
+            border-color: #1a3e2f;
+        }
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .btn-submit {
+            background: #1a3e2f;
+            border: none;
+            padding: 12px 28px;
+            font-weight: 600;
+            border-radius: 60px;
+            transition: 0.2s;
+        }
+        .btn-submit:hover {
+            background: #0f2e22;
+            transform: scale(1.02);
+        }
+        .form-control, .form-select {
+            border-radius: 16px;
+            padding: 12px 16px;
+            border: 1px solid #dee2e6;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #1a3e2f;
+            box-shadow: 0 0 0 0.2rem rgba(26,62,47,0.2);
+        }
+        .section-title {
+            font-weight: 700;
+            color: #1f2f29;
+            border-left: 5px solid #1a3e2f;
+            padding-left: 16px;
+        }
+        footer {
+            border-top: 1px solid #dce5e1;
+            background: white;
+        }
+        .dynamic-field {
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .card-service {
+                margin-bottom: 12px;
+            }
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div id="organization" hidden></div>
@@ -209,316 +254,32 @@
     </style>
 
     <header class="shadow-sm bg-white">
-        <nav class="navbar navbar-expand-lg navbar-light container py-3 px-3 px-lg-0">            
-            <!-- Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="{{route('index')}}">
-                <img src="{{asset('build/client/images/logo.svg')}}" alt="Girollato" height="40">
-            </a>
-
-            <!-- Toggle mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Menu -->
-            <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav mx-auto m-auto me-4 mb-2 mb-lg-0 gap-lg-3">
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header active" href="{{route('index')}}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header" href="{{route('about')}}">Sobre Nós</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header" href="{{ request()->routeIs('index') ? '#depoiment' : route('index') . '#depoiment' }}">Depoimentos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header" href="{{ request()->routeIs('about') ? '#team-section' : route('about') . '#team-section' }}">Representantes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header" href="{{route('products')}}">Produtos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link font-changa font-18 font-semibold font-header" href="{{route('contact')}}">Contato</a>
-                    </li>
-                </ul>
-
-                <!-- Botão -->
-                <div class="d-flex justify-content-center gap-2 align-items-center btn-header btn bg-yellow rounded-pill px-4">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11.6741 10.0755C11.5016 9.96226 11.3291 9.90566 11.1565 10.1321L10.4665 11.0377C10.2939 11.1509 10.1789 11.2075 9.94888 11.0943C9.08626 10.6415 7.87859 10.1321 6.84345 8.43396C6.78594 8.20755 6.90096 8.09434 7.01597 7.98113L7.53355 7.18868C7.64856 7.07547 7.59105 6.96226 7.53355 6.84906L6.84345 5.20755C6.67093 4.75472 6.4984 4.81132 6.32588 4.81132H5.86581C5.7508 4.81132 5.52077 4.86792 5.29073 5.09434C4.02556 6.33962 4.54313 8.09434 5.46326 9.22642C5.63578 9.45283 6.78594 11.4906 9.25879 12.566C11.099 13.3585 11.5016 13.2453 12.0192 13.1321C12.6518 13.0755 13.2843 12.566 13.5719 12.0566C13.6294 11.8868 13.9169 11.1509 13.6869 11.0377M9.14377 16.3585C6.78594 16.3585 5.00319 15.1132 5.00319 15.1132L2.1853 15.8491L2.8754 13.1321C2.8754 13.1321 1.72524 11.3774 1.72524 9.16981C1.72524 5.09434 5.11821 1.69811 9.31629 1.69811C13.2268 1.69811 16.5623 4.69811 16.5623 8.88679C16.5623 12.9623 13.2268 16.3019 9.14377 16.3585ZM0 18L4.77316 16.6981C6.15555 17.3947 7.69626 17.7309 9.24823 17.6747C10.8002 17.6184 12.3116 17.1715 13.6382 16.3768C14.9648 15.582 16.0622 14.4658 16.8259 13.1347C17.5895 11.8037 17.9937 10.3022 18 8.77359C18 3.90566 14.0895 0 9.14377 0C7.55639 0.00399723 5.99777 0.417245 4.62313 1.19859C3.24848 1.97993 2.10579 3.10211 1.30885 4.45336C0.511907 5.80461 0.0885224 7.33778 0.0808596 8.9002C0.0731969 10.4626 0.481524 11.9997 1.26518 13.3585" fill="#10513D"/>
-                    </svg>
-
-                    <a href="#" class="font-changa color-green font-16 font-medium text-decoration-none">
-                        Solicitar Atendimento
-                    </a>
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-custom navbar-expand-lg sticky-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-file-text-fill me-2"></i>Cartório Fácil
+                </a>
+                <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link text-white-50" href="{{route('index')}}">Início</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-50" href="{{route('orders')}}">Meus Pedidos</a></li>
+                        <li class="nav-item"><a class="nav-link text-white-50" href="#">Atendimento</a></li>
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
-
-    <div class="modal fade" id="modalDownloadFicha" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content bg-green">
-
-                <form id="formDownloadFicha">
-                    @csrf
-
-                    <div class="modal-header flex-column">
-                        <div class="d-flex justify-content-end col-12">
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <img src="{{asset('build/client/images/girollato-footer.svg')}}" alt="Girollato" height="40">
-                        <h5 class="modal-title text-white font-changa font-20 font-medium mt-3">Preencha o formulário para baixar o arquivo</h5>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <div class="mb-3">
-                            <label class="form-label text-white font-changa font-15 font-regular">Nome</label>
-                            <input type="text" name="name" class="form-control" required>
-                        </div>
-
-                        <div class="row">
-                            <div class="mb-3 col-12 col-lg-6">
-                                <label class="form-label text-white font-changa font-15 font-regular">CNPJ</label>
-                                <input type="text" inputmode="numeric" name="cnpj" id="cnpj" class="form-control" required>
-                            </div>
-    
-                            <div class="mb-3 col-12 col-lg-6">
-                                <label class="form-label text-white font-changa font-15 font-regular">Telefone</label>
-                                <input type="text" inputmode="numeric" name="phone" id="phone" class="form-control" required>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="submit" class="btn bg-yellow border">
-                            Baixar arquivo
-                        </button>
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const modal = new bootstrap.Modal(document.getElementById('modalDownloadFicha'));
-            const form = document.getElementById('formDownloadFicha');
-
-            let currentFile = null;
-
-            document.querySelectorAll('.btn-download-ficha').forEach(button => {
-
-                button.addEventListener('click', function(e){
-
-                    e.preventDefault();
-
-                    currentFile = this.getAttribute('href');
-
-                    modal.show();
-
-                });
-
-            });
-
-            form.addEventListener('submit', function(e){
-
-                e.preventDefault();
-
-                const formData = new FormData(form);
-
-                fetch("{{ route('download.ficha.store') }}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": document.querySelector('input[name=_token]').value
-                    },
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(res => {
-
-                    if(res.success){
-
-                        modal.hide();
-
-                        // FORÇA DOWNLOAD
-                        const link = document.createElement('a');
-                        link.href = currentFile;
-                        link.setAttribute('download', '');
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
-                        form.reset();
-
-                    }
-
-                });
-
-            });
-
-        });
-
-        // mascara CNPJ
-        function maskCNPJ(value) {
-
-            value = value.replace(/\D/g, '');
-
-            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
-            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
-            value = value.replace(/(\d{4})(\d)/, '$1-$2');
-
-            return value.substring(0, 18);
-        }
-
-
-        // mascara celular
-        function maskPhone(value) {
-
-            value = value.replace(/\D/g, '');
-
-            value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
-            value = value.replace(/(\d{5})(\d)/, '$1-$2');
-
-            return value.substring(0, 15);
-        }
-
-
-        // aplicar máscaras
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const cnpj = document.getElementById('cnpj');
-            const phone = document.getElementById('phone');
-
-            if(cnpj){
-                cnpj.addEventListener('input', function(){
-                    this.value = maskCNPJ(this.value);
-                });
-            }
-
-            if(phone){
-                phone.addEventListener('input', function(){
-                    this.value = maskPhone(this.value);
-                });
-            }
-
-        });
-    </script>
-
-    <main>
+    <main class="container py-4 py-md-5">
         @yield('content') 
     </main>
 
-    <footer class="bg-green text-white pt-5 pb-3">
-        <div class="container">
-
-            <!-- Linha principal -->
-            <div class="row align-items-start">
-
-                <!-- Logo + botão -->
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <img src="{{asset('build/client/images/girollato-footer.svg')}}" alt="Girollato" height="40">
-
-                    <div class="mt-5">
-                        <a href="{{ request()->routeIs('about') ? '#team-section' : route('about') . '#team-section' }}" class="border-btn-footer btn bg-yellow px-4 py-2 rounded-pill font-changa color-green font-16 font-medium text-decoration-none">
-                            Encontrar Representantes
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Mapa do site -->
-                <div class="col-lg-6 mb-4 mb-lg-0">
-                    <h6 class="font-changa font-16 font-bold mb-3 position-relative d-inline-block font-changa font-16 font-medium">
-                        Mapa do Site
-                        <span class="d-block bg-yellow mt-1" style="height:3px; width:40px;"></span>
-                    </h6>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <ul class="list-unstyled">
-                                <li><a href="{{route('index')}}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Início</a></li>
-                                <li><a href="{{route('about')}}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Quem Somos</a></li>
-                                <li><a href="{{ request()->routeIs('index') ? '#stats-section' : route('index') . '#stats-section' }}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Diferenciais</a></li>
-                                <li><a href="{{route('blogAll')}}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Blog</a></li>
-                                <li><a href="{{route('products')}}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Produtos</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-6">
-                            <ul class="list-unstyled">
-                                <li><a href="{{ request()->routeIs('index') ? '#depoiment' : route('index') . '#depoiment' }}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Depoimentos</a></li>
-                                <li><a href="{{ request()->routeIs('index') ? '#faq' : route('index') . '#faq' }}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">FAQ</a></li>
-                                <li><a href="{{route('contact')}}" class="font-changa font-16 font-regular text-white text-decoration-none d-block mb-2">Contato</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Redes sociais -->
-                @if (isset($contact) && 
-                $contact->link_insta <> null ||
-                $contact->link_face <> null ||
-                $contact->link_tik_tok <> null)
-                    
-                @endif
-                <div class="col-lg-2 text-lg-end">
-                    <div class="d-flex gap-3 justify-content-lg-end">
-                        @if ($contact->link_insta <> null)                            
-                            <a href="{{$contact->link_insta}}" target="_blank" rel="noopener noreferrer" class="text-white fs-5">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                        @endif
-                        @if ($contact->link_face <> null)                            
-                            <a href="{{$contact->link_face}}" target="_blank" rel="noopener noreferrer" class="text-white fs-5">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                        @endif
-                        @if ($contact->link_tik_tok <> null)                            
-                            <a href="{{$contact->link_tik_tok}}" target="_blank" rel="noopener noreferrer" class="text-white fs-5">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
-                        @endif
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Linha inferior -->
-            <hr class="border-light opacity-25 my-4">
-
-            <div class="row align-items-center">
-
-                <div class="col-md-10 small">
-                    <div class="d-flex flex-wrap col-12 font-changa font-16 font-regular text-center text-lg-end justify-content-center justify-content-lg-end">
-                        <p id="footer-text"></p>                        
-                    </div>
-
-                    <script defer>
-                        const currentYeaar = (new Date).getFullYear();
-                        document.getElementById("footer-text").innerHTML = `© ${currentYeaar} <span> Transportes e Atacadista de Rações LTDA.
-                    Todos os direitos reservados.</span> <a href="https://policies.google.com/privacy?hl=pt-BR" target="_blank" class="text-white font-semibold">| Política de Privacidade</a>`
-                    </script>
-                </div>
-
-                <div class="col-12 col-md-2 text-center text-md-end mt-3 mt-md-0">
-                    <a href="http://www.whi.dev.br" target="_blank" rel="noopener noreferrer">
-                        <img src="{{asset('build/client/images/whi.svg')}}" alt="Agência WHI" style="height:35px;">
-                    </a>
-                </div>
-
-            </div>
-
-        </div>
+    <footer class="mt-5 py-4 text-center text-muted small">
+        <div class="container">© 2025 Cartório Fácil — Atendimento digital com segurança e agilidade.</div>
     </footer>
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
     
     <script src="https://cdn.ckeditor.com/4.22.1/basic/ckeditor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
@@ -528,6 +289,452 @@
     <script src="{{ asset('build/client/css/bootstrap/js/bootstrap.bundle.js') }}"></script>
     <script src="{{ asset('build/client/lgpd/script.js') }}"></script>
     <script src="{{ asset('build/client/js/default.js') }}"></script>
+
+    <script>
+        // ==================== DEFINIÇÃO DOS SERVIÇOS COM CAMPOS DINÂMICOS ====================
+        const servicos = [
+            {
+                id: 1,
+                nome: "Certidão de Nascimento",
+                icone: "bi-baby",
+                documentos: [
+                    "RG do requerente (original digitalizado)",
+                    "CPF (frente e verso ou imagem do documento)",
+                    "Comprovante de endereço recente",
+                    "Dados dos pais (nomes completos)"
+                ],
+                instrucoes: "A certidão pode ser solicitada para 1ª ou 2ª via. É necessário apresentar documento oficial com foto.",
+                camposDinamicos: [
+                    { tipo: "select", nome: "tipoCertidao", label: "Tipo de certidão", obrigatorio: true, opcoes: ["1ª Via", "2ª Via"] },
+                    { tipo: "text", nome: "nomeMae", label: "Nome completo da mãe", obrigatorio: true, placeholder: "Digite o nome da mãe" },
+                    { tipo: "text", nome: "nomePai", label: "Nome completo do pai", obrigatorio: false, placeholder: "Digite o nome do pai (opcional)" },
+                    { tipo: "date", nome: "dataNascimento", label: "Data de nascimento", obrigatorio: true, placeholder: "" }
+                ]
+            },
+            {
+                id: 2,
+                nome: "Certidão de Casamento",
+                icone: "bi-hearts",
+                documentos: [
+                    "RG e CPF de ambos os cônjuges",
+                    "Certidão de nascimento atualizada (se for 1ª via)",
+                    "Comprovante de residência",
+                    "Documento de identificação de 2 testemunhas"
+                ],
+                instrucoes: "Para certidão de casamento, informar data e local do casamento. Caso seja averbação, especificar.",
+                camposDinamicos: [
+                    { tipo: "text", nome: "nomeConjuge1", label: "Nome do primeiro cônjuge", obrigatorio: true, placeholder: "Nome completo" },
+                    { tipo: "text", nome: "nomeConjuge2", label: "Nome do segundo cônjuge", obrigatorio: true, placeholder: "Nome completo" },
+                    { tipo: "date", nome: "dataCasamento", label: "Data do casamento", obrigatorio: true, placeholder: "" },
+                    { tipo: "text", nome: "localCasamento", label: "Local do casamento (cidade/estado)", obrigatorio: true, placeholder: "Ex: São Paulo - SP" },
+                    { tipo: "select", nome: "tipoAverbacao", label: "Tipo de solicitação", obrigatorio: true, opcoes: ["1ª Via", "2ª Via", "Averbação"] }
+                ]
+            },
+            {
+                id: 3,
+                nome: "Escritura de Compra e Venda",
+                icone: "bi-house-door",
+                documentos: [
+                    "RG e CPF de comprador e vendedor",
+                    "Matrícula atualizada do imóvel (certidão) - até 30 dias",
+                    "Comprovante de quitação de IPTU/ITR",
+                    "Certidão de casamento ou declaração de união estável"
+                ],
+                instrucoes: "Documentos devem estar com assinatura digitalizada. Solicitamos também certidão negativa de débitos.",
+                camposDinamicos: [
+                    { tipo: "text", nome: "nomeComprador", label: "Nome completo do comprador", obrigatorio: true, placeholder: "Nome completo" },
+                    { tipo: "text", nome: "cpfComprador", label: "CPF do comprador", obrigatorio: true, placeholder: "000.000.000-00" },
+                    { tipo: "text", nome: "nomeVendedor", label: "Nome completo do vendedor", obrigatorio: true, placeholder: "Nome completo" },
+                    { tipo: "text", nome: "cpfVendedor", label: "CPF do vendedor", obrigatorio: true, placeholder: "000.000.000-00" },
+                    { tipo: "text", nome: "enderecoImovel", label: "Endereço completo do imóvel", obrigatorio: true, placeholder: "Rua, número, bairro, cidade" },
+                    { tipo: "text", nome: "matriculaImovel", label: "Número da matrícula do imóvel", obrigatorio: true, placeholder: "Nº da matrícula no cartório" },
+                    { tipo: "number", nome: "valorVenda", label: "Valor da venda (R$)", obrigatorio: true, placeholder: "Ex: 250000" }
+                ]
+            },
+            {
+                id: 4,
+                nome: "Reconhecimento de Firma",
+                icone: "bi-pen",
+                documentos: [
+                    "Documento original com foto (RG/CNH)",
+                    "CPF",
+                    "Documento a ser reconhecido (original)",
+                    "Comprovante de endereço"
+                ],
+                instrucoes: "Envie foto legível do documento a ser reconhecido. O atendente orientará presencial ou por videoconferência.",
+                camposDinamicos: [
+                    { tipo: "select", nome: "tipoReconhecimento", label: "Tipo de reconhecimento", obrigatorio: true, opcoes: ["Por semelhança", "Por autenticidade"] },
+                    { tipo: "text", nome: "documentoReconhecer", label: "Descrição do documento a ser reconhecido", obrigatorio: true, placeholder: "Ex: Contrato de aluguel, procuração, etc." },
+                    { tipo: "select", nome: "formaAtendimento", label: "Forma de atendimento preferencial", obrigatorio: true, opcoes: ["Presencial", "Videoconferência", "Online com token"] }
+                ]
+            },
+            {
+                id: 5,
+                nome: "Abertura de Inventário",
+                icone: "bi-folder-symlink",
+                documentos: [
+                    "Certidão de óbito do falecido",
+                    "RG, CPF e certidão de nascimento/casamento dos herdeiros",
+                    "Relação de bens e documentos dos imóveis/veículos",
+                    "Último comprovante de residência do falecido"
+                ],
+                instrucoes: "Processo judicial ou extrajudicial. Você receberá orientação personalizada.",
+                camposDinamicos: [
+                    { tipo: "text", nome: "nomeFalecido", label: "Nome completo do falecido", obrigatorio: true, placeholder: "Nome completo" },
+                    { tipo: "date", nome: "dataObito", label: "Data do óbito", obrigatorio: true, placeholder: "" },
+                    { tipo: "text", nome: "cartorioObito", label: "Cartório onde foi registrado o óbito", obrigatorio: true, placeholder: "Nome do cartório e cidade" },
+                    { tipo: "number", nome: "numeroHerdeiros", label: "Número de herdeiros", obrigatorio: true, placeholder: "Quantidade de herdeiros" },
+                    { tipo: "select", nome: "tipoInventario", label: "Tipo de inventário", obrigatorio: true, opcoes: ["Judicial", "Extrajudicial (cartório)"] },
+                    { tipo: "textarea", nome: "relacaoBens", label: "Relação resumida dos bens", obrigatorio: false, placeholder: "Descreva os principais bens (imóveis, veículos, etc.)" }
+                ]
+            }
+        ];
+
+        let selectedService = null;
+        let uploadedFiles = [];
+        const MAX_FILES = 8;
+
+        // Renderizar cards de serviços
+        function renderServices() {
+            const container = document.getElementById('servicesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            servicos.forEach(serv => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-12';
+                col.innerHTML = `
+                    <div class="card-service card p-3" data-id="${serv.id}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <i class="bi ${serv.icone} fs-2" style="color: #1a3e2f;"></i>
+                            <span class="service-check text-white small" id="checkBadge-${serv.id}" style="display: none;"><i class="bi bi-check-lg"></i> Selecionado</span>
+                        </div>
+                        <h5 class="mt-2 fw-bold">${serv.nome}</h5>
+                        <p class="text-muted small mb-0">Clique para detalhes</p>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+
+            document.querySelectorAll('.card-service').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const id = parseInt(card.getAttribute('data-id'));
+                    const servico = servicos.find(s => s.id === id);
+                    if (servico) {
+                        selectService(servico);
+                    }
+                });
+            });
+        }
+
+        // Gerar campos dinâmicos baseado no serviço
+        function generateDynamicFields(servico) {
+            if (!servico || !servico.camposDinamicos) return '';
+            
+            let html = '<div class="dynamic-fields-wrapper">';
+            html += '<h6 class="fw-bold mb-3 text-success"><i class="bi bi-file-text"></i> Dados específicos do serviço: ' + servico.nome + '</h6>';
+            
+            servico.camposDinamicos.forEach(campo => {
+                const obrigatorioAttr = campo.obrigatorio ? 'required' : '';
+                const requiredSpan = campo.obrigatorio ? '<span class="text-danger">*</span>' : '';
+                
+                html += `<div class="mb-3 dynamic-field">`;
+                html += `<label class="form-label fw-semibold">${campo.label} ${requiredSpan}</label>`;
+                
+                switch(campo.tipo) {
+                    case 'text':
+                        html += `<input type="text" class="form-control" name="${campo.nome}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}>`;
+                        break;
+                    case 'number':
+                        html += `<input type="number" class="form-control" name="${campo.nome}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr} step="any">`;
+                        break;
+                    case 'date':
+                        html += `<input type="date" class="form-control" name="${campo.nome}" ${obrigatorioAttr}>`;
+                        break;
+                    case 'select':
+                        html += `<select class="form-select" name="${campo.nome}" ${obrigatorioAttr}>`;
+                        html += `<option value="">Selecione...</option>`;
+                        campo.opcoes.forEach(op => {
+                            html += `<option value="${op}">${op}</option>`;
+                        });
+                        html += `</select>`;
+                        break;
+                    case 'textarea':
+                        html += `<textarea class="form-control" name="${campo.nome}" rows="3" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}></textarea>`;
+                        break;
+                    default:
+                        html += `<input type="text" class="form-control" name="${campo.nome}" ${obrigatorioAttr}>`;
+                }
+                
+                html += `</div>`;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Atualizar a explicação dos documentos
+        function updateDocsExplanation(servico) {
+            const docsDiv = document.getElementById('docsExplanation');
+            let docsHtml = `
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-file-earmark-check fs-3 me-3 text-success"></i>
+                    <div>
+                        <h6 class="fw-bold mb-2">📄 ${servico.nome}</h6>
+                        <p class="small text-secondary">${servico.instrucoes}</p>
+                        <ul class="list-unstyled">
+            `;
+            servico.documentos.forEach(doc => {
+                docsHtml += `<li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2" style="font-size: 0.9rem;"></i> ${doc}</li>`;
+            });
+            docsHtml += `</ul><div class="alert alert-light border mt-2 py-2 small"><i class="bi bi-chat-right-quote"></i> <strong>Orientação extra:</strong> Todos os arquivos devem estar legíveis e em formato PDF ou imagem (JPG/PNG). Certifique-se de que os documentos estão atualizados.</div></div></div>`;
+            docsDiv.innerHTML = docsHtml;
+        }
+
+        // Selecionar serviço e atualizar tudo
+        function selectService(servico) {
+            // Atualizar UI dos cards
+            document.querySelectorAll('.card-service').forEach(card => {
+                card.classList.remove('selected-card');
+                const badge = card.querySelector('[class*="service-check"]');
+                if (badge) badge.style.display = 'none';
+            });
+            const targetCard = document.querySelector(`.card-service[data-id="${servico.id}"]`);
+            if (targetCard) {
+                targetCard.classList.add('selected-card');
+                const badge = targetCard.querySelector('.service-check');
+                if (badge) badge.style.display = 'inline-block';
+            }
+
+            selectedService = servico;
+            document.getElementById('selectedServiceId').value = servico.id;
+            document.getElementById('selectedServiceName').value = servico.nome;
+
+            // Atualizar documentos necessários
+            updateDocsExplanation(servico);
+
+            // Gerar e injetar campos dinâmicos
+            const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+            const dynamicFieldsHtml = generateDynamicFields(servico);
+            dynamicContainer.innerHTML = dynamicFieldsHtml;
+            
+            // Adicionar animação sutil
+            const wrapper = dynamicContainer.querySelector('.dynamic-fields-wrapper');
+            if (wrapper) {
+                wrapper.style.animation = 'fadeIn 0.4s ease';
+            }
+        }
+
+        // FUNÇÕES DE UPLOAD DE ARQUIVOS
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const selectBtn = document.getElementById('selectFilesBtn');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const fileListUl = document.getElementById('fileList');
+
+        function updateFileListUI() {
+            if (uploadedFiles.length === 0) {
+                fileListContainer.classList.add('d-none');
+                return;
+            }
+            fileListContainer.classList.remove('d-none');
+            fileListUl.innerHTML = '';
+            uploadedFiles.forEach((file, idx) => {
+                const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                const li = document.createElement('li');
+                li.className = 'd-flex justify-content-between align-items-center border-bottom pb-2 mb-2';
+                li.innerHTML = `
+                    <div><i class="bi bi-file-earmark-text me-2"></i> <strong>${file.name}</strong> <span class="text-muted small">(${sizeMB} MB)</span></div>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle" data-index="${idx}"><i class="bi bi-x-lg"></i></button>
+                `;
+                fileListUl.appendChild(li);
+            });
+            document.querySelectorAll('#fileList .btn-outline-danger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    if (!isNaN(index)) {
+                        uploadedFiles.splice(index, 1);
+                        updateFileListUI();
+                        fileInput.value = '';
+                    }
+                    e.stopPropagation();
+                });
+            });
+        }
+
+        function addFiles(files) {
+            const fileArray = Array.from(files);
+            let addedCount = 0;
+            for (let f of fileArray) {
+                if (uploadedFiles.length >= MAX_FILES) {
+                    alert(`Máximo de ${MAX_FILES} arquivos permitidos. Remova algum antes de adicionar novo.`);
+                    break;
+                }
+                if (!f.type.match('image.*') && !f.type.match('application/pdf')) {
+                    alert(`Arquivo ${f.name} não é suportado. Use PDF, JPG ou PNG.`);
+                    continue;
+                }
+                if (f.size > 10 * 1024 * 1024) {
+                    alert(`Arquivo ${f.name} excede 10MB.`);
+                    continue;
+                }
+                uploadedFiles.push(f);
+                addedCount++;
+            }
+            if (addedCount > 0) updateFileListUI();
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        selectBtn.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#e9f3ef';
+            dropzone.style.borderColor = '#1a3e2f';
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.backgroundColor = '#fafcfb';
+            dropzone.style.borderColor = '#cbd5e1';
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#fafcfb';
+            dropzone.style.borderColor = '#cbd5e1';
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length) addFiles(droppedFiles);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) addFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        // Envio do formulário
+        const form = document.getElementById('solicitacaoForm');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nomeCompleto').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const servicoId = document.getElementById('selectedServiceId').value;
+
+            if (!nome || !email || !telefone) {
+                alert('Por favor, preencha nome, e-mail e telefone.');
+                return;
+            }
+            if (!servicoId) {
+                alert('Você deve selecionar um serviço para continuar.');
+                return;
+            }
+            
+            // Validar campos dinâmicos obrigatórios
+            if (selectedService && selectedService.camposDinamicos) {
+                for (let campo of selectedService.camposDinamicos) {
+                    if (campo.obrigatorio) {
+                        const campoElement = document.querySelector(`[name="${campo.nome}"]`);
+                        if (campoElement && !campoElement.value.trim()) {
+                            alert(`Por favor, preencha o campo "${campo.label}" (obrigatório).`);
+                            campoElement.focus();
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            if (uploadedFiles.length === 0) {
+                alert('Envie ao menos um documento (conforme lista de documentos necessários) para processar a solicitação.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('nome', nome);
+            formData.append('email', email);
+            formData.append('telefone', telefone);
+            formData.append('servico_id', servicoId);
+            formData.append('servico_nome', document.getElementById('selectedServiceName').value);
+            
+            // Adicionar campos dinâmicos
+            if (selectedService && selectedService.camposDinamicos) {
+                for (let campo of selectedService.camposDinamicos) {
+                    const valor = document.querySelector(`[name="${campo.nome}"]`)?.value || '';
+                    formData.append(campo.nome, valor);
+                }
+            }
+            
+            uploadedFiles.forEach((file, idx) => {
+                formData.append(`documento_${idx}`, file, file.name);
+            });
+            
+            console.log('Dados enviados (simulação):');
+            for (let pair of formData.entries()) {
+                if (pair[1] instanceof File) {
+                    console.log(`${pair[0]}: ${pair[1].name} (${pair[1].size} bytes)`);
+                } else {
+                    console.log(`${pair[0]}: ${pair[1]}`);
+                }
+            }
+
+            // Modal de sucesso
+            const modalHtml = `
+                <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow">
+                            <div class="modal-header bg-success text-white border-0">
+                                <h5 class="modal-title"><i class="bi bi-check-circle-fill"></i> Solicitação enviada!</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Olá, <strong>${nome}</strong>! Sua solicitação de <strong>${document.getElementById('selectedServiceName').value}</strong> foi recebida com sucesso.</p>
+                                <p>Você enviou <strong>${uploadedFiles.length} arquivo(s)</strong>. Em breve um atendente entrará em contato via e-mail ou WhatsApp.</p>
+                                <hr>
+                                <small class="text-muted">Protocolo gerado: #CART-${Math.floor(Math.random() * 100000)}</small>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Fechar</button>
+                                <button type="button" id="resetFormBtn" class="btn btn-success rounded-pill" data-bs-dismiss="modal">Nova solicitação</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById('successModal');
+            if(existingModal) existingModal.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modalElement = document.getElementById('successModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            const resetBtn = document.getElementById('resetFormBtn');
+            resetBtn.addEventListener('click', () => {
+                form.reset();
+                selectedService = null;
+                document.getElementById('selectedServiceId').value = '';
+                document.getElementById('selectedServiceName').value = '';
+                document.querySelectorAll('.card-service').forEach(card => {
+                    card.classList.remove('selected-card');
+                    const badge = card.querySelector('.service-check');
+                    if (badge) badge.style.display = 'none';
+                });
+                document.getElementById('docsExplanation').innerHTML = `
+                    <div class="d-flex align-items-center text-secondary">
+                        <i class="bi bi-info-circle fs-4 me-2"></i>
+                        <span>Selecione um serviço ao lado para visualizar a lista de documentos obrigatórios e orientações.</span>
+                    </div>
+                `;
+                document.getElementById('dynamicFieldsContainer').innerHTML = `
+                    <div class="alert alert-light border text-center py-3" id="noServiceSelectedMsg">
+                        <i class="bi bi-info-circle"></i> Selecione um serviço para visualizar os campos específicos.
+                    </div>
+                `;
+                uploadedFiles = [];
+                updateFileListUI();
+                fileInput.value = '';
+            });
+        });
+
+        // Inicialização
+        renderServices();
+        if(servicos.length) selectService(servicos[0]);
+    </script>
 
     {{-- Modais alert --}}
     <script>
