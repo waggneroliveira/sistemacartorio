@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthClientController;
-use App\Http\Controllers\Auth\PasswordEmailClientController;
-use App\Http\Controllers\Auth\ResetPasswordClientController;
 use App\Http\Controllers\Client\AboutPageController;
 use App\Http\Controllers\Client\BenefitPageController;
 use App\Http\Controllers\Client\BlogPageController;
@@ -13,6 +10,8 @@ use App\Http\Controllers\Client\JuridicoPageController;
 use App\Http\Controllers\Client\NoticiesPageController;
 use App\Http\Controllers\Client\ProductPageController;
 use App\Http\Controllers\Client\RegionPageController;
+use App\Http\Controllers\Client\RegistryServicePageController;
+use App\Http\Controllers\Client\RegistryServiceRequestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DownloadFichaController;
@@ -42,10 +41,15 @@ Route::get('/meus-pedidos', function () {
 })->name('orders');
 
 // Rota para página de serviços de cartório
-Route::get('/servicos-cartorio', [App\Http\Controllers\Client\RegistryServicePageController::class, 'index'])->name('registry-services');
+Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('registry-services');
 
 // API Routes para serviços de cartório
-Route::get('/api/registry-services', [App\Http\Controllers\Client\RegistryServicePageController::class, 'getServices'])->name('api.registry-services');
+Route::get('/api/registry-services', [RegistryServicePageController::class, 'getServices'])->name('api.registry-services');
+
+// API Routes para solicitações de serviço
+Route::post('/api/registry-service-requests', [RegistryServiceRequestController::class, 'store'])->name('api.registry-service-requests.store');
+Route::get('/api/registry-service-requests/{id}', [RegistryServiceRequestController::class, 'show'])->name('api.registry-service-requests.show');
+Route::get('/api/user-requests/{email}', [RegistryServiceRequestController::class, 'getUserRequests'])->name('api.user-requests');
 
 Route::get('produto/{category}/{slug}', [ProductPageController::class, 'productView'])->name('client.product');
 Route::get('produtos', [ProductPageController::class, 'productAll'])->name('products');

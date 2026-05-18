@@ -614,21 +614,36 @@
             const servicoId = document.getElementById('selectedServiceId').value;
 
             if (!nome || !email || !telefone) {
-                alert('Por favor, preencha nome, e-mail e telefone.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Dados incompletos',
+                    text: 'Por favor, preencha nome, e-mail e telefone.',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
             if (!servicoId) {
-                alert('Você deve selecionar um serviço para continuar.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Serviço não selecionado',
+                    text: 'Você deve selecionar um serviço para continuar.',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
             
             // Validar campos dinâmicos obrigatórios
             if (selectedService && selectedService.camposDinamicos) {
                 for (let campo of selectedService.camposDinamicos) {
-                    if (campo.obrigatorio) {
-                        const campoElement = document.querySelector(`[name="${campo.nome}"]`);
+                    if (campo.required) {
+                        const campoElement = document.querySelector(`[name="${campo.name}"]`);
                         if (campoElement && !campoElement.value.trim()) {
-                            alert(`Por favor, preencha o campo "${campo.label}" (obrigatório).`);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Campo obrigatório',
+                                text: `Por favor, preencha o campo "${campo.label}" (obrigatório).`,
+                                confirmButtonText: 'OK'
+                            });
                             campoElement.focus();
                             return;
                         }
@@ -637,94 +652,132 @@
             }
             
             if (uploadedFiles.length === 0) {
-                alert('Envie ao menos um documento (conforme lista de documentos necessários) para processar a solicitação.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Documentos não enviados',
+                    text: 'Envie ao menos um documento (conforme lista de documentos necessários) para processar a solicitação.',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('nome', nome);
-            formData.append('email', email);
-            formData.append('telefone', telefone);
-            formData.append('servico_id', servicoId);
-            formData.append('servico_nome', document.getElementById('selectedServiceName').value);
-            
-            // Adicionar campos dinâmicos
-            if (selectedService && selectedService.camposDinamicos) {
-                for (let campo of selectedService.camposDinamicos) {
-                    const valor = document.querySelector(`[name="${campo.nome}"]`)?.value || '';
-                    formData.append(campo.nome, valor);
-                }
-            }
-            
-            uploadedFiles.forEach((file, idx) => {
-                formData.append(`documento_${idx}`, file, file.name);
-            });
-            
-            console.log('Dados enviados (simulação):');
-            for (let pair of formData.entries()) {
-                if (pair[1] instanceof File) {
-                    console.log(`${pair[0]}: ${pair[1].name} (${pair[1].size} bytes)`);
-                } else {
-                    console.log(`${pair[0]}: ${pair[1]}`);
-                }
-            }
+            // Mostrar loading
+            Swal.fire({
+                title: 'Processando...',
+                html: 'Enviando sua solicitação. Por favor, aguarde.',
+                allowOutsideClick: false,
+                didOpen: async () => {
+                    Swal.showLoading();
+                    
+                    const formData = new FormData();
+                    formData.append('nome', nome);
+                    formData.append('email', email);
+                    formData.append('telefone', telefone);
+                    formData.append('servico_id', servicoId);
+                    
+                    // Adicionar campos dinâmicos
+                    if (selectedService && selectedService.camposDinamicos) {
+                        for (let campo of selectedService.camposDinamicos) {
+                            const valor = document.querySelector(`[name="${campo.name}"]`)?.value || '';
+                            formData.append(campo.name, valor);
+                        }
+                    }
+                    
+                    // Adicionar arquivos
+                    uploadedFiles.forEach((file, idx) => {
+                        formData.append(`documento_${idx}`, file, file.name);
+                    });
+                    
+                    try {
+                        const response = await fetch('/api/registry-service-requests', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            }
+                        });
 
-            // Modal de sucesso
-            const modalHtml = `
-                <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content rounded-4 border-0 shadow">
-                            <div class="modal-header bg-success text-white border-0">
-                                <h5 class="modal-title"><i class="bi bi-check-circle-fill"></i> Solicitação enviada!</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Olá, <strong>${nome}</strong>! Sua solicitação de <strong>${document.getElementById('selectedServiceName').value}</strong> foi recebida com sucesso.</p>
-                                <p>Você enviou <strong>${uploadedFiles.length} arquivo(s)</strong>. Em breve um atendente entrará em contato via e-mail ou WhatsApp.</p>
-                                <hr>
-                                <small class="text-muted">Protocolo gerado: #CART-${Math.floor(Math.random() * 100000)}</small>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Fechar</button>
-                                <button type="button" id="resetFormBtn" class="btn btn-success rounded-pill" data-bs-dismiss="modal">Nova solicitação</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            const existingModal = document.getElementById('successModal');
-            if(existingModal) existingModal.remove();
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modalElement = document.getElementById('successModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-            
-            const resetBtn = document.getElementById('resetFormBtn');
-            resetBtn.addEventListener('click', () => {
-                form.reset();
-                selectedService = null;
-                document.getElementById('selectedServiceId').value = '';
-                document.getElementById('selectedServiceName').value = '';
-                document.querySelectorAll('.card-service').forEach(card => {
-                    card.classList.remove('selected-card');
-                    const badge = card.querySelector('.service-check');
-                    if (badge) badge.style.display = 'none';
-                });
-                document.getElementById('docsExplanation').innerHTML = `
-                    <div class="d-flex align-items-center text-secondary">
-                        <i class="bi bi-info-circle fs-4 me-2"></i>
-                        <span>Selecione um serviço ao lado para visualizar a lista de documentos obrigatórios e orientações.</span>
-                    </div>
-                `;
-                document.getElementById('dynamicFieldsContainer').innerHTML = `
-                    <div class="alert alert-light border text-center py-3" id="noServiceSelectedMsg">
-                        <i class="bi bi-info-circle"></i> Selecione um serviço para visualizar os campos específicos.
-                    </div>
-                `;
-                uploadedFiles = [];
-                updateFileListUI();
-                fileInput.value = '';
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Sucesso
+                            Swal.close();
+                            
+                            const modalHtml = `
+                                <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content rounded-4 border-0 shadow">
+                                            <div class="modal-header bg-success text-white border-0">
+                                                <h5 class="modal-title"><i class="bi bi-check-circle-fill"></i> Solicitação enviada!</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Olá, <strong>${nome}</strong>! Sua solicitação de <strong>${document.getElementById('selectedServiceName').value}</strong> foi recebida com sucesso.</p>
+                                                <p>Você enviou <strong>${uploadedFiles.length} arquivo(s)</strong>. Em breve um atendente entrará em contato via e-mail ou WhatsApp.</p>
+                                                <hr>
+                                                <small class="text-muted">Protocolo gerado: <strong>#CART-${result.request_id}</strong></small>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Fechar</button>
+                                                <button type="button" id="resetFormBtn" class="btn btn-success rounded-pill" data-bs-dismiss="modal">Nova solicitação</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            const existingModal = document.getElementById('successModal');
+                            if(existingModal) existingModal.remove();
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            const modalElement = document.getElementById('successModal');
+                            const modal = new bootstrap.Modal(modalElement);
+                            modal.show();
+                            
+                            const resetBtn = document.getElementById('resetFormBtn');
+                            resetBtn.addEventListener('click', () => {
+                                form.reset();
+                                selectedService = null;
+                                document.getElementById('selectedServiceId').value = '';
+                                document.getElementById('selectedServiceName').value = '';
+                                document.querySelectorAll('.card-service').forEach(card => {
+                                    card.classList.remove('selected-card');
+                                    const badge = card.querySelector('.service-check');
+                                    if (badge) badge.style.display = 'none';
+                                });
+                                document.getElementById('docsExplanation').innerHTML = `
+                                    <div class="d-flex align-items-center text-secondary">
+                                        <i class="bi bi-info-circle fs-4 me-2"></i>
+                                        <span>Selecione um serviço ao lado para visualizar a lista de documentos obrigatórios e orientações.</span>
+                                    </div>
+                                `;
+                                document.getElementById('dynamicFieldsContainer').innerHTML = `
+                                    <div class="alert alert-light border text-center py-3" id="noServiceSelectedMsg">
+                                        <i class="bi bi-info-circle"></i> Selecione um serviço para visualizar os campos específicos.
+                                    </div>
+                                `;
+                                uploadedFiles = [];
+                                updateFileListUI();
+                                fileInput.value = '';
+                            });
+                        } else {
+                            // Erro
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro ao enviar',
+                                html: result.message || 'Ocorreu um erro ao processar sua solicitação. Tente novamente.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro de conexão',
+                            text: 'Não foi possível enviar sua solicitação. Verifique sua conexão e tente novamente.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
             });
         });
 
