@@ -292,103 +292,47 @@
 
     <script>
         // ==================== DEFINIÇÃO DOS SERVIÇOS COM CAMPOS DINÂMICOS ====================
-        const servicos = [
-            {
-                id: 1,
-                nome: "Certidão de Nascimento",
-                icone: "bi-baby",
-                documentos: [
-                    "RG do requerente (original digitalizado)",
-                    "CPF (frente e verso ou imagem do documento)",
-                    "Comprovante de endereço recente",
-                    "Dados dos pais (nomes completos)"
-                ],
-                instrucoes: "A certidão pode ser solicitada para 1ª ou 2ª via. É necessário apresentar documento oficial com foto.",
-                camposDinamicos: [
-                    { tipo: "select", nome: "tipoCertidao", label: "Tipo de certidão", obrigatorio: true, opcoes: ["1ª Via", "2ª Via"] },
-                    { tipo: "text", nome: "nomeMae", label: "Nome completo da mãe", obrigatorio: true, placeholder: "Digite o nome da mãe" },
-                    { tipo: "text", nome: "nomePai", label: "Nome completo do pai", obrigatorio: false, placeholder: "Digite o nome do pai (opcional)" },
-                    { tipo: "date", nome: "dataNascimento", label: "Data de nascimento", obrigatorio: true, placeholder: "" }
-                ]
-            },
-            {
-                id: 2,
-                nome: "Certidão de Casamento",
-                icone: "bi-hearts",
-                documentos: [
-                    "RG e CPF de ambos os cônjuges",
-                    "Certidão de nascimento atualizada (se for 1ª via)",
-                    "Comprovante de residência",
-                    "Documento de identificação de 2 testemunhas"
-                ],
-                instrucoes: "Para certidão de casamento, informar data e local do casamento. Caso seja averbação, especificar.",
-                camposDinamicos: [
-                    { tipo: "text", nome: "nomeConjuge1", label: "Nome do primeiro cônjuge", obrigatorio: true, placeholder: "Nome completo" },
-                    { tipo: "text", nome: "nomeConjuge2", label: "Nome do segundo cônjuge", obrigatorio: true, placeholder: "Nome completo" },
-                    { tipo: "date", nome: "dataCasamento", label: "Data do casamento", obrigatorio: true, placeholder: "" },
-                    { tipo: "text", nome: "localCasamento", label: "Local do casamento (cidade/estado)", obrigatorio: true, placeholder: "Ex: São Paulo - SP" },
-                    { tipo: "select", nome: "tipoAverbacao", label: "Tipo de solicitação", obrigatorio: true, opcoes: ["1ª Via", "2ª Via", "Averbação"] }
-                ]
-            },
-            {
-                id: 3,
-                nome: "Escritura de Compra e Venda",
-                icone: "bi-house-door",
-                documentos: [
-                    "RG e CPF de comprador e vendedor",
-                    "Matrícula atualizada do imóvel (certidão) - até 30 dias",
-                    "Comprovante de quitação de IPTU/ITR",
-                    "Certidão de casamento ou declaração de união estável"
-                ],
-                instrucoes: "Documentos devem estar com assinatura digitalizada. Solicitamos também certidão negativa de débitos.",
-                camposDinamicos: [
-                    { tipo: "text", nome: "nomeComprador", label: "Nome completo do comprador", obrigatorio: true, placeholder: "Nome completo" },
-                    { tipo: "text", nome: "cpfComprador", label: "CPF do comprador", obrigatorio: true, placeholder: "000.000.000-00" },
-                    { tipo: "text", nome: "nomeVendedor", label: "Nome completo do vendedor", obrigatorio: true, placeholder: "Nome completo" },
-                    { tipo: "text", nome: "cpfVendedor", label: "CPF do vendedor", obrigatorio: true, placeholder: "000.000.000-00" },
-                    { tipo: "text", nome: "enderecoImovel", label: "Endereço completo do imóvel", obrigatorio: true, placeholder: "Rua, número, bairro, cidade" },
-                    { tipo: "text", nome: "matriculaImovel", label: "Número da matrícula do imóvel", obrigatorio: true, placeholder: "Nº da matrícula no cartório" },
-                    { tipo: "number", nome: "valorVenda", label: "Valor da venda (R$)", obrigatorio: true, placeholder: "Ex: 250000" }
-                ]
-            },
-            {
-                id: 4,
-                nome: "Reconhecimento de Firma",
-                icone: "bi-pen",
-                documentos: [
-                    "Documento original com foto (RG/CNH)",
-                    "CPF",
-                    "Documento a ser reconhecido (original)",
-                    "Comprovante de endereço"
-                ],
-                instrucoes: "Envie foto legível do documento a ser reconhecido. O atendente orientará presencial ou por videoconferência.",
-                camposDinamicos: [
-                    { tipo: "select", nome: "tipoReconhecimento", label: "Tipo de reconhecimento", obrigatorio: true, opcoes: ["Por semelhança", "Por autenticidade"] },
-                    { tipo: "text", nome: "documentoReconhecer", label: "Descrição do documento a ser reconhecido", obrigatorio: true, placeholder: "Ex: Contrato de aluguel, procuração, etc." },
-                    { tipo: "select", nome: "formaAtendimento", label: "Forma de atendimento preferencial", obrigatorio: true, opcoes: ["Presencial", "Videoconferência", "Online com token"] }
-                ]
-            },
-            {
-                id: 5,
-                nome: "Abertura de Inventário",
-                icone: "bi-folder-symlink",
-                documentos: [
-                    "Certidão de óbito do falecido",
-                    "RG, CPF e certidão de nascimento/casamento dos herdeiros",
-                    "Relação de bens e documentos dos imóveis/veículos",
-                    "Último comprovante de residência do falecido"
-                ],
-                instrucoes: "Processo judicial ou extrajudicial. Você receberá orientação personalizada.",
-                camposDinamicos: [
-                    { tipo: "text", nome: "nomeFalecido", label: "Nome completo do falecido", obrigatorio: true, placeholder: "Nome completo" },
-                    { tipo: "date", nome: "dataObito", label: "Data do óbito", obrigatorio: true, placeholder: "" },
-                    { tipo: "text", nome: "cartorioObito", label: "Cartório onde foi registrado o óbito", obrigatorio: true, placeholder: "Nome do cartório e cidade" },
-                    { tipo: "number", nome: "numeroHerdeiros", label: "Número de herdeiros", obrigatorio: true, placeholder: "Quantidade de herdeiros" },
-                    { tipo: "select", nome: "tipoInventario", label: "Tipo de inventário", obrigatorio: true, opcoes: ["Judicial", "Extrajudicial (cartório)"] },
-                    { tipo: "textarea", nome: "relacaoBens", label: "Relação resumida dos bens", obrigatorio: false, placeholder: "Descreva os principais bens (imóveis, veículos, etc.)" }
-                ]
+        let servicos = [];
+
+        // Carregar serviços da API
+        async function loadServicesFromAPI() {
+            try {
+                const response = await fetch('/api/registry-services');
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ao buscar serviços: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success && Array.isArray(result.data)) {
+                    servicos = result.data;
+                    console.log('Serviços carregados com sucesso:', servicos);
+                    renderServices();
+                    
+                    // Selecionar o primeiro serviço automaticamente
+                    if (servicos.length > 0) {
+                        selectService(servicos[0]);
+                    }
+                } else {
+                    console.error('Formato inválido de resposta:', result);
+                    showErrorAlert('Erro ao carregar serviços');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar serviços:', error);
+                showErrorAlert('Não foi possível carregar os serviços. Por favor, recarregue a página.');
             }
-        ];
+        }
+
+        // Mostrar alerta de erro
+        function showErrorAlert(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: message,
+                confirmButtonText: 'OK'
+            });
+        }
 
         let selectedService = null;
         let uploadedFiles = [];
@@ -434,35 +378,43 @@
             html += '<h6 class="fw-bold mb-3 text-success"><i class="bi bi-file-text"></i> Dados específicos do serviço: ' + servico.nome + '</h6>';
             
             servico.camposDinamicos.forEach(campo => {
-                const obrigatorioAttr = campo.obrigatorio ? 'required' : '';
-                const requiredSpan = campo.obrigatorio ? '<span class="text-danger">*</span>' : '';
+                const obrigatorioAttr = campo.required ? 'required' : '';
+                const requiredSpan = campo.required ? '<span class="text-danger">*</span>' : '';
                 
                 html += `<div class="mb-3 dynamic-field">`;
                 html += `<label class="form-label fw-semibold">${campo.label} ${requiredSpan}</label>`;
                 
-                switch(campo.tipo) {
+                switch(campo.type) {
                     case 'text':
-                        html += `<input type="text" class="form-control" name="${campo.nome}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}>`;
+                        html += `<input type="text" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}>`;
                         break;
                     case 'number':
-                        html += `<input type="number" class="form-control" name="${campo.nome}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr} step="any">`;
+                        html += `<input type="number" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr} step="any">`;
                         break;
                     case 'date':
-                        html += `<input type="date" class="form-control" name="${campo.nome}" ${obrigatorioAttr}>`;
+                        html += `<input type="date" class="form-control" name="${campo.name}" ${obrigatorioAttr}>`;
+                        break;
+                    case 'email':
+                        html += `<input type="email" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}>`;
+                        break;
+                    case 'tel':
+                        html += `<input type="tel" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}>`;
                         break;
                     case 'select':
-                        html += `<select class="form-select" name="${campo.nome}" ${obrigatorioAttr}>`;
+                        html += `<select class="form-select" name="${campo.name}" ${obrigatorioAttr}>`;
                         html += `<option value="">Selecione...</option>`;
-                        campo.opcoes.forEach(op => {
-                            html += `<option value="${op}">${op}</option>`;
-                        });
+                        if (Array.isArray(campo.options)) {
+                            campo.options.forEach(op => {
+                                html += `<option value="${op}">${op}</option>`;
+                            });
+                        }
                         html += `</select>`;
                         break;
                     case 'textarea':
-                        html += `<textarea class="form-control" name="${campo.nome}" rows="3" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}></textarea>`;
+                        html += `<textarea class="form-control" name="${campo.name}" rows="3" placeholder="${campo.placeholder || ''}" ${obrigatorioAttr}></textarea>`;
                         break;
                     default:
-                        html += `<input type="text" class="form-control" name="${campo.nome}" ${obrigatorioAttr}>`;
+                        html += `<input type="text" class="form-control" name="${campo.name}" ${obrigatorioAttr}>`;
                 }
                 
                 html += `</div>`;
@@ -732,8 +684,7 @@
         });
 
         // Inicialização
-        renderServices();
-        if(servicos.length) selectService(servicos[0]);
+        loadServicesFromAPI();
     </script>
 
     {{-- Modais alert --}}

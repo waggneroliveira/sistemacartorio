@@ -41,6 +41,12 @@ Route::get('/meus-pedidos', function () {
     return view('client.blades.orders');
 })->name('orders');
 
+// Rota para página de serviços de cartório
+Route::get('/servicos-cartorio', [App\Http\Controllers\Client\RegistryServicePageController::class, 'index'])->name('registry-services');
+
+// API Routes para serviços de cartório
+Route::get('/api/registry-services', [App\Http\Controllers\Client\RegistryServicePageController::class, 'getServices'])->name('api.registry-services');
+
 Route::get('produto/{category}/{slug}', [ProductPageController::class, 'productView'])->name('client.product');
 Route::get('produtos', [ProductPageController::class, 'productAll'])->name('products');
 
