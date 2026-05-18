@@ -338,29 +338,74 @@
         let uploadedFiles = [];
         const MAX_FILES = 8;
 
-        // Renderizar cards de serviços
+        // Renderizar cards de serviços em carrossel
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             if (!container) return;
-            container.innerHTML = '';
+            
+            // Criar estrutura do Swiper
+            container.innerHTML = `
+                <div class="swiper servicesSwiper">
+                    <div class="swiper-wrapper" id="servicesWrapper"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            `;
+            
+            const wrapper = document.getElementById('servicesWrapper');
+            
+            // Adicionar serviços ao swiper-wrapper
             servicos.forEach(serv => {
-                const col = document.createElement('div');
-                col.className = 'col-md-6 col-12';
-                col.innerHTML = `
-                    <div class="card-service card p-3" data-id="${serv.id}">
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `
+                    <div class="card-service card p-3 h-100" data-id="${serv.id}">
                         <div class="d-flex justify-content-between align-items-center">
                             <i class="bi ${serv.icone} fs-2" style="color: #1a3e2f;"></i>
-                            <span class="service-check text-white small" id="checkBadge-${serv.id}" style="display: none;"><i class="bi bi-check-lg"></i> Selecionado</span>
+                            <span class="service-check text-white small" id="checkBadge-${serv.id}" style="display: none;">
+                                <i class="bi bi-check-lg"></i> Selecionado
+                            </span>
                         </div>
                         <h5 class="mt-2 fw-bold">${serv.nome}</h5>
                         <p class="text-muted small mb-0">Clique para detalhes</p>
                     </div>
                 `;
-                container.appendChild(col);
+                wrapper.appendChild(slide);
             });
-
+            
+            // Inicializar Swiper apenas com navigation (arrows)
+            const swiper = new Swiper('.servicesSwiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 2.5,
+                        spaceBetween: 30,
+                    },
+                    1024: {
+                        slidesPerView: 3.5,
+                        spaceBetween: 30,
+                    },
+                },
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                loop: servicos.length > 3,
+            });
+            
+            // Adicionar eventos de clique
             document.querySelectorAll('.card-service').forEach(card => {
                 card.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const id = parseInt(card.getAttribute('data-id'));
                     const servico = servicos.find(s => s.id === id);
                     if (servico) {

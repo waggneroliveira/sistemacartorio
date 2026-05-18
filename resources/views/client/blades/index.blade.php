@@ -1,20 +1,100 @@
 @extends('client.core.client')
 @section('content')
+    <style>
+        /* Estilos para o Swiper */
+        .servicesSwiper {
+            padding: 20px 0 60px 0;
+        }
+        /* Esconder pagination/dots */
+        .servicesSwiper .swiper-pagination {
+            display: none !important;
+        }
+        .servicesSwiper .swiper-button-next,
+        .servicesSwiper .swiper-button-prev {
+            top: inherit;
+            bottom: 0;
+        }
+        .servicesSwiper .swiper-button-next{
+            left: 50%;
+            transform: translateX(-50%);
+            margin-left: 5px;
+        }
+        .servicesSwiper .swiper-button-prev{
+            left: inherit;
+            right: 50%;
+            transform: translateX(-50%);
+            margin-right: 5px;
+        }
+        .servicesSwiper .swiper-button-next,
+        .servicesSwiper .swiper-button-prev {
+            background-color: #1a3e2f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .servicesSwiper .swiper-button-next:after,
+        .servicesSwiper .swiper-button-prev:after {
+            font-size: 18px;
+        }
+
+        .servicesSwiper .swiper-pagination-bullet-active {
+            background-color: #1a3e2f;
+        }
+
+        /* Estilos para Owl Carousel */
+        .services-carousel .owl-nav button {
+            background-color: #1a3e2f !important;
+            color: white !important;
+            width: 40px;
+            height: 40px;
+            border-radius: 50% !important;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .services-carousel .owl-nav .owl-prev {
+            left: -20px;
+        }
+
+        .services-carousel .owl-nav .owl-next {
+            right: -20px;
+        }
+
+        .services-carousel .owl-dots .owl-dot.active span {
+            background-color: #1a3e2f !important;
+        }
+
+        /* Card styles */
+        .card-service {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+        }
+
+        .card-service:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
         <!-- HEADER -->
     <div class="text-center mb-5">
         <h1 class="display-6 fw-bold" style="color: #1a3e2f;">Solicite serviços com agilidade</h1>
         <p class="lead text-secondary">Escolha o serviço, preencha os dados específicos e envie seus documentos</p>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
         <!-- COLUNA ESQUERDA: SERVIÇOS + DOCS NECESSÁRIOS -->
-        <div class="col-lg-5">
+        <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h3 class="section-title mb-3"><i class="bi bi-grid-3x3-gap-fill me-2"></i> Escolha um serviço</h3>
                     <p class="text-muted small">Clique em qualquer serviço para ver os documentos exigidos e campos específicos</p>
                     <div class="row g-3" id="servicesContainer">
-                        <!-- Serviços serão injetados via JS -->
+                        <!-- Serviços injetados via JS -->
                     </div>
                 </div>
             </div>
