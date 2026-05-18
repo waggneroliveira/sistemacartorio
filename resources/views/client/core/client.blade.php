@@ -395,10 +395,7 @@
                         spaceBetween: 30,
                     },
                 },
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
-                },
+                autoplay: false,
                 loop: servicos.length > 3,
             });
             
