@@ -50,13 +50,6 @@ class RegistryServiceController extends Controller
 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
-     */
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -69,9 +62,9 @@ class RegistryServiceController extends Controller
             'dynamic_fields.*.type' => 'required|in:text,textarea,select,date,number,email,tel',
             'dynamic_fields.*.name' => 'required|string|max:255|regex:/^[a-zA-Z_][a-zA-Z0-9_]*$/',
             'dynamic_fields.*.label' => 'required|string|max:255',
-            'dynamic_fields.*.obrigatorio' => 'boolean',
+            'dynamic_fields.*.required' => 'boolean',
             'dynamic_fields.*.placeholder' => 'nullable|string|max:255',
-            'dynamic_fields.*.opcoes' => 'nullable|array',
+            'dynamic_fields.*.options' => 'nullable|array',
             'is_active' => 'boolean',
             'display_order' => 'integer|min:0',
         ]);
@@ -83,7 +76,41 @@ class RegistryServiceController extends Controller
             ], 422);
         }
 
-        $service = RegistryService::create($validator->validated());
+        $data = $validator->validated();
+        
+        // Process required_documents - remove empty values and reindex
+        if (isset($data['required_documents']) && is_array($data['required_documents'])) {
+            $documents = array_filter($data['required_documents'], function($value) {
+                return !empty(trim($value));
+            });
+            $data['required_documents'] = array_values($documents);
+        }
+        
+        // Process dynamic_fields - convert field names from Portuguese to English pattern
+        if (isset($data['dynamic_fields']) && is_array($data['dynamic_fields'])) {
+            $processedFields = [];
+            foreach ($data['dynamic_fields'] as $field) {
+                $processedField = [
+                    'type' => $field['type'],
+                    'name' => $field['name'],
+                    'label' => $field['label'],
+                    'required' => $field['required'] ?? false,
+                ];
+                
+                if (isset($field['placeholder'])) {
+                    $processedField['placeholder'] = $field['placeholder'];
+                }
+                
+                if (isset($field['options']) && is_array($field['options'])) {
+                    $processedField['options'] = $field['options'];
+                }
+                
+                $processedFields[] = $processedField;
+            }
+            $data['dynamic_fields'] = $processedFields;
+        }
+
+        $service = RegistryService::create($data);
 
         return response()->json([
             'success' => true,
@@ -92,12 +119,6 @@ class RegistryServiceController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
     public function show(int $id): JsonResponse
     {
         $service = RegistryService::find($id);
@@ -116,14 +137,6 @@ class RegistryServiceController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     * @throws ValidationException
-     */
     public function update(Request $request, int $id): JsonResponse
     {
         $service = RegistryService::find($id);
@@ -145,9 +158,9 @@ class RegistryServiceController extends Controller
             'dynamic_fields.*.type' => 'required|in:text,textarea,select,date,number,email,tel',
             'dynamic_fields.*.name' => 'required|string|max:255|regex:/^[a-zA-Z_][a-zA-Z0-9_]*$/',
             'dynamic_fields.*.label' => 'required|string|max:255',
-            'dynamic_fields.*.obrigatorio' => 'boolean',
+            'dynamic_fields.*.required' => 'boolean',
             'dynamic_fields.*.placeholder' => 'nullable|string|max:255',
-            'dynamic_fields.*.opcoes' => 'nullable|array',
+            'dynamic_fields.*.options' => 'nullable|array',
             'is_active' => 'boolean',
             'display_order' => 'integer|min:0',
         ]);
@@ -159,7 +172,41 @@ class RegistryServiceController extends Controller
             ], 422);
         }
 
-        $service->update($validator->validated());
+        $data = $validator->validated();
+        
+        // Process required_documents - remove empty values and reindex
+        if (isset($data['required_documents']) && is_array($data['required_documents'])) {
+            $documents = array_filter($data['required_documents'], function($value) {
+                return !empty(trim($value));
+            });
+            $data['required_documents'] = array_values($documents);
+        }
+        
+        // Process dynamic_fields - convert field names from Portuguese to English pattern
+        if (isset($data['dynamic_fields']) && is_array($data['dynamic_fields'])) {
+            $processedFields = [];
+            foreach ($data['dynamic_fields'] as $field) {
+                $processedField = [
+                    'type' => $field['type'],
+                    'name' => $field['name'],
+                    'label' => $field['label'],
+                    'required' => $field['required'] ?? false,
+                ];
+                
+                if (isset($field['placeholder'])) {
+                    $processedField['placeholder'] = $field['placeholder'];
+                }
+                
+                if (isset($field['options']) && is_array($field['options'])) {
+                    $processedField['options'] = $field['options'];
+                }
+                
+                $processedFields[] = $processedField;
+            }
+            $data['dynamic_fields'] = $processedFields;
+        }
+
+        $service->update($data);
 
         return response()->json([
             'success' => true,
@@ -168,12 +215,6 @@ class RegistryServiceController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
     public function destroy(int $id): JsonResponse
     {
         $service = RegistryService::find($id);
