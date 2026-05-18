@@ -42,6 +42,11 @@
                 ])
             @endif
 
+            @include('admin.components.dashboard-card', [
+                'route' => route('admin.dashboard.registryService.index'),
+                'icon' => 'mdi-format-list-bulleted',
+                'title' => 'Serviços'
+            ])
             {{-- Tópicos --}}
             @if (Auth::user()->hasRole('Super') || 
             Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 

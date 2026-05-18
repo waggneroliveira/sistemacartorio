@@ -10,13 +10,8 @@ use Illuminate\Validation\ValidationException;
 
 class RegistryServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request): JsonResponse
+
+    public function index(Request $request)
     {
         $query = RegistryService::query();
 
@@ -48,15 +43,11 @@ class RegistryServiceController extends Controller
             $query->ordered();
         }
 
-        // Pagination
-        $perPage = $request->get('per_page', 15);
-        $services = $query->paginate($perPage);
+        $services = $query->get();
+        // dd($services);
 
-        return response()->json([
-            'success' => true,
-            'data' => $services,
-            'message' => 'Registry services retrieved successfully'
-        ]);
+        return view('admin.blades.registryService.index', compact('services'));
+
     }
 
     /**
@@ -337,6 +328,34 @@ class RegistryServiceController extends Controller
             'data' => $service,
             'message' => 'Service status updated successfully'
         ]);
+    }   
+
+    /**
+     * Destroy multiple selected services.
+     */
+    public function destroySelected(Request $request)
+    {
+        $ids = $request->input('ids');
+        if ($ids) {
+            RegistryService::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 400);
+    }
+
+    /**
+     * Update sorting order.
+     */
+    public function sorting(Request $request)
+    {
+        $order = $request->input('order');
+        if ($order) {
+            foreach ($order as $index => $itemId) {
+                RegistryService::where('id', $itemId)->update(['display_order' => $index]);
+            }
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 400);
     }
 
 }

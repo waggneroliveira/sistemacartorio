@@ -101,17 +101,25 @@ Route::prefix('painel/')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        Route::prefix('registry-services')->group(function () {
-            Route::get('/', [RegistryServiceController::class, 'index']);
-            Route::get('/active', [RegistryServiceController::class, 'getActiveServices']);
-            Route::post('/bulk', [RegistryServiceController::class, 'bulkStore']);
-            Route::post('/', [RegistryServiceController::class, 'store']);
-            Route::get('/{id}', [RegistryServiceController::class, 'show']);
-            Route::put('/{id}', [RegistryServiceController::class, 'update']);
-            Route::delete('/{id}', [RegistryServiceController::class, 'destroy']);
-            Route::patch('/{id}/status', [RegistryServiceController::class, 'updateStatus']);
-            Route::patch('/{id}/restore', [RegistryServiceController::class, 'restore']);
-        });
+        Route::resource('registry-services', RegistryServiceController::class)
+        ->names('admin.dashboard.registryService')
+        ->parameters(['registry-services'=>'registryService']);
+        Route::post('registry-services/delete', [RegistryServiceController::class, 'destroySelected'])
+        ->name('admin.dashboard.registryService.destroySelected');
+        Route::post('registry-services/sorting', [RegistryServiceController::class, 'sorting'])
+        ->name('admin.dashboard.registryService.sorting');
+
+        // Route::prefix('registry-services')->group(function () {
+        //     Route::get('/', [RegistryServiceController::class, 'index']);
+        //     Route::get('/active', [RegistryServiceController::class, 'getActiveServices']);
+        //     Route::post('/bulk', [RegistryServiceController::class, 'bulkStore']);
+        //     Route::post('/', [RegistryServiceController::class, 'store']);
+        //     Route::get('/{id}', [RegistryServiceController::class, 'show']);
+        //     Route::put('/{id}', [RegistryServiceController::class, 'update']);
+        //     Route::delete('/{id}', [RegistryServiceController::class, 'destroy']);
+        //     Route::patch('/{id}/status', [RegistryServiceController::class, 'updateStatus']);
+        //     Route::patch('/{id}/restore', [RegistryServiceController::class, 'restore']);
+        // });
 
 
 
