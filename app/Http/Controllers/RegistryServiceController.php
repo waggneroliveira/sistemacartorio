@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\RegistryService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class RegistryServiceController extends Controller
 {
@@ -50,7 +53,7 @@ class RegistryServiceController extends Controller
 
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:registry_services,name',
@@ -70,10 +73,8 @@ class RegistryServiceController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            Alert::error('error', __('dashboard.response_item_error_create'));
+            return redirect()->back();
         }
 
         $data = $validator->validated();
@@ -110,13 +111,17 @@ class RegistryServiceController extends Controller
             $data['dynamic_fields'] = $processedFields;
         }
 
-        $service = RegistryService::create($data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $service,
-            'message' => 'Registry service created successfully'
-        ], 201);
+        try {
+            DB::beginTransaction();
+                $service = RegistryService::create($data);
+            DB::commit();
+            session()->flash('success', __('dashboard.response_item_create'));
+        } catch (\Exception $e) {
+            DB::rollback();            
+            Alert::error('error', __('dashboard.response_item_error_create'));
+        }
+        
+        return redirect()->back();
     }
 
     public function show(int $id): JsonResponse
@@ -215,7 +220,7 @@ class RegistryServiceController extends Controller
         ]);
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id)
     {
         $service = RegistryService::find($id);
 
@@ -228,10 +233,8 @@ class RegistryServiceController extends Controller
 
         $service->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registry service deleted successfully'
-        ]);
+        Session::flash('success',__('dashboard.response_item_delete'));
+        return redirect()->back();
     }
 
     /**

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class RegistryServicePageController extends Controller
 {
-    //
+    public function index(){
+
+    }
 }
 

@@ -109,10 +109,10 @@
     <p class="text-muted mt-1 mb-0">Adicione os documentos necessários para este serviço</p>
 </div>
 
-<div class="mb-3">
+{{-- <div class="mb-3">
     <label for="display_order" class="form-label">Ordem de Exibição</label>
     <input type="number" name="display_order" class="form-control" id="display_order{{isset($service->id)?$service->id:''}}" value="{{isset($service)?$service->display_order:0}}" placeholder="0">
-</div>
+</div> --}}
 
 <div class="col-lg-12">
     <div class="mb-3">
