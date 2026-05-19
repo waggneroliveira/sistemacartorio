@@ -25,6 +25,7 @@ use App\Models\BenefitTopic;
 use App\Models\BlogCategory;
 use App\Models\Contact;
 use App\Models\Direction;
+use App\Models\RegistryService;
 use App\Models\Report;
 use App\Models\Statute;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,8 @@ require __DIR__ . '/dashboard.php';
 Route::get('/', function () {
     return redirect()->route('index');
 });
+Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('index');
+
 Route::get('/meus-pedidos', function () {
     return view('client.blades.orders');
 })->name('orders');
@@ -46,11 +49,10 @@ Route::get('/pagamentos', function () {
     return view('client.blades.payment');
 })->name('payment');
 
-// Rota para página de serviços de cartório
-Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('registry-services');
 
 // API Routes para serviços de cartório
 Route::get('/api/registry-services', [RegistryServicePageController::class, 'getServices'])->name('api.registry-services');
+Route::get('/api/registry-services/{id}', [RegistryServicePageController::class, 'getServiceById'])->name('api.registry-services.show');
 
 // API Routes para solicitações de serviço
 Route::post('/api/registry-service-requests', [RegistryServiceRequestController::class, 'store'])->name('api.registry-service-requests.store');
@@ -111,36 +113,18 @@ Route::get('blog/filter/{category?}', [HomePageController::class, 'filterByCateg
 Route::post('/download-ficha/store', [DownloadFichaController::class, 'store'])
 ->name('download.ficha.store');
 
-View::composer('client.core.client', function ($view) {
-    $blogCategories = BlogCategory::whereHas('blogs')
-    ->active()
-    ->sorting()
-    ->limit(10)
+View::composer('client.blades.index', function ($view) {
+    $services = RegistryService::where('is_active', true)
+    ->orderBy('display_order')
     ->get();
-    $announcements = Announcement::select(
-        'exhibition',
-        'link',
-        'exhibition',
-        'path_image',
-        'active',
-        'sorting',
-    )
-    ->where('exhibition', '=', 'mobile')
-    ->orWhere('exhibition', '=', 'horizontal')
-    ->active()
-    ->sorting()
-    ->get();
-    $contact = Contact::first();
-    $abouts = About::active()->sorting()->get();
-    $directions = Direction::active()->sorting()->count();
-    $benefitTopics = BenefitTopic::active()->sorting()->count();
-    $report = Report::active()->count();
+        
+    // Pré-carregar templates dos campos dinâmicos para cada serviço
+    $dynamicFieldsTemplates = [];
+    foreach ($services as $service) {
+        $dynamicFieldsTemplates[$service->id] = $service->dynamic_fields ?? [];
+    }
+        
 
-    return $view->with('blogCategories', $blogCategories)
-    ->with('announcements', $announcements)
-    ->with('contact', $contact)
-    ->with('directions', $directions)
-    ->with('benefitTopics', $benefitTopics)
-    ->with('report', $report)
-    ->with('abouts', $abouts);
+    return $view->with('services', $services)
+    ->with('dynamicFieldsTemplates', $dynamicFieldsTemplates);
 });

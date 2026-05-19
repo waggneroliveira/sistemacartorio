@@ -25,6 +25,7 @@
         align-items: center;
         flex: 1;
         min-width: 70px;
+        cursor: pointer;
     }
     
     .step-circle {
@@ -338,7 +339,7 @@
         animation: fadeIn 0.3s ease;
     }
     
-    /* Dica flutuante para primeiro acesso */
+    /* Dica flutuante */
     .guide-tip {
         background: #fef9c3;
         border-left: 4px solid #eab308;
@@ -354,6 +355,20 @@
     .guide-tip i {
         color: #eab308;
         font-size: 1rem;
+    }
+    
+    /* Loading */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
     }
     
     /* Responsividade */
@@ -389,7 +404,7 @@
 <!-- STEP INDICATOR - PASSO A PASSO VISUAL -->
 <div class="step-wrapper">
     <div class="step-indicator" id="stepIndicator">
-        <div class="step-item active" data-step="1">
+        <div class="step-item" data-step="1">
             <div class="step-circle">1</div>
             <span class="step-label">Escolher serviço</span>
         </div>
@@ -410,7 +425,6 @@
         </div>
     </div>
     
-    <!-- Dica amigável para novos usuários -->
     <div class="guide-tip mt-2" id="guideTip">
         <i class="bi bi-lightbulb"></i>
         <span>✨ <strong>Dica:</strong> Comece clicando em um serviço na lista ao lado →</span>
@@ -432,10 +446,27 @@
             </div>
         </div>
         <div class="services-list" id="servicesContainer">
-            <div class="text-center py-4 text-secondary">
-                <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
-                <span>Carregando serviços...</span>
-            </div>
+            @forelse($services as $service)
+                <div class="service-item" data-id="{{ $service->id }}" data-name="{{ $service->name }}">
+                    <div class="service-icon">
+                        <i class="bi {{ $service->icon ?? 'bi-file-text' }}"></i>
+                    </div>
+                    <div class="service-info">
+                        <div class="service-name">{{ $service->name }}</div>
+                        <div class="service-desc">
+                            {{ Str::limit($service->instructions ?? 'Clique para ver detalhes', 50) }}
+                        </div>
+                    </div>
+                    <div class="service-check" style="display: none;">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-4 text-secondary">
+                    <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+                    <span>Nenhum serviço disponível no momento</span>
+                </div>
+            @endforelse
         </div>
         <div class="p-2 text-center border-top bg-light">
             <small class="text-muted">
@@ -460,9 +491,10 @@
         
         <div class="card-body p-4">
             <form id="solicitacaoForm" enctype="multipart/form-data">
+                @csrf
                 
-                <input type="hidden" id="selectedServiceId" name="servicoId" value="">
-                <input type="hidden" id="selectedServiceName" name="servicoNome" value="">
+                <input type="hidden" id="selectedServiceId" name="servico_id" value="">
+                <input type="hidden" id="selectedServiceName" name="servico_nome" value="">
                 
                 <!-- Dados básicos -->
                 <div class="mb-3">
@@ -490,9 +522,9 @@
                     </div>
                 </div>
                 
-                <!-- Campos dinâmicos -->
+                <!-- Campos dinâmicos (serão preenchidos via JS) -->
                 <div id="dynamicFieldsContainer" class="mb-4">
-                    <div class="alert alert-light border text-center py-4" id="noServiceSelectedMsg">
+                    <div class="alert alert-light border text-center py-4">
                         <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
                         <span>Selecione um serviço para começar</span>
                     </div>
@@ -538,8 +570,8 @@
         </div>
     </div>
     
-    <!-- COLUNA 3: DOCUMENTOS NECESSÁRIOS (SEMPRE VISÍVEL) -->
-    <div class="documentos-card">
+    <!-- COLUNA 3: DOCUMENTOS NECESSÁRIOS -->
+    <div class="documentos-card" id="documentosCard">
         <div class="documentos-header">
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-file-earmark-check fs-5"></i>
@@ -562,4 +594,496 @@
         </div>
     </div>
 </div>
+
+<script>
+    // ==================== VARIÁVEIS GLOBAIS ====================
+let selectedServiceId = null;
+let uploadedFiles = [];
+const MAX_FILES = 8;
+
+// ==================== ATUALIZAR STEP INDICATOR ====================
+function updateStepIndicator(step) {
+    const steps = document.querySelectorAll('.step-item');
+    steps.forEach((item, index) => {
+        const stepNum = index + 1;
+        item.classList.remove('active', 'completed');
+        
+        if (stepNum < step) {
+            item.classList.add('completed');
+        } else if (stepNum === step) {
+            item.classList.add('active');
+        }
+    });
+    
+    const guideTip = document.getElementById('guideTip');
+    if (guideTip) {
+        const tips = {
+            1: '✨ <strong>Dica:</strong> Comece clicando em um serviço na lista ao lado →',
+            2: '📋 <strong>Dica:</strong> Verifique os documentos necessários e organize-os antes de enviar',
+            3: '✏️ <strong>Dica:</strong> Preencha todos os campos em vermelho (são obrigatórios)',
+            4: '📎 <strong>Dica:</strong> Selecione os documentos e clique em Enviar'
+        };
+        guideTip.innerHTML = `<i class="bi bi-lightbulb"></i> ${tips[step] || tips[1]}`;
+    }
+}
+
+// ==================== RENDERIZAR CAMPOS DINÂMICOS ====================
+function renderDynamicFields(fields) {
+    if (!fields || !Array.isArray(fields) || fields.length === 0) {
+        return '<div class="alert alert-light border text-center py-4">Nenhum campo adicional necessário para este serviço.</div>';
+    }
+    
+    let html = '<div class="dynamic-fields-wrapper">';
+    html += '<div class="alert alert-success py-2 mb-3 small"><i class="bi bi-file-text"></i> <strong>Dados específicos do serviço selecionado</strong></div>';
+    
+    fields.forEach(campo => {
+        const obrigatorio = campo.required ? 'required' : '';
+        const requiredStar = campo.required ? '<span class="text-danger">*</span>' : '';
+        
+        html += `<div class="mb-3 dynamic-field">`;
+        html += `<label class="form-label">${campo.label} ${requiredStar}</label>`;
+        
+        switch(campo.type) {
+            case 'text':
+                html += `<input type="text" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorio}>`;
+                break;
+            case 'number':
+                html += `<input type="number" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorio} step="any">`;
+                break;
+            case 'date':
+                html += `<input type="date" class="form-control" name="${campo.name}" ${obrigatorio}>`;
+                break;
+            case 'email':
+                html += `<input type="email" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorio}>`;
+                break;
+            case 'tel':
+                html += `<input type="tel" class="form-control" name="${campo.name}" placeholder="${campo.placeholder || ''}" ${obrigatorio}>`;
+                break;
+            case 'select':
+                html += `<select class="form-select" name="${campo.name}" ${obrigatorio}>`;
+                html += `<option value="">Selecione...</option>`;
+                if (Array.isArray(campo.options) && campo.options.length > 0) {
+                    campo.options.forEach(op => {
+                        html += `<option value="${op}">${op}</option>`;
+                    });
+                }
+                html += `</select>`;
+                break;
+            case 'textarea':
+                html += `<textarea class="form-control" name="${campo.name}" rows="3" placeholder="${campo.placeholder || ''}" ${obrigatorio}></textarea>`;
+                break;
+            default:
+                html += `<input type="text" class="form-control" name="${campo.name}" ${obrigatorio}>`;
+        }
+        
+        html += `</div>`;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+// ==================== ATUALIZAR DOCUMENTOS ====================
+function updateDocuments(documents, serviceName, instructions) {
+    const docsDiv = document.getElementById('docsExplanation');
+    if (!docsDiv) return;
+    
+    // Garantir que documents seja um array
+    let docsArray = [];
+    if (Array.isArray(documents)) {
+        docsArray = documents;
+    } else if (typeof documents === 'string') {
+        try {
+            const parsed = JSON.parse(documents);
+            docsArray = Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            docsArray = [];
+        }
+    }
+    
+    if (!docsArray || docsArray.length === 0) {
+        docsDiv.innerHTML = `
+            <div class="text-center py-4 text-secondary">
+                <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                <span>Este serviço não requer documentos específicos</span>
+            </div>
+        `;
+        return;
+    }
+    
+    let docsHtml = `
+        <div class="mb-3 pb-2 border-bottom">
+            <strong class="text-success">${serviceName}</strong>
+            <p class="small text-muted mt-1 mb-0">${instructions || 'Envie os documentos abaixo:'}</p>
+        </div>
+        <ul class="list-unstyled mb-3">
+    `;
+    
+    docsArray.forEach(doc => {
+        if (doc && typeof doc === 'string') {
+            docsHtml += `<li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1" style="font-size: 0.75rem;"></i>
+                            <span>${escapeHtml(doc)}</span>
+                        </li>`;
+        }
+    });
+    
+    docsHtml += `</ul>
+        <div class="alert alert-warning small mt-2 mb-0 py-2">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Atenção:</strong> Documentos ilegíveis ou incompletos podem atrasar seu pedido.
+        </div>
+    `;
+    
+    docsDiv.innerHTML = docsHtml;
+}
+
+// ==================== FUNÇÃO DE ESCAPE HTML ====================
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ==================== SELECIONAR SERVIÇO ====================
+async function selectService(serviceId, serviceName) {
+    selectedServiceId = serviceId;
+    document.getElementById('selectedServiceId').value = serviceId;
+    document.getElementById('selectedServiceName').value = serviceName;
+    
+    // Atualizar UI dos cards
+    document.querySelectorAll('.service-item').forEach(item => {
+        item.classList.remove('selected');
+        const badge = item.querySelector('.service-check');
+        if (badge) badge.style.display = 'none';
+    });
+    
+    const targetItem = document.querySelector(`.service-item[data-id="${serviceId}"]`);
+    if (targetItem) {
+        targetItem.classList.add('selected');
+        const badge = targetItem.querySelector('.service-check');
+        if (badge) badge.style.display = 'flex';
+    }
+    
+    // Mostrar loading nos campos dinâmicos
+    const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+    dynamicContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Carregando campos do serviço...</p></div>';
+    
+    // Buscar dados do serviço via AJAX
+    try {
+        const response = await fetch(`/api/registry-services/${serviceId}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const service = result.data;
+            
+            // Garantir que documentos seja array
+            let documentos = [];
+            if (Array.isArray(service.documentos)) {
+                documentos = service.documentos;
+            } else if (typeof service.documentos === 'string') {
+                try {
+                    const parsed = JSON.parse(service.documentos);
+                    documentos = Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    documentos = [];
+                }
+            }
+            
+            // Garantir que camposDinamicos seja array
+            let campos = [];
+            if (Array.isArray(service.camposDinamicos)) {
+                campos = service.camposDinamicos;
+            } else if (typeof service.camposDinamicos === 'string') {
+                try {
+                    const parsed = JSON.parse(service.camposDinamicos);
+                    campos = Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    campos = [];
+                }
+            }
+            
+            // Atualizar documentos
+            updateDocuments(documentos, service.nome, service.instrucoes);
+            
+            // Renderizar campos dinâmicos
+            dynamicContainer.innerHTML = renderDynamicFields(campos);
+            
+            updateStepIndicator(3);
+        } else {
+            dynamicContainer.innerHTML = '<div class="alert alert-danger text-center">Erro ao carregar campos do serviço.</div>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar serviço:', error);
+        dynamicContainer.innerHTML = '<div class="alert alert-danger text-center">Erro ao carregar campos do serviço. Tente novamente.</div>';
+    }
+}
+
+// ==================== FUNÇÕES DE UPLOAD ====================
+function updateFileListUI() {
+    const fileListContainer = document.getElementById('fileListContainer');
+    const fileListUl = document.getElementById('fileList');
+    
+    if (!fileListContainer || !fileListUl) return;
+    
+    if (uploadedFiles.length === 0) {
+        fileListContainer.classList.add('d-none');
+        return;
+    }
+    
+    fileListContainer.classList.remove('d-none');
+    fileListUl.innerHTML = '';
+    
+    uploadedFiles.forEach((file, idx) => {
+        const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+        const li = document.createElement('li');
+        li.className = 'd-flex justify-content-between align-items-center border-bottom pb-2 mb-2';
+        li.innerHTML = `
+            <div><i class="bi bi-file-earmark-text me-2"></i> <strong>${escapeHtml(file.name)}</strong> <span class="text-muted small">(${sizeMB} MB)</span></div>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-circle remove-file" data-index="${idx}"><i class="bi bi-x-lg"></i></button>
+        `;
+        fileListUl.appendChild(li);
+    });
+    
+    document.querySelectorAll('.remove-file').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(btn.getAttribute('data-index'));
+            if (!isNaN(index)) {
+                uploadedFiles.splice(index, 1);
+                updateFileListUI();
+                const fileInput = document.getElementById('fileInput');
+                if (fileInput) fileInput.value = '';
+                
+                if (uploadedFiles.length > 0) {
+                    updateStepIndicator(4);
+                } else {
+                    updateStepIndicator(3);
+                }
+            }
+            e.stopPropagation();
+        });
+    });
+}
+
+function addFiles(files) {
+    const fileArray = Array.from(files);
+    let addedCount = 0;
+    
+    for (let f of fileArray) {
+        if (uploadedFiles.length >= MAX_FILES) {
+            alert(`Máximo de ${MAX_FILES} arquivos permitidos.`);
+            break;
+        }
+        if (!f.type.match('image.*') && !f.type.match('application/pdf')) {
+            alert(`Arquivo ${f.name} não é suportado. Use PDF, JPG ou PNG.`);
+            continue;
+        }
+        if (f.size > 10 * 1024 * 1024) {
+            alert(`Arquivo ${f.name} excede 10MB.`);
+            continue;
+        }
+        uploadedFiles.push(f);
+        addedCount++;
+    }
+    
+    if (addedCount > 0) {
+        updateFileListUI();
+        updateStepIndicator(4);
+    }
+}
+
+// ==================== ENVIO DO FORMULÁRIO ====================
+async function submitForm(event) {
+    event.preventDefault();
+    
+    const nome = document.getElementById('nomeCompleto').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const servicoId = document.getElementById('selectedServiceId').value;
+    
+    if (!nome || !email || !telefone) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Dados incompletos',
+            text: 'Por favor, preencha nome, e-mail e telefone.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (!servicoId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Serviço não selecionado',
+            text: 'Você deve selecionar um serviço para continuar.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    // Validar campos dinâmicos obrigatórios
+    const dynamicFields = document.querySelectorAll('#dynamicFieldsContainer .dynamic-field');
+    for (let field of dynamicFields) {
+        const requiredInput = field.querySelector('[required]');
+        if (requiredInput && !requiredInput.value.trim()) {
+            const label = field.querySelector('.form-label')?.innerText || 'Campo';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo obrigatório',
+                text: `Por favor, preencha o campo "${label.replace('*', '')}".`,
+                confirmButtonText: 'OK'
+            });
+            requiredInput.focus();
+            return;
+        }
+    }
+    
+    if (uploadedFiles.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Documentos não enviados',
+            text: 'Envie ao menos um documento para processar a solicitação.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Processando...',
+        html: 'Enviando sua solicitação. Por favor, aguarde.',
+        allowOutsideClick: false,
+        didOpen: async () => {
+            Swal.showLoading();
+            
+            const formData = new FormData();
+            formData.append('nome', nome);
+            formData.append('email', email);
+            formData.append('telefone', telefone);
+            formData.append('servico_id', servicoId);
+            
+            // Campos dinâmicos
+            const dynamicInputs = document.querySelectorAll('#dynamicFieldsContainer input, #dynamicFieldsContainer select, #dynamicFieldsContainer textarea');
+            dynamicInputs.forEach(input => {
+                if (input.name) {
+                    formData.append(input.name, input.value);
+                }
+            });
+            
+            // Arquivos
+            uploadedFiles.forEach((file, idx) => {
+                formData.append(`documento_${idx}`, file);
+            });
+            
+            try {
+                const response = await fetch('/api/registry-service-requests', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    Swal.close();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Solicitação enviada!',
+                        html: `
+                            <p>Olá, <strong>${escapeHtml(nome)}</strong>! Sua solicitação foi recebida com sucesso.</p>
+                            <p>Você enviou <strong>${uploadedFiles.length} arquivo(s)</strong>.</p>
+                            <p>Em breve um atendente entrará em contato.</p>
+                            <hr>
+                            <small class="text-muted">Protocolo: <strong>#${result.protocol || result.request_id}</strong></small>
+                        `,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao enviar',
+                        text: result.message || 'Ocorreu um erro ao processar sua solicitação.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro de conexão',
+                    text: 'Não foi possível enviar sua solicitação. Verifique sua conexão.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    });
+}
+
+// ==================== INICIALIZAÇÃO ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Clique nos serviços
+    document.querySelectorAll('.service-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const id = parseInt(item.getAttribute('data-id'));
+            const name = item.getAttribute('data-name');
+            selectService(id, name);
+        });
+    });
+    
+    // Upload de arquivos
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const selectBtn = document.getElementById('selectFilesBtn');
+    
+    if (dropzone) {
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#e9f3ef';
+            dropzone.style.borderColor = '#1a3e2f';
+        });
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.style.backgroundColor = '#fafcfb';
+            dropzone.style.borderColor = '#cbd5e1';
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.backgroundColor = '#fafcfb';
+            dropzone.style.borderColor = '#cbd5e1';
+            if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+        });
+    }
+    
+    if (selectBtn) {
+        selectBtn.addEventListener('click', () => fileInput.click());
+    }
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) addFiles(e.target.files);
+            fileInput.value = '';
+        });
+    }
+    
+    // Envio do formulário
+    const form = document.getElementById('solicitacaoForm');
+    if (form) {
+        form.addEventListener('submit', submitForm);
+    }
+    
+    // Selecionar primeiro serviço automaticamente
+    const firstService = document.querySelector('.service-item');
+    if (firstService) {
+        const id = parseInt(firstService.getAttribute('data-id'));
+        const name = firstService.getAttribute('data-name');
+        selectService(id, name);
+    }
+});
+</script>
 @endsection

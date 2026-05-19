@@ -109,6 +109,24 @@ Route::prefix('painel/')->group(function () {
         Route::post('registry-services/sorting', [RegistryServiceController::class, 'sorting'])
         ->name('admin.dashboard.registryService.sorting');
 
+
+    // Em routes/web.php (admin)
+// Route::prefix('admin')->middleware(['auth'])->group(function () {
+//     Route::prefix('dashboard')->group(function () {
+//         // Rotas para gerenciar serviços
+//         Route::resource('registryService', RegistryServiceController::class);
+//     });
+// });
+
+// // Em routes/api.php (para o frontend)
+// Route::prefix('api')->group(function () {
+//     Route::get('registry-services', [RegistryServiceController::class, 'apiIndex']);
+//     Route::get('registry-services/{id}', [RegistryServiceController::class, 'apiShow']);
+//     Route::post('registry-service-requests', [RegistryServiceRequestController::class, 'apiStore']);
+// });
+
+        // Route::resource('registryService', RegistryServiceController::class);
+
         // Route::prefix('registry-services')->group(function () {
         //     Route::get('/', [RegistryServiceController::class, 'index']);
         //     Route::get('/active', [RegistryServiceController::class, 'getActiveServices']);
