@@ -39,6 +39,9 @@ Route::get('/', function () {
 Route::get('/meus-pedidos', function () {
     return view('client.blades.orders');
 })->name('orders');
+Route::get('/meus-perfil', function () {
+    return view('client.blades.profile');
+})->name('profile');
 
 // Rota para página de serviços de cartório
 Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('registry-services');
