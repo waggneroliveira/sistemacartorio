@@ -140,7 +140,597 @@
             .whatsapp-float:hover{ transform: translateY(-50%); }
         }
     </style>
-
+    <style>
+        /* ========== ESTILOS DA PÁGINA DE PAGAMENTO ========== */
+        
+        .pagamento-page {
+            background: #f8fbf9;
+            min-height: calc(100vh - 300px);
+        }
+        
+        /* Header */
+        .pagamento-header {
+            background: white;
+            border-bottom: 1px solid #e8ece9;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+        
+        .breadcrumb-item a {
+            color: #7a8f85;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: #1a5c42;
+            font-weight: 500;
+        }
+        
+        .pagamento-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2f29;
+            margin-bottom: 10px;
+        }
+        
+        .pagamento-subtitle {
+            color: #7a8f85;
+            margin: 0;
+        }
+        
+        .pedido-info-header {
+            background: #f8fbf9;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: inline-flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .badge-status {
+            background: #fff3e0;
+            color: #ed6c02;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Cards */
+        .pagamento-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2f29;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .card-title i {
+            color: #1a5c42;
+            margin-right: 10px;
+        }
+        
+        /* Métodos de Pagamento */
+        .payment-method {
+            border: 2px solid #e8ece9;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .payment-method:hover {
+            border-color: #cbd5e1;
+        }
+        
+        .payment-method.selected {
+            border-color: #1a5c42;
+            background: #f8fbf9;
+        }
+        
+        .payment-method-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .payment-method-header:hover {
+            background: #fafcfb;
+        }
+        
+        .payment-radio {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .custom-radio {
+            width: 45px;
+            height: 45px;
+            background: #f0f7f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .custom-radio i {
+            font-size: 1.4rem;
+            color: #1a5c42;
+        }
+        
+        .payment-info strong {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .payment-info small {
+            font-size: 0.75rem;
+            color: #7a8f85;
+        }
+        
+        .payment-icons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #7a8f85;
+            font-size: 0.8rem;
+        }
+        
+        .payment-icons i {
+            font-size: 1.2rem;
+        }
+        
+        .payment-form {
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid #e8ece9;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* PIX */
+        .pix-container {
+            padding: 15px 0;
+        }
+        
+        .pix-discount-banner {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6d9);
+            color: #1a5c42;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .pix-qrcode {
+            margin-bottom: 20px;
+        }
+        
+        .qrcode-placeholder {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 2px solid #e8ece9;
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qrcode-placeholder i {
+            font-size: 4rem;
+            color: #1a5c42;
+            margin-bottom: 10px;
+        }
+        
+        .qrcode-placeholder p {
+            font-size: 0.8rem;
+            color: #7a8f85;
+            margin: 0;
+        }
+        
+        .btn-copy-pix {
+            background: #1a5c42;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-copy-pix:hover {
+            background: #0a2b1f;
+            transform: translateY(-2px);
+        }
+        
+        .pix-details {
+            background: #f8fbf9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .pix-details span {
+            display: block;
+            font-size: 0.7rem;
+            color: #7a8f85;
+            margin-bottom: 4px;
+        }
+        
+        .pix-timer {
+            text-align: center;
+            padding: 15px;
+            background: #fff3e0;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        
+        /* Boleto */
+        .boleto-container {
+            padding: 15px 0;
+        }
+        
+        .boleto-info-card {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .boleto-info-card i {
+            font-size: 1.5rem;
+            color: #1976d2;
+        }
+        
+        .boleto-info-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        
+        .boleto-customer-info {
+            margin-bottom: 20px;
+        }
+        
+        .boleto-customer-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #1f2f29;
+        }
+        
+        .btn-gerar-boleto {
+            width: 100%;
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-gerar-boleto:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+        }
+        
+        /* Link de Pagamento */
+        .link-container {
+            padding: 15px 0;
+        }
+        
+        .link-info-card {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .link-info-card i {
+            font-size: 1.5rem;
+            color: #7b1fa2;
+        }
+        
+        .btn-validar-link {
+            background: #7b1fa2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .link-example {
+            margin-top: 10px;
+            color: #7a8f85;
+            font-size: 0.7rem;
+        }
+        
+        /* Cupom */
+        .cupom-container {
+            margin-top: 10px;
+        }
+        
+        .btn-aplicar-cupom {
+            background: #1a5c42;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .cupom-message {
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        /* Botões de Ação */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn-voltar {
+            flex: 1;
+            background: white;
+            border: 2px solid #e8ece9;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-voltar:hover {
+            background: #f8fbf9;
+            border-color: #cbd5e1;
+        }
+        
+        .btn-finalizar {
+            flex: 2;
+            background: linear-gradient(135deg, #1a5c42, #0a2b1f);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-finalizar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26,92,66,0.3);
+        }
+        
+        /* Resumo Card */
+        .resumo-card, .resumo-card-mobile {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            position: sticky;
+            top: 100px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        
+        .resumo-card h3, .resumo-card-mobile h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .resumo-items {
+            margin-bottom: 20px;
+        }
+        
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #5a6e65;
+        }
+        
+        .resumo-item.desconto {
+            color: #2e7d32;
+        }
+        
+        .resumo-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 2px solid #f0f2f5;
+            font-size: 1.2rem;
+        }
+        
+        .resumo-detalhes {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e8ece9;
+        }
+        
+        .detalhe-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: #7a8f85;
+        }
+        
+        /* Selos de Segurança */
+        .security-seals {
+            margin-top: 20px;
+        }
+        
+        .seal-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .seal-item i {
+            font-size: 2rem;
+            color: #1a5c42;
+        }
+        
+        .seal-item strong {
+            display: block;
+            font-size: 0.85rem;
+        }
+        
+        .seal-item small {
+            font-size: 0.7rem;
+            color: #7a8f85;
+        }
+        
+        /* Modais */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .success-icon i {
+            font-size: 3rem;
+            color: #2e7d32;
+        }
+        
+        .protocolo-box {
+            background: #f8fbf9;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .btn-ok {
+            background: #1a5c42;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+        
+        .boleto-icon {
+            width: 80px;
+            height: 80px;
+            background: #e3f2fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .boleto-icon i {
+            font-size: 3rem;
+            color: #1976d2;
+        }
+        
+        .boleto-linha-digitavel {
+            background: #f8fbf9;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .boleto-linha-digitavel strong {
+            font-size: 0.7rem;
+            word-break: break-all;
+        }
+        
+        .btn-baixar-boleto {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .pagamento-header {
+                padding: 20px 0;
+            }
+            
+            .pagamento-title {
+                font-size: 1.5rem;
+            }
+            
+            .payment-method-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .payment-icons {
+                align-self: flex-start;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .resumo-card {
+                position: relative;
+                top: 0;
+            }
+            
+            .payment-form {
+                padding: 0 10px 10px 10px;
+            }
+        }
+    </style>
     <style>
         body {
             background: #f0f2f5;
@@ -725,6 +1315,11 @@
                                 <i class="bi bi-person me-2"></i>Meu Perfil
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" href="{{route('payment')}}">
+                                <i class="bi bi-coin me-2"></i>Pagamentos
+                            </a>
+                        </li>
                     </ul>
                     
                     <div class="d-flex align-items-center gap-2">
@@ -830,7 +1425,7 @@
                 <div class="col-12">
                     <hr style="border-color: rgba(255,255,255,0.1);">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="payment-methods">
+                        <div class="payment-methods d-flex">
                             <i class="bi bi-credit-card-2-front"></i>
                             <i class="bi bi-bank"></i>
                             <i class="bi bi-cash-stack"></i>
