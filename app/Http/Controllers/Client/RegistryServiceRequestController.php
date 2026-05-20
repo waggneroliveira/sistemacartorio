@@ -133,9 +133,26 @@ class RegistryServiceRequestController extends Controller
             }
 
             /**
-             * Verificar documentos
+             * Verificar documentos obrigatórios
+             * Só exigir documentos se o serviço tiver documentos obrigatórios
              */
-            if (empty($uploadedFilesInfo)) {
+            $hasRequiredDocuments = false;
+            
+            if ($service->documentos && is_array($service->documentos) && count($service->documentos) > 0) {
+                $hasRequiredDocuments = true;
+            } elseif ($service->documentos && is_string($service->documentos)) {
+                try {
+                    $docsArray = json_decode($service->documentos, true);
+                    if (is_array($docsArray) && count($docsArray) > 0) {
+                        $hasRequiredDocuments = true;
+                    }
+                } catch (\Exception $e) {
+                    // Se não conseguir fazer parse, considera como sem documentos
+                }
+            }
+            
+            // Exigir documentos apenas se houver documentos obrigatórios
+            if ($hasRequiredDocuments && empty($uploadedFilesInfo)) {
 
                 return response()->json([
                     'success' => false,

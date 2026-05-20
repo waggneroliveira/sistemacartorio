@@ -531,7 +531,7 @@
                 </div>
 
                 <!-- Upload -->
-                <div class="mb-4">
+                <div class="mb-4" id="uploadSection" style="display: none;">
                     <label class="form-label required-field">
                         <i class="bi bi-cloud-upload"></i> 3. Envie os documentos
                     </label>
@@ -686,7 +686,9 @@ function renderDynamicFields(fields) {
 // ==================== ATUALIZAR DOCUMENTOS ====================
 function updateDocuments(documents, serviceName, instructions) {
     const docsDiv = document.getElementById('docsExplanation');
-    if (!docsDiv) return;
+    const uploadSection = document.getElementById('uploadSection');
+    
+    if (!docsDiv || !uploadSection) return;
     
     // Garantir que documents seja um array
     let docsArray = [];
@@ -702,6 +704,8 @@ function updateDocuments(documents, serviceName, instructions) {
     }
     
     if (!docsArray || docsArray.length === 0) {
+        // Sem documentos necessários - esconder apenas upload
+        uploadSection.style.display = 'none';
         docsDiv.innerHTML = `
             <div class="text-center py-4 text-secondary">
                 <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
@@ -710,6 +714,9 @@ function updateDocuments(documents, serviceName, instructions) {
         `;
         return;
     }
+    
+    // Com documentos necessários - mostrar upload
+    uploadSection.style.display = 'block';
     
     let docsHtml = `
         <div class="mb-3 pb-2 border-bottom">
@@ -939,7 +946,9 @@ async function submitForm(event) {
         }
     }
     
-    if (uploadedFiles.length === 0) {
+    // Validar documentos apenas se a seção de upload estiver visível
+    const uploadSection = document.getElementById('uploadSection');
+    if (uploadSection && uploadSection.style.display !== 'none' && uploadedFiles.length === 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Documentos não enviados',
