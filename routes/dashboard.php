@@ -26,6 +26,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\RegistryServiceController;
+use App\Http\Controllers\RegistryServiceRequestDashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceLocationController;
@@ -108,6 +109,19 @@ Route::prefix('painel/')->group(function () {
         ->name('admin.dashboard.registryService.destroySelected');
         Route::post('registry-services/sorting', [RegistryServiceController::class, 'sorting'])
         ->name('admin.dashboard.registryService.sorting');
+
+        // SOLICITAÇÕES DE SERVIÇOS
+        Route::prefix('solicitacoes-de-servicos')->name('admin.dashboard.registryServiceRequest.')->group(function() {
+            Route::get('/', [RegistryServiceRequestDashboardController::class, 'index'])->name('index');
+            Route::get('/{id}', [RegistryServiceRequestDashboardController::class, 'show'])->name('show');
+            Route::patch('/{id}/status', [RegistryServiceRequestDashboardController::class, 'updateStatus'])->name('updateStatus');
+            Route::post('/{id}/observation', [RegistryServiceRequestDashboardController::class, 'addObservation'])->name('addObservation');
+            Route::post('/{id}/request-documents', [RegistryServiceRequestDashboardController::class, 'requestDocuments'])->name('requestDocuments');
+            Route::post('/{id}/approve-documents', [RegistryServiceRequestDashboardController::class, 'approveDocuments'])->name('approveDocuments');
+            Route::post('/{id}/close', [RegistryServiceRequestDashboardController::class, 'closeRequest'])->name('closeRequest');
+            Route::post('/{id}/reopen', [RegistryServiceRequestDashboardController::class, 'reopenRequest'])->name('reopenRequest');
+            Route::post('/bulk-action', [RegistryServiceRequestDashboardController::class, 'bulkAction'])->name('bulkAction');
+        });
 
 
     // Em routes/web.php (admin)

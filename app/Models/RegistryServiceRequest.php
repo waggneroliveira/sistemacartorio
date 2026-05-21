@@ -21,11 +21,17 @@ class RegistryServiceRequest extends Model
         'uploaded_files',
         'status',
         'admin_notes',
+        'document_requests',
+        'document_approval',
+        'closing_data',
     ];
 
     protected $casts = [
         'dynamic_fields_data' => 'array',
         'uploaded_files' => 'array',
+        'document_requests' => 'array',
+        'document_approval' => 'array',
+        'closing_data' => 'array',
     ];
 
     /**

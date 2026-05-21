@@ -49,8 +49,8 @@
             ])
 
             @include('admin.components.dashboard-card', [
-                'route' => route('admin.dashboard.registryService.index'),
-                'icon' => 'mdi-format-list-bulleted',
+                'route' => route('admin.dashboard.registryServiceRequest.index'),
+                'icon' => 'mdi-file-document-multiple',
                 'title' => 'Solicitações'
             ])
             {{-- Tópicos --}}
