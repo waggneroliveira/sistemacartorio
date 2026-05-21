@@ -13,8 +13,24 @@ class OrdersPageController extends Controller
      */
     public function index(Request $request)
     {
-        // Obter email do cliente (por sessão, query param ou cookie)
+        // TEMPORÁRIO: Retorna todos os pedidos para teste
+        // Depois você substitui pelo usuário logado: auth()->user()->email
         $clientEmail = $request->query('email') ?? session('client_email') ?? null;
+        
+        // SE NÃO TIVER EMAIL, BUSCA TODOS OS PEDIDOS (para teste)
+        // OU você pode definir um email fixo para teste
+        if (!$clientEmail) {
+            // Opção 1: Retornar todos os pedidos (para desenvolvimento)
+            $dbRequests = RegistryServiceRequest::with('service')->orderBy('created_at', 'desc')->get();
+            
+            // Opção 2: Usar um email fixo para teste (descomente a linha abaixo e comente a de cima)
+            // $dbRequests = RegistryServiceRequest::where('email', 'teste@teste.com')->with('service')->orderBy('created_at', 'desc')->get();
+        } else {
+            $dbRequests = RegistryServiceRequest::where('email', $clientEmail)
+                ->with('service')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         $requests = [];
         $stats = [
@@ -24,35 +40,33 @@ class OrdersPageController extends Controller
             'aguardandoPagamento' => 0,
         ];
 
-        // Se temos um email, buscar solicitações
-        if ($clientEmail) {
-            $requests = RegistryServiceRequest::where('email', $clientEmail)
-                ->with('service')
-                ->orderBy('created_at', 'desc')
-                ->get()
-                ->map(function ($request) {
-                    return [
-                        'id' => $request->id,
-                        'protocolo' => 'CART-' . str_pad($request->id, 5, '0', STR_PAD_LEFT),
-                        'servico' => $request->service?->name ?? 'Serviço indisponível',
-                        'dataSolicitacao' => $request->created_at->format('Y-m-d'),
-                        'status' => $this->mapStatus($request->status),
-                        'statusTexto' => $this->getStatusLabel($request->status),
-                        'valor' => $this->getValorServico($request->service),
-                        'descricao' => $request->service?->description ?? 'Sem descrição',
-                        'documentos' => $request->uploaded_files ?? [],
-                        'pagamento' => [
-                            'status' => 'pendente',
-                            'data' => null,
-                            'metodo' => null,
-                        ],
-                        'historico' => $this->buildHistorico($request),
-                        'camposAdicionais' => $request->dynamic_fields_data ?? [],
-                        'clienteNome' => $request->full_name,
-                        'clienteEmail' => $request->email,
-                        'clienteTelefone' => $request->phone,
-                    ];
-                });
+        if ($dbRequests && $dbRequests->count() > 0) {
+            $requests = $dbRequests->map(function ($request) {
+                // Log para debug
+                \Log::info('Processando request ID: ' . $request->id . ', Status: ' . $request->status);
+                
+                return [
+                    'id' => $request->id,
+                    'protocolo' => 'CART-' . str_pad($request->id, 5, '0', STR_PAD_LEFT),
+                    'servico' => $request->service?->name ?? 'Serviço indisponível',
+                    'dataSolicitacao' => $request->created_at->format('Y-m-d'),
+                    'status' => $this->mapStatus($request->status),
+                    'statusTexto' => $this->getStatusLabel($request->status),
+                    'valor' => $this->getValorServico($request->service),
+                    'descricao' => $request->service?->description ?? 'Sem descrição',
+                    'documentos' => $this->getUploadedFiles($request),
+                    'pagamento' => [
+                        'status' => $request->payment_status ?? 'pendente',
+                        'data' => $request->payment_date ?? null,
+                        'metodo' => $request->payment_method ?? null,
+                    ],
+                    'historico' => $this->buildHistorico($request),
+                    'camposAdicionais' => $this->getDynamicFields($request),
+                    'clienteNome' => $request->full_name ?? 'Cliente',
+                    'clienteEmail' => $request->email ?? 'email@exemplo.com',
+                    'clienteTelefone' => $request->phone ?? '(00) 00000-0000',
+                ];
+            });
 
             // Calcular estatísticas
             $stats['total'] = $requests->count();
@@ -61,10 +75,14 @@ class OrdersPageController extends Controller
             $stats['aguardandoPagamento'] = $requests->filter(fn($r) => $r['status'] === 'aguardando_pagamento')->count();
         }
 
+        // Log para debug
+        \Log::info('Total de requests encontrados: ' . count($requests));
+        \Log::info('Stats: ', $stats);
+// dd($requests, $stats);
         return view('client.blades.orders', [
             'requests' => $requests,
             'stats' => $stats,
-            'clientEmail' => $clientEmail,
+            'clientEmail' => $clientEmail, // Mantido para compatibilidade
         ]);
     }
 
@@ -103,13 +121,10 @@ class OrdersPageController extends Controller
     }
 
     /**
-     * Obter valor do serviço (placeholder)
+     * Obter valor do serviço
      */
     private function getValorServico($service)
     {
-        // TODO: Implementar tabela de valores dos serviços
-        // Por enquanto, retornar um valor padrão baseado no tipo de serviço
-        
         if (!$service) {
             return 89.90;
         }
@@ -129,7 +144,37 @@ class OrdersPageController extends Controller
             }
         }
 
-        return 150.00; // Valor padrão
+        return 150.00;
+    }
+
+    /**
+     * Obter arquivos enviados
+     */
+    private function getUploadedFiles($request)
+    {
+        if (isset($request->uploaded_files) && $request->uploaded_files) {
+            if (is_string($request->uploaded_files)) {
+                $files = json_decode($request->uploaded_files, true);
+                return is_array($files) ? $files : [];
+            }
+            return is_array($request->uploaded_files) ? $request->uploaded_files : [];
+        }
+        return [];
+    }
+
+    /**
+     * Obter campos dinâmicos
+     */
+    private function getDynamicFields($request)
+    {
+        if (isset($request->dynamic_fields_data) && $request->dynamic_fields_data) {
+            if (is_string($request->dynamic_fields_data)) {
+                $fields = json_decode($request->dynamic_fields_data, true);
+                return is_array($fields) ? $fields : [];
+            }
+            return is_array($request->dynamic_fields_data) ? $request->dynamic_fields_data : [];
+        }
+        return [];
     }
 
     /**
@@ -139,28 +184,20 @@ class OrdersPageController extends Controller
     {
         $historico = [];
 
-        // Evento de criação
+        // Evento de criação - sempre o primeiro
         $historico[] = [
-            'data' => $request->created_at->format('Y-m-d H:i'),
+            'data' => $request->created_at->format('d/m/Y H:i'),
             'status' => 'Solicitação recebida',
             'descricao' => 'Pedido criado com sucesso',
         ];
 
-        // Se tem observações (admin_notes), adicionar
-        if ($request->admin_notes) {
-            $notes = is_string($request->admin_notes) 
-                ? json_decode($request->admin_notes, true) 
-                : $request->admin_notes;
-
-                if (is_array($notes)) {
-                    foreach ($notes as $note) {
-                        $historico[] = [
-                            'data' => \Carbon\Carbon::parse($note['timestamp'] ?? now())->format('Y-m-d H:i'),
-                            'status' => 'Observação adicionada',
-                            'descricao' => $note['text'] ?? $note,
-                        ];
-                    }
-                }
+        // Se tem pagamento
+        if ($request->payment_status === 'paid' || ($request->payment_date ?? false)) {
+            $historico[] = [
+                'data' => $request->payment_date ? date('d/m/Y H:i', strtotime($request->payment_date)) : $request->updated_at->format('d/m/Y H:i'),
+                'status' => 'Pagamento confirmado',
+                'descricao' => 'Pagamento confirmado para processamento do pedido',
+            ];
         }
 
         // Se tem solicitação de documentos
@@ -171,9 +208,21 @@ class OrdersPageController extends Controller
 
             if (is_array($docRequest)) {
                 $historico[] = [
-                    'data' => \Carbon\Carbon::parse($docRequest['timestamp'] ?? now())->format('Y-m-d H:i'),
+                    'data' => isset($docRequest['timestamp']) ? date('d/m/Y H:i', strtotime($docRequest['timestamp'])) : $request->updated_at->format('d/m/Y H:i'),
                     'status' => 'Documentos solicitados',
-                    'descricao' => 'Documentos foram solicitados ao cliente',
+                    'descricao' => 'Documentos adicionais foram solicitados',
+                ];
+            }
+        }
+
+        // Se tem envio de documentos
+        if ($request->uploaded_files) {
+            $files = $this->getUploadedFiles($request);
+            if (!empty($files)) {
+                $historico[] = [
+                    'data' => $request->updated_at->format('d/m/Y H:i'),
+                    'status' => 'Documentos enviados',
+                    'descricao' => count($files) . ' documento(s) enviado(s) pelo cliente',
                 ];
             }
         }
@@ -186,33 +235,67 @@ class OrdersPageController extends Controller
 
             if (is_array($approval)) {
                 $historico[] = [
-                    'data' => \Carbon\Carbon::parse($approval['timestamp'] ?? now())->format('Y-m-d H:i'),
+                    'data' => isset($approval['timestamp']) ? date('d/m/Y H:i', strtotime($approval['timestamp'])) : $request->updated_at->format('d/m/Y H:i'),
                     'status' => 'Documentos aprovados',
-                    'descricao' => 'Seus documentos foram aprovados',
+                    'descricao' => 'Documentos verificados e aprovados',
                 ];
             }
         }
 
-        // Se tem dados de encerramento
-        if ($request->closing_data) {
-            $closing = is_string($request->closing_data)
-                ? json_decode($request->closing_data, true)
-                : $request->closing_data;
+        // Adiciona evento quando entrar em análise
+        if ($request->status === 'awaiting_documents' || $request->status === 'in_progress') {
+            $historico[] = [
+                'data' => $request->updated_at->format('d/m/Y H:i'),
+                'status' => 'Em análise',
+                'descricao' => 'Seu pedido entrou em análise pelo cartório',
+            ];
+        }
 
-            if (is_array($closing)) {
-                $resultado = $closing['result'] === 'approved' ? 'Aprovado' : 'Rejeitado';
-                $historico[] = [
-                    'data' => \Carbon\Carbon::parse($closing['timestamp'] ?? now())->format('Y-m-d H:i'),
-                    'status' => "Processo {$resultado}",
-                    'descricao' => $closing['notes'] ?? 'Processo finalizado',
-                ];
+        // Adiciona evento quando está em andamento
+        if ($request->status === 'in_progress' && $request->status !== 'awaiting_documents') {
+            $historico[] = [
+                'data' => $request->updated_at->format('d/m/Y H:i'),
+                'status' => 'Em andamento',
+                'descricao' => 'Seu pedido está sendo processado',
+            ];
+        }
+
+        // Se tem observações do admin
+        if ($request->admin_notes) {
+            $notes = is_string($request->admin_notes) 
+                ? json_decode($request->admin_notes, true) 
+                : $request->admin_notes;
+
+            if (is_array($notes)) {
+                foreach ($notes as $note) {
+                    $historico[] = [
+                        'data' => isset($note['timestamp']) ? date('d/m/Y H:i', strtotime($note['timestamp'])) : $request->updated_at->format('d/m/Y H:i'),
+                        'status' => 'Atualização',
+                        'descricao' => $note['text'] ?? (is_string($note) ? $note : 'Atualização no pedido'),
+                    ];
+                }
             }
         }
 
-        // Evento de atualização (se diferente da criação)
-        if ($request->updated_at != $request->created_at) {
-            // Já temos atualizações no histórico acima
+        // Se tem dados de encerramento (concluído)
+        if ($request->status === 'completed' || $request->closing_data) {
+            $historico[] = [
+                'data' => $request->updated_at->format('d/m/Y H:i'),
+                'status' => 'Concluído',
+                'descricao' => 'Processo finalizado com sucesso',
+            ];
         }
+
+        // Ordenar o histórico por data (crescente)
+        usort($historico, function($a, $b) {
+            $dateA = \DateTime::createFromFormat('d/m/Y H:i', $a['data']);
+            $dateB = \DateTime::createFromFormat('d/m/Y H:i', $b['data']);
+            
+            if (!$dateA) $dateA = new \DateTime($a['data']);
+            if (!$dateB) $dateB = new \DateTime($b['data']);
+            
+            return $dateA <=> $dateB;
+        });
 
         return $historico;
     }

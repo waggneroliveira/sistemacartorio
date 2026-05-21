@@ -8,7 +8,7 @@
         <h1 class="display-6 fw-bold" style="color: #1a3e2f;">Meus Pedidos</h1>
         <p class="text-secondary">Acompanhe o status e histórico das suas solicitações</p>
     </div>
-    <a href="#" class="btn btn-outline-success rounded-pill mt-2 mt-md-0">
+    <a href="{{ route('index') }}" class="btn btn-outline-success rounded-pill mt-2 mt-md-0">
         <i class="bi bi-plus-circle"></i> Nova solicitação
     </a>
 </div>
@@ -193,137 +193,145 @@
     display: block;
     margin-bottom: 5px;
 }
+
+.order-card {
+    border: 1px solid #e0e8e4;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.order-card:hover {
+    border-color: #1a5c42;
+    background-color: #f8fbf9;
+}
+
+.order-card.selected {
+    border-color: #1a5c42;
+    background-color: #e8f5e9;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-pendente {
+    background: #fff3e0;
+    color: #ed6c02;
+}
+
+.status-analise {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-aguardando-pagamento {
+    background: #fff3e0;
+    color: #ed6c02;
+}
+
+.status-andamento {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.status-concluido {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.status-cancelado {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.payment-required-card {
+    background: linear-gradient(135deg, #fff8e1, #fff3e0);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ffe0b2;
+}
+
+.pix-discount-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 8px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.qrcode-placeholder {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #e0e8e4;
+}
+
+.pix-info {
+    background: #f8fbf9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.detail-card {
+    background: #f8fbf9;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.file-tag {
+    background: #e8f5e9;
+    color: #388e3c;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.timeline-step {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #388e3c;
+}
+
+.timeline-icon.active {
+    background: #1a5c42;
+    color: white;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 
 <script>
-// ==================== DADOS MOCKADOS DE PEDIDOS COM VALORES ====================
-let pedidos = [
-    {
-        id: 1001,
-        protocolo: "CART-28471",
-        servico: "Certidão de Nascimento",
-        dataSolicitacao: "2025-04-28",
-        status: "concluido",
-        statusTexto: "Concluído",
-        valor: 89.90,
-        descricao: "2ª via de certidão de nascimento - solicitante: Maria Silva",
-        documentos: ["RG_front.pdf", "CPF.png", "comprovante_endereco.pdf"],
-        pagamento: { status: "pago", data: "2025-04-28", metodo: "cartao" },
-        historico: [
-            { data: "2025-04-28 09:23", status: "Solicitação recebida", descricao: "Pedido criado com sucesso" },
-            { data: "2025-04-28 14:15", status: "Pagamento confirmado", descricao: "Pagamento aprovado" },
-            { data: "2025-04-29 10:00", status: "Documentos em análise", descricao: "Documentos recebidos e em validação" },
-            { data: "2025-04-30 16:20", status: "Em processamento", descricao: "Certidão sendo emitida pelo cartório" },
-            { data: "2025-05-02 11:45", status: "Concluído", descricao: "Certidão disponível para retirada/envio" }
-        ],
-        camposAdicionais: { tipoCertidao: "2ª Via", nomeMae: "Ana Silva", dataNascimento: "15/03/1990" }
-    },
-    {
-        id: 1002,
-        protocolo: "CART-29102",
-        servico: "Escritura de Compra e Venda",
-        dataSolicitacao: "2025-05-10",
-        status: "andamento",
-        statusTexto: "Em andamento",
-        valor: 450.00,
-        descricao: "Escritura de imóvel - comprador: João Santos",
-        documentos: ["rg_joao.pdf", "cpf_joao.pdf", "matricula_imovel.pdf", "comprovante_iptu.pdf"],
-        pagamento: { status: "pago", data: "2025-05-10", metodo: "pix" },
-        historico: [
-            { data: "2025-05-10 08:30", status: "Solicitação recebida", descricao: "Pedido criado" },
-            { data: "2025-05-10 08:45", status: "Pagamento confirmado", descricao: "Pagamento via PIX aprovado" },
-            { data: "2025-05-11 09:45", status: "Documentos em análise", descricao: "Documentos sendo verificados pelo cartório" },
-            { data: "2025-05-13 14:20", status: "Em andamento", descricao: "Análise jurídica da escritura iniciada" }
-        ],
-        camposAdicionais: { nomeComprador: "João Santos", valorVenda: "320.000", enderecoImovel: "Rua das Flores, 123 - Centro" }
-    },
-    {
-        id: 1003,
-        protocolo: "CART-30567",
-        servico: "Reconhecimento de Firma",
-        dataSolicitacao: "2025-05-15",
-        status: "aguardando_pagamento",
-        statusTexto: "Aguardando pagamento",
-        valor: 35.90,
-        descricao: "Reconhecimento de firma em contrato de aluguel",
-        documentos: ["documento_reconhecer.pdf", "rg_requerente.jpg"],
-        pagamento: { status: "pendente" },
-        historico: [
-            { data: "2025-05-15 10:15", status: "Solicitação recebida", descricao: "Pedido criado aguardando pagamento" }
-        ],
-        camposAdicionais: { tipoReconhecimento: "Por semelhança", documentoReconhecer: "Contrato de aluguel residencial" }
-    },
-    {
-        id: 1004,
-        protocolo: "CART-29834",
-        servico: "Certidão de Casamento",
-        dataSolicitacao: "2025-05-05",
-        status: "analise",
-        statusTexto: "Em análise",
-        valor: 89.90,
-        descricao: "2ª via de certidão de casamento - casamento realizado em 2018",
-        documentos: ["rg_conjuge1.jpg", "rg_conjuge2.jpg", "comprovante_residencia.pdf"],
-        pagamento: { status: "pago", data: "2025-05-05", metodo: "boleto" },
-        historico: [
-            { data: "2025-05-05 11:20", status: "Solicitação recebida", descricao: "Pedido registrado" },
-            { data: "2025-05-06 09:30", status: "Pagamento confirmado", descricao: "Boleto compensado" },
-            { data: "2025-05-06 10:00", status: "Em análise", descricao: "Documentos sendo verificados" }
-        ],
-        camposAdicionais: { nomeConjuge1: "Carlos Alberto", nomeConjuge2: "Fernanda Lima", dataCasamento: "12/10/2018" }
-    },
-    {
-        id: 1005,
-        protocolo: "CART-31245",
-        servico: "Abertura de Inventário",
-        dataSolicitacao: "2025-05-18",
-        status: "aguardando_pagamento",
-        statusTexto: "Aguardando pagamento",
-        valor: 580.00,
-        descricao: "Inventário extrajudicial - falecido: José Oliveira",
-        documentos: ["certidao_obito.pdf", "rg_herdeiros.pdf"],
-        pagamento: { status: "pendente" },
-        historico: [
-            { data: "2025-05-18 15:45", status: "Solicitação recebida", descricao: "Aguardando pagamento para iniciar processo" }
-        ],
-        camposAdicionais: { nomeFalecido: "José Oliveira", dataObito: "10/05/2025", numeroHerdeiros: "3" }
-    },
-    {
-        id: 1006,
-        protocolo: "CART-32088",
-        servico: "Certidão de Nascimento",
-        dataSolicitacao: "2025-05-20",
-        status: "concluido",
-        statusTexto: "Concluído",
-        valor: 89.90,
-        descricao: "1ª via de certidão de nascimento - recém-nascido",
-        documentos: ["declaracao_nascido.pdf", "rg_mae.pdf", "cpf_mae.pdf"],
-        pagamento: { status: "pago", data: "2025-05-20", metodo: "cartao" },
-        historico: [
-            { data: "2025-05-20 07:30", status: "Solicitação recebida", descricao: "Pedido criado" },
-            { data: "2025-05-20 07:35", status: "Pagamento confirmado", descricao: "Pagamento aprovado" },
-            { data: "2025-05-20 13:20", status: "Documentos em análise", descricao: "Documentos validados com sucesso" },
-            { data: "2025-05-21 10:00", status: "Concluído", descricao: "Certidão emitida e enviada por e-mail" }
-        ],
-        camposAdicionais: { tipoCertidao: "1ª Via", nomeMae: "Patrícia Souza", dataNascimento: "18/05/2025" }
-    },
-    {
-        id: 1007,
-        protocolo: "CART-32599",
-        servico: "Autenticação de Documentos",
-        dataSolicitacao: "2025-05-22",
-        status: "aguardando_pagamento",
-        statusTexto: "Aguardando pagamento",
-        valor: 25.90,
-        descricao: "Autenticação de cópias de documentos pessoais",
-        documentos: ["rg_copia.pdf", "cpf_copia.pdf", "comprovante_residencia_copia.pdf"],
-        pagamento: { status: "pendente" },
-        historico: [
-            { data: "2025-05-22 09:00", status: "Solicitação recebida", descricao: "Aguardando pagamento" }
-        ],
-        camposAdicionais: { quantidadeDocs: "3", tipoAutenticacao: "Cópia simples" }
-    }
-];
-
+// ==================== DADOS REAIS DO BACKEND ====================
+const requests = @json($requests ?? []);
 let currentFilter = "todos";
 let currentSearch = "";
 let selectedOrderId = null;
@@ -341,26 +349,54 @@ function getStatusClass(status) {
     return classes[status] || 'status-pendente';
 }
 
+function getStatusIcon(status) {
+    const icons = {
+        'pendente': 'bi-clock',
+        'analise': 'bi-search',
+        'aguardando_pagamento': 'bi-credit-card',
+        'andamento': 'bi-gear',
+        'concluido': 'bi-check-circle',
+        'cancelado': 'bi-x-circle'
+    };
+    return icons[status] || 'bi-question-circle';
+}
+
 // Helper: formatação de data
 function formatDate(dateStr) {
+    if (!dateStr) return 'Data não informada';
     const date = new Date(dateStr);
     return date.toLocaleDateString('pt-BR');
 }
 
 // Formatar valor monetário
 function formatMoney(value) {
+    if (!value && value !== 0) return 'R$ 0,00';
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 // Renderizar lista de pedidos com filtros
 function renderOrdersList() {
-    let filtered = pedidos.filter(pedido => {
-        if (currentFilter !== "todos" && pedido.status !== currentFilter) return false;
+    if (!requests || requests.length === 0) {
+        const container = document.getElementById('ordersListContainer');
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-folder2-open fs-1 text-secondary"></i>
+                <p class="mt-2 text-secondary">Você ainda não possui solicitações.</p>
+                <a href="{{ route('index') }}" class="btn btn-sm btn-success mt-2">
+                    <i class="bi bi-plus-circle"></i> Fazer Solicitação
+                </a>
+            </div>
+        `;
+        return;
+    }
+
+    let filtered = requests.filter(request => {
+        if (currentFilter !== "todos" && request.status !== currentFilter) return false;
         if (currentSearch) {
             const searchLower = currentSearch.toLowerCase();
-            return pedido.protocolo.toLowerCase().includes(searchLower) ||
-                   pedido.servico.toLowerCase().includes(searchLower) ||
-                   pedido.descricao.toLowerCase().includes(searchLower);
+            return request.protocolo.toLowerCase().includes(searchLower) ||
+                   request.servico.toLowerCase().includes(searchLower) ||
+                   request.descricao.toLowerCase().includes(searchLower);
         }
         return true;
     });
@@ -378,22 +414,22 @@ function renderOrdersList() {
         return;
     }
 
-    container.innerHTML = filtered.map(pedido => `
-        <div class="order-card p-3 mb-2 ${selectedOrderId === pedido.id ? 'selected' : ''}" 
-             data-order-id="${pedido.id}">
+    container.innerHTML = filtered.map(request => `
+        <div class="order-card p-3 mb-2 ${selectedOrderId === request.id ? 'selected' : ''}" 
+             data-order-id="${request.id}">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
-                    <span class="fw-bold">${pedido.servico}</span>
+                    <span class="fw-bold">${request.servico}</span>
                     <br>
-                    <small class="text-muted">Protocolo: ${pedido.protocolo}</small>
+                    <small class="text-muted">Protocolo: ${request.protocolo}</small>
                 </div>
-                <span class="status-badge ${getStatusClass(pedido.status)}">
-                    <i class="bi ${getStatusIcon(pedido.status)}"></i> ${pedido.statusTexto}
+                <span class="status-badge ${getStatusClass(request.status)}">
+                    <i class="bi ${getStatusIcon(request.status)}"></i> ${request.statusTexto}
                 </span>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
-                <small class="text-muted"><i class="bi bi-calendar3"></i> ${formatDate(pedido.dataSolicitacao)}</small>
-                <small class="text-success">${pedido.status === 'aguardando_pagamento' ? formatMoney(pedido.valor) : 'Ver detalhes →'}</small>
+                <small class="text-muted"><i class="bi bi-calendar3"></i> ${formatDate(request.dataSolicitacao)}</small>
+                <small class="text-success">${request.status === 'aguardando_pagamento' ? formatMoney(request.valor) : 'Ver detalhes →'}</small>
             </div>
         </div>
     `).join('');
@@ -406,33 +442,34 @@ function renderOrdersList() {
     });
 }
 
-function getStatusIcon(status) {
-    const icons = {
-        'pendente': 'bi-clock',
-        'analise': 'bi-search',
-        'aguardando_pagamento': 'bi-credit-card',
-        'andamento': 'bi-gear',
-        'concluido': 'bi-check-circle',
-        'cancelado': 'bi-x-circle'
-    };
-    return icons[status] || 'bi-question-circle';
-}
-
 // Atualizar estatísticas
 function updateStats() {
-    const total = pedidos.length;
-    const emAndamento = pedidos.filter(p => p.status === 'andamento' || p.status === 'analise').length;
-    const concluidos = pedidos.filter(p => p.status === 'concluido').length;
-    const aguardandoPagamento = pedidos.filter(p => p.status === 'aguardando_pagamento').length;
+    if (!requests || requests.length === 0) {
+        document.getElementById('totalPedidos').textContent = '0';
+        document.getElementById('emAndamentoCount').textContent = '0';
+        document.getElementById('concluidosCount').textContent = '0';
+        document.getElementById('aguardandoPagamentoCount').textContent = '0';
+        return;
+    }
     
-    document.getElementById('totalPedidos').textContent = total;
-    document.getElementById('emAndamentoCount').textContent = emAndamento;
-    document.getElementById('concluidosCount').textContent = concluidos;
-    document.getElementById('aguardandoPagamentoCount').textContent = aguardandoPagamento;
+    const total = requests.length;
+    const emAndamento = requests.filter(r => r.status === 'andamento' || r.status === 'analise').length;
+    const concluidos = requests.filter(r => r.status === 'concluido').length;
+    const aguardandoPagamento = requests.filter(r => r.status === 'aguardando_pagamento').length;
+    
+    const totalEl = document.getElementById('totalPedidos');
+    const emAndamentoEl = document.getElementById('emAndamentoCount');
+    const concluidosEl = document.getElementById('concluidosCount');
+    const aguardandoEl = document.getElementById('aguardandoPagamentoCount');
+    
+    if (totalEl) totalEl.textContent = total;
+    if (emAndamentoEl) emAndamentoEl.textContent = emAndamento;
+    if (concluidosEl) concluidosEl.textContent = concluidos;
+    if (aguardandoEl) aguardandoEl.textContent = aguardandoPagamento;
 }
 
 // Função de Pagamento
-function abrirPagamento(pedido) {
+function abrirPagamento(request) {
     const modalBody = document.getElementById('paymentModalBody');
     let metodoSelecionado = null;
     
@@ -441,17 +478,17 @@ function abrirPagamento(pedido) {
             <div class="text-center mb-4">
                 <i class="bi bi-receipt fs-1 text-success"></i>
                 <h4>Pagamento do Pedido</h4>
-                <p class="text-muted">Protocolo: ${pedido.protocolo}</p>
+                <p class="text-muted">Protocolo: ${request.protocolo}</p>
             </div>
             
             <div class="payment-card">
                 <div class="row align-items-center">
                     <div class="col-md-6">
-                        <strong>${pedido.servico}</strong>
-                        <p class="text-muted small mb-0">${pedido.descricao}</p>
+                        <strong>${request.servico}</strong>
+                        <p class="text-muted small mb-0">${request.descricao.substring(0, 100)}</p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <div class="payment-value">${formatMoney(pedido.valor)}</div>
+                        <div class="payment-value">${formatMoney(request.valor)}</div>
                         <small>em até 12x no cartão</small>
                     </div>
                 </div>
@@ -484,14 +521,13 @@ function abrirPagamento(pedido) {
         </div>
     `;
     
-    // Adicionar eventos aos métodos de pagamento
     const methods = modalBody.querySelectorAll('.payment-method-btn');
     methods.forEach(btn => {
         btn.addEventListener('click', () => {
             methods.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             metodoSelecionado = btn.getAttribute('data-metodo');
-            mostrarFormularioPagamento(metodoSelecionado, pedido, modalBody);
+            mostrarFormularioPagamento(metodoSelecionado, request, modalBody);
         });
     });
     
@@ -499,9 +535,9 @@ function abrirPagamento(pedido) {
     modal.show();
 }
 
-function mostrarFormularioPagamento(metodo, pedido, container) {
+function mostrarFormularioPagamento(metodo, request, container) {
     const formContainer = container.querySelector('#paymentDetailsForm');
-    const valorComDesconto = metodo === 'pix' ? pedido.valor * 0.95 : pedido.valor;
+    const valorComDesconto = metodo === 'pix' ? request.valor * 0.95 : request.valor;
     
     let html = '';
     
@@ -538,7 +574,7 @@ function mostrarFormularioPagamento(metodo, pedido, container) {
                         <option value="6">6x de ${formatMoney(valorComDesconto/6)}</option>
                     </select>
                 </div>
-                <button class="btn-pagar mt-3" onclick="confirmarPagamento(${pedido.id}, 'cartao', ${valorComDesconto})">
+                <button class="btn-pagar mt-3" onclick="confirmarPagamento(${request.id}, 'cartao', ${valorComDesconto})">
                     <i class="bi bi-lock-fill"></i> Pagar ${formatMoney(valorComDesconto)}
                 </button>
             </div>
@@ -557,7 +593,7 @@ function mostrarFormularioPagamento(metodo, pedido, container) {
                     <div class="small text-muted">Chave PIX (CNPJ)</div>
                     <strong>12.345.678/0001-90</strong>
                 </div>
-                <button class="btn-pagar mt-3" onclick="confirmarPagamento(${pedido.id}, 'pix', ${valorComDesconto})">
+                <button class="btn-pagar mt-3" onclick="confirmarPagamento(${request.id}, 'pix', ${valorComDesconto})">
                     <i class="bi bi-check-circle"></i> Simular Pagamento PIX
                 </button>
             </div>
@@ -568,7 +604,7 @@ function mostrarFormularioPagamento(metodo, pedido, container) {
                 <i class="bi bi-receipt" style="font-size: 60px; color: #1976d2;"></i>
                 <h6 class="mt-2">Boleto Bancário</h6>
                 <p class="small text-muted">Vencimento em 3 dias úteis</p>
-                <button class="btn-pagar mt-2" onclick="confirmarPagamento(${pedido.id}, 'boleto', ${valorComDesconto})">
+                <button class="btn-pagar mt-2" onclick="confirmarPagamento(${request.id}, 'boleto', ${valorComDesconto})">
                     <i class="bi bi-file-pdf"></i> Gerar Boleto
                 </button>
             </div>
@@ -577,7 +613,6 @@ function mostrarFormularioPagamento(metodo, pedido, container) {
     
     formContainer.innerHTML = html;
     
-    // Máscara para número do cartão
     const cardNumber = document.getElementById('cardNumber');
     if (cardNumber) {
         cardNumber.addEventListener('input', function(e) {
@@ -588,13 +623,14 @@ function mostrarFormularioPagamento(metodo, pedido, container) {
     }
 }
 
-function confirmarPagamento(pedidoId, metodo, valor) {
-    const pedido = pedidos.find(p => p.id === pedidoId);
+function confirmarPagamento(requestId, metodo, valor) {
+    const request = requests.find(r => r.id === requestId);
+    if (!request) return;
     
     // Atualizar status do pedido
-    pedido.status = 'analise';
-    pedido.statusTexto = 'Em análise';
-    pedido.pagamento = {
+    request.status = 'analise';
+    request.statusTexto = 'Em análise';
+    request.pagamento = {
         status: 'pago',
         data: new Date().toISOString().split('T')[0],
         metodo: metodo,
@@ -602,60 +638,80 @@ function confirmarPagamento(pedidoId, metodo, valor) {
     };
     
     // Adicionar ao histórico
-    pedido.historico.unshift({
+    if (!request.historico) request.historico = [];
+    request.historico.unshift({
         data: new Date().toLocaleString('pt-BR'),
         status: 'Pagamento confirmado',
         descricao: `Pagamento de ${formatMoney(valor)} via ${metodo.toUpperCase()} confirmado`
     });
     
     // Fechar modal
-    bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+    if (modal) modal.hide();
     
     // Atualizar a lista e estatísticas
     renderOrdersList();
     updateStats();
     
     // Recarregar detalhes do pedido se for o selecionado
-    if (selectedOrderId === pedidoId) {
-        renderOrderDetails(pedido);
+    if (selectedOrderId === requestId) {
+        renderOrderDetails(request);
     }
     
     // Mostrar mensagem de sucesso
-    alert(`✅ Pagamento confirmado!\n\nPedido: ${pedido.protocolo}\nValor: ${formatMoney(valor)}\nMétodo: ${metodo.toUpperCase()}\n\nSeu pedido agora está em análise.`);
+    alert(`✅ Pagamento confirmado!\n\nPedido: ${request.protocolo}\nValor: ${formatMoney(valor)}\nMétodo: ${metodo.toUpperCase()}\n\nSeu pedido agora está em análise.`);
 }
 
 // Selecionar pedido e exibir detalhes
 function selectOrder(orderId) {
     selectedOrderId = orderId;
-    const pedido = pedidos.find(p => p.id === orderId);
-    if (!pedido) return;
+    const request = requests.find(r => r.id === orderId);
+    if (!request) return;
     
     renderOrdersList();
-    renderOrderDetails(pedido);
+    renderOrderDetails(request);
 }
 
 // Renderizar detalhes do pedido selecionado
-function renderOrderDetails(pedido) {
+// Renderizar detalhes do pedido selecionado
+function renderOrderDetails(request) {
     const container = document.getElementById('orderDetailContainer');
     
     const statusOrder = ['aguardando_pagamento', 'pendente', 'analise', 'andamento', 'concluido'];
-    const currentIndex = statusOrder.indexOf(pedido.status);
+    const currentIndex = statusOrder.indexOf(request.status);
     const progressPercent = currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 50;
+    
+    // Garantir que documentos existe
+    const documentos = request.documentos || [];
+    
+    // Garantir que campos adicionais existe
+    const camposAdicionais = request.camposAdicionais || {};
+    
+    // Garantir que histórico existe e ordenar cronologicamente (do mais antigo para o mais recente)
+    let historico = request.historico || [];
+    
+    // Ordenar o histórico por data (do mais antigo para o mais recente)
+    historico.sort((a, b) => {
+        // Converter as strings de data para objetos Date para comparação
+        const dateA = parseDateString(a.data);
+        const dateB = parseDateString(b.data);
+        return dateA - dateB;
+    });
     
     const html = `
         <div class="fade-in">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <h4 class="fw-bold">${pedido.servico}</h4>
-                    <p class="text-muted mb-0">Protocolo: ${pedido.protocolo}</p>
-                    <p class="text-muted small"><i class="bi bi-calendar"></i> Solicitado em: ${formatDate(pedido.dataSolicitacao)}</p>
+                    <h4 class="fw-bold">${request.servico}</h4>
+                    <p class="text-muted mb-0">Protocolo: ${request.protocolo}</p>
+                    <p class="text-muted small"><i class="bi bi-calendar"></i> Solicitado em: ${formatDate(request.dataSolicitacao)}</p>
                 </div>
-                <span class="status-badge ${getStatusClass(pedido.status)} fs-6">
-                    <i class="bi ${getStatusIcon(pedido.status)}"></i> ${pedido.statusTexto}
+                <span class="status-badge ${getStatusClass(request.status)} fs-6">
+                    <i class="bi ${getStatusIcon(request.status)}"></i> ${request.statusTexto}
                 </span>
             </div>
             
-            ${pedido.status === 'aguardando_pagamento' ? `
+            ${request.status === 'aguardando_pagamento' ? `
                 <div class="payment-required-card mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
@@ -664,8 +720,8 @@ function renderOrderDetails(pedido) {
                             <p class="mb-0 small text-muted mt-1">Efetue o pagamento para dar continuidade ao seu pedido</p>
                         </div>
                         <div class="text-end">
-                            <div class="fw-bold text-success fs-4">${formatMoney(pedido.valor)}</div>
-                            <button class="btn-pagar mt-2" onclick="abrirPagamento(${JSON.stringify(pedido).replace(/"/g, '&quot;')})">
+                            <div class="fw-bold text-success fs-4">${formatMoney(request.valor)}</div>
+                            <button class="btn-pagar mt-2" onclick="abrirPagamento(${JSON.stringify(request).replace(/"/g, '&quot;')})">
                                 <i class="bi bi-lock-fill"></i> Realizar Pagamento
                             </button>
                         </div>
@@ -683,75 +739,128 @@ function renderOrderDetails(pedido) {
                 </div>
             </div>
             
-            ${pedido.pagamento && pedido.pagamento.status === 'pago' ? `
+            ${request.pagamento && request.pagamento.status === 'pago' ? `
                 <div class="detail-card">
                     <h6 class="fw-bold mb-2"><i class="bi bi-receipt"></i> Informações do Pagamento</h6>
                     <div class="row g-2">
                         <div class="col-md-4">
                             <small class="text-muted">Valor pago</small>
-                            <div class="fw-bold">${formatMoney(pedido.pagamento.valor || pedido.valor)}</div>
+                            <div class="fw-bold">${formatMoney(request.pagamento.valor || request.valor)}</div>
                         </div>
                         <div class="col-md-4">
                             <small class="text-muted">Método</small>
-                            <div>${pedido.pagamento.metodo ? pedido.pagamento.metodo.toUpperCase() : '-'}</div>
+                            <div>${request.pagamento.metodo ? request.pagamento.metodo.toUpperCase() : '-'}</div>
                         </div>
                         <div class="col-md-4">
                             <small class="text-muted">Data do pagamento</small>
-                            <div>${pedido.pagamento.data || '-'}</div>
+                            <div>${request.pagamento.data || '-'}</div>
                         </div>
                     </div>
                 </div>
             ` : ''}
             
             <div class="detail-card">
+                <h6 class="fw-bold mb-2"><i class="bi bi-person-circle"></i> Dados do cliente</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">Nome</small>
+                        <p class="mb-0 fw-bold">${request.clienteNome || 'Não informado'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Email</small>
+                        <p class="mb-0 fw-bold">${request.clienteEmail || 'Não informado'}</p>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                        <small class="text-muted">Telefone</small>
+                        <p class="mb-0 fw-bold">${request.clienteTelefone || 'Não informado'}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card">
                 <h6 class="fw-bold mb-2"><i class="bi bi-card-text"></i> Descrição</h6>
-                <p class="mb-0">${pedido.descricao}</p>
+                <p class="mb-0">${request.descricao || 'Sem descrição'}</p>
             </div>
             
-            <div class="detail-card">
-                <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text"></i> Documentos enviados</h6>
-                <div class="d-flex flex-wrap">
-                    ${pedido.documentos.map(doc => `
-                        <span class="file-tag"><i class="bi bi-file-earmark-check text-success"></i> ${doc}</span>
-                    `).join('')}
+            ${documentos.length > 0 ? `
+                <div class="detail-card">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text"></i> Documentos enviados</h6>
+                    <div class="d-flex flex-wrap">
+                        ${documentos.map(doc => {
+                            const docName = typeof doc === 'string' ? doc : (doc.original_name || 'documento.pdf');
+                            return `<span class="file-tag"><i class="bi bi-file-earmark-check text-success"></i> ${docName}</span>`;
+                        }).join('')}
+                    </div>
                 </div>
-            </div>
+            ` : ''}
             
-            <div class="detail-card">
-                <h6 class="fw-bold mb-2"><i class="bi bi-info-square"></i> Informações adicionais</h6>
-                <div class="row g-2">
-                    ${Object.entries(pedido.camposAdicionais).map(([key, value]) => `
-                        <div class="col-12">
-                            <small class="text-muted">${formatLabel(key)}:</small>
-                            <span class="ms-2">${value}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-            
-            <div class="detail-card">
-                <h6 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Linha do tempo</h6>
-                <div>
-                    ${pedido.historico.map((item, idx) => `
-                        <div class="timeline-step d-flex gap-3 ${idx === pedido.historico.length-1 ? 'mb-0' : ''}">
-                            <div class="timeline-icon ${idx === pedido.historico.length-1 ? 'active' : 'completed'}">
-                                <i class="bi ${idx === pedido.historico.length-1 ? 'bi-hourglass-split' : 'bi-check2'} small"></i>
+            ${Object.keys(camposAdicionais).length > 0 ? `
+                <div class="detail-card">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-info-square"></i> Informações adicionais</h6>
+                    <div class="row g-2">
+                        ${Object.entries(camposAdicionais).map(([key, value]) => `
+                            <div class="col-12">
+                                <small class="text-muted">${formatLabel(key)}:</small>
+                                <span class="ms-2">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between flex-wrap">
-                                    <strong>${item.status}</strong>
-                                    <small class="text-muted">${item.data}</small>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${historico.length > 0 ? `
+                <div class="detail-card">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Linha do tempo</h6>
+                    <div class="timeline-container">
+                        ${historico.map((item, idx) => `
+                            <div class="timeline-step d-flex gap-3 ${idx === historico.length-1 ? 'mb-0' : ''}">
+                                <div class="timeline-icon ${idx === historico.length-1 ? 'active' : 'completed'}">
+                                    <i class="bi ${idx === historico.length-1 ? 'bi-hourglass-split' : 'bi-check2'} small"></i>
                                 </div>
-                                <p class="mb-2 small text-secondary">${item.descricao}</p>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between flex-wrap">
+                                        <strong>${item.status}</strong>
+                                        <small class="text-muted">${item.data}</small>
+                                    </div>
+                                    <p class="mb-2 small text-secondary">${item.descricao}</p>
+                                </div>
                             </div>
-                        </div>
-                    `).join('')}
+                            ${idx !== historico.length-1 ? '<div class="timeline-connector"></div>' : ''}
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
+            ` : ''}
         </div>
     `;
     
     container.innerHTML = html;
+}
+
+// Função auxiliar para converter string de data para objeto Date
+function parseDateString(dateStr) {
+    // Tenta diferentes formatos de data
+    // Formato: DD/MM/YYYY HH:MM ou DD/MM/YYYY
+    if (dateStr.includes('/')) {
+        const parts = dateStr.split(/[\s\/:]+/);
+        if (parts.length >= 3) {
+            // Formato brasileiro: dia/mês/ano
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const year = parseInt(parts[2]);
+            const hour = parts.length > 3 ? parseInt(parts[3]) : 0;
+            const minute = parts.length > 4 ? parseInt(parts[4]) : 0;
+            return new Date(year, month, day, hour, minute);
+        }
+    }
+    
+    // Tenta formato ISO
+    const isoDate = new Date(dateStr);
+    if (!isNaN(isoDate.getTime())) {
+        return isoDate;
+    }
+    
+    // Se não conseguir, retorna data atual
+    return new Date();
 }
 
 function formatLabel(key) {
@@ -778,71 +887,53 @@ function formatLabel(key) {
 
 // Eventos de filtro e busca
 function initFilters() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentFilter = btn.getAttribute('data-filter');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    if (filterBtns.length > 0) {
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                renderOrdersList();
+            });
+        });
+    }
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
             renderOrdersList();
         });
-    });
-    
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        currentSearch = e.target.value;
-        renderOrdersList();
-    });
+    }
 }
 
 // Inicialização
 function init() {
-    renderOrdersList();
-    updateStats();
-    initFilters();
-    if (pedidos.length > 0) {
-        selectOrder(pedidos[0].id);
+    if (requests && requests.length > 0) {
+        renderOrdersList();
+        updateStats();
+        initFilters();
+        selectOrder(requests[0].id);
+    } else {
+        const container = document.getElementById('ordersListContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-folder2-open fs-1 text-secondary"></i>
+                    <p class="mt-2 text-secondary">Você ainda não possui solicitações.</p>
+                    <a href="{{ route('index') }}" class="btn btn-sm btn-success mt-2">
+                        <i class="bi bi-plus-circle"></i> Fazer Solicitação
+                    </a>
+                </div>
+            `;
+        }
+        updateStats();
     }
 }
 
-init();
+// Aguardar o DOM carregar
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
-<style>
-/* Estilos adicionais */
-.status-aguardando-pagamento {
-    background: #fff3e0;
-    color: #ed6c02;
-}
-
-.payment-required-card {
-    background: linear-gradient(135deg, #fff8e1, #fff3e0);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #ffe0b2;
-}
-
-.pix-discount-badge {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 8px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.qrcode-placeholder {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #e0e8e4;
-}
-
-.pix-info {
-    background: #f8fbf9;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-</style>
 
 @endsection
