@@ -8,6 +8,7 @@ use App\Http\Controllers\Client\EventPageController;
 use App\Http\Controllers\Client\HomePageController;
 use App\Http\Controllers\Client\JuridicoPageController;
 use App\Http\Controllers\Client\NoticiesPageController;
+use App\Http\Controllers\Client\OrdersPageController;
 use App\Http\Controllers\Client\ProductPageController;
 use App\Http\Controllers\Client\RegionPageController;
 use App\Http\Controllers\Client\RegistryServicePageController;
@@ -39,9 +40,7 @@ Route::get('/', function () {
 });
 Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('index');
 
-Route::get('/meus-pedidos', function () {
-    return view('client.blades.orders');
-})->name('orders');
+Route::get('/meus-pedidos', [OrdersPageController::class, 'index'])->name('orders');
 Route::get('/meus-perfil', function () {
     return view('client.blades.profile');
 })->name('profile');
