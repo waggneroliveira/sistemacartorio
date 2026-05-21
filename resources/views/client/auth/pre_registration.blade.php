@@ -776,7 +776,7 @@
         <div class="checkbox-group">
           <input type="checkbox" id="lgpd_accept" name="lgpd_accept" required>
           <label for="lgpd_accept">
-            Li e aceito os <a href="#" target="_blank">termos da LGPD</a> e autorizo o tratamento dos meus dados conforme a Política de Privacidade do Cartório.
+            Li e aceito os <a href="{{route('lgpd-index')}}" target="_blank">termos da LGPD</a> e autorizo o tratamento dos meus dados conforme a Política de Privacidade do Cartório.
           </label>
         </div>
 

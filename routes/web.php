@@ -49,6 +49,9 @@ Route::get('/pagamentos', function () {
     return view('client.blades.payment');
 })->name('payment');
 
+Route::get('/termos-lgpd', function () {
+    return view('client.blades.term-lgpd');
+})->name('lgpd-index');
 Route::get('/login', function () {
     return view('client.auth.pre_registration');
 })->name('login');
