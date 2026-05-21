@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Login | Cartório Central</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -18,7 +19,7 @@
       box-sizing: border-box;
     }
     .text-success{
-        color: #198754; !important;
+        color: #198754 !important;
     }
     .text-danger{
         color: #dc3545 !important;
@@ -540,6 +541,14 @@
     .modal-message.show {
       display: block;
     }
+    .modal-message.error {
+      background: #ffe6e5;
+      border-left: 4px solid #b91c1c;
+    }
+    .modal-message.success {
+      background: #e0f2fe;
+      border-left: 4px solid #198754;
+    }
 
     .info-text {
       font-size: 0.7rem;
@@ -550,6 +559,159 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
+    }
+
+    /* MODAL DE SUCESSO (VERIFICAÇÃO DE E-MAIL) */
+    .success-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.3s, opacity 0.3s;
+    }
+
+    .success-modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .success-modal-container {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      border-radius: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    .success-modal-overlay.active .success-modal-container {
+      transform: scale(1);
+    }
+
+    .success-modal-content {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #0a2b3e 0%, #1b4f6e 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(27, 79, 110, 0.4);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(27, 79, 110, 0);
+      }
+    }
+
+    .success-icon svg {
+      width: 45px;
+      height: 45px;
+      color: #ffd966;
+    }
+
+    .success-modal-content h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0a2b3e;
+      margin-bottom: 0.8rem;
+    }
+
+    .success-modal-content .email-highlight {
+      font-weight: 600;
+      color: #1b4f6e;
+      background: #eef2ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 0.3rem;
+    }
+
+    .success-message-box {
+      background: #eef2ff;
+      border-left: 4px solid #1b4f6e;
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+
+    .success-message-box .flex {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .success-message-box svg {
+      width: 20px;
+      height: 20px;
+      color: #1b4f6e;
+      flex-shrink: 0;
+    }
+
+    .resend-btn {
+      background: none;
+      border: none;
+      color: #1b4f6e;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .resend-btn:hover {
+      color: #0a2b3e;
+      text-decoration: underline;
+    }
+
+    .back-to-login {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0a2b3e;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-to-login:hover {
+      background: #1b4f6e;
+      transform: translateY(-2px);
+    }
+
+    .divider {
+      border-top: 1px solid #e2e8f0;
+      margin: 1rem 0;
     }
 
     /* RESPONSIVIDADE */
@@ -620,6 +782,9 @@
       }
       .modal-container {
         max-height: 85vh;
+      }
+      .success-modal-content h2 {
+        font-size: 1.4rem;
       }
     }
 
@@ -736,7 +901,7 @@
       <button class="modal-close" id="closeModalBtn">&times;</button>
     </div>
     <div class="modal-body">
-      <form id="registerForm" method="POST" action="{{route('register-client')}}">
+      <form id="registerForm" method="POST" action="{{ route('register-client') }}">
         @csrf
         <div class="register-input-group">
           <label for="reg_name">Nome completo *</label>
@@ -776,7 +941,7 @@
         <div class="checkbox-group">
           <input type="checkbox" id="lgpd_accept" name="lgpd_accept" required>
           <label for="lgpd_accept">
-            Li e aceito os <a href="{{route('lgpd-index')}}" target="_blank">termos da LGPD</a> e autorizo o tratamento dos meus dados conforme a Política de Privacidade do Cartório.
+            Li e aceito os <a href="{{ route('lgpd-index') }}" target="_blank">termos da LGPD</a> e autorizo o tratamento dos meus dados conforme a Política de Privacidade do Cartório.
           </label>
         </div>
 
@@ -789,6 +954,48 @@
           <i class="fas fa-envelope"></i> Após enviar, você receberá um link de verificação por e‑mail para ativar sua conta.
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE SUCESSO (VERIFICAÇÃO DE E-MAIL) -->
+<div id="successModal" class="success-modal-overlay">
+  <div class="success-modal-container">
+    <div class="success-modal-content">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <h2>Verifique seu e-mail</h2>
+      <p style="margin-bottom: 0.5rem; color: #4a5c6c;">
+        Enviamos um link de confirmação para
+      </p>
+      <span class="email-highlight" id="successEmail">usuario@exemplo.com</span>
+      
+      <div class="success-message-box">
+        <div class="flex">
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <p style="font-size: 0.9rem; color: #1f3b4a;">
+            Confirme seu e-mail clicando no link que enviamos para você.
+          </p>
+        </div>
+      </div>
+      
+      <p style="font-size: 0.9rem; color: #6c7e8e;">
+        Não recebeu o e-mail?
+        <button type="button" id="resendEmailBtn" class="resend-btn">
+          Reenviar e-mail de confirmação
+        </button>
+      </p>
+      
+      <div class="divider"></div>
+      
+      <button id="closeSuccessAndGoToLogin" class="back-to-login">
+        <i class="fas fa-arrow-left"></i> Voltar para o login
+      </button>
     </div>
   </div>
 </div>
@@ -833,11 +1040,29 @@
 
     document.querySelectorAll('.toggle-password').forEach(btn => setupTogglePassword(btn));
 
-    // Modal
+    // Modal de cadastro
     const modal = document.getElementById('registerModal');
     const openBtn = document.getElementById('openRegisterModal');
     const closeBtn = document.getElementById('closeModalBtn');
     const modalMessageDiv = document.getElementById('modalMessage');
+
+    // Modal de sucesso
+    const successModal = document.getElementById('successModal');
+    
+    function showSuccessModal(email) {
+      document.getElementById('successEmail').textContent = email;
+      successModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSuccessModal() {
+      successModal.classList.remove('active');
+      if (window.innerWidth <= 768) {
+        document.body.style.overflow = 'auto';
+      } else {
+        document.body.style.overflow = 'hidden';
+      }
+    }
 
     if (openBtn) {
       openBtn.addEventListener('click', function(e) {
@@ -879,10 +1104,11 @@
       if (e.target === modal) closeModal();
     });
 
-    // Pré-validação
+    // Interceptar o submit do formulário para tratar sucesso via AJAX
     const registerFormElem = document.getElementById('registerForm');
     if (registerFormElem) {
       registerFormElem.addEventListener('submit', function(e) {
+        // Validações básicas antes de enviar
         const name = document.getElementById('reg_name')?.value.trim();
         const email = document.getElementById('reg_email')?.value.trim();
         const whatsapp = document.getElementById('reg_whatsapp')?.value.trim();
@@ -912,30 +1138,102 @@
           return;
         }
 
+        // Se passou nas validações, deixa o formulário enviar normalmente
+        // Mas vamos adicionar um listener para capturar a resposta do servidor via session
+        // O Laravel redirecionará com session('success') ou session('error')
+        // Como o formulário é submetido normalmente, a página recarregará
+        // Precisamos verificar na próxima carga se há uma session de sucesso para abrir o modal
+        
         const submitBtn = registerFormElem.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
         submitBtn.disabled = true;
+        
+        // O formulário será enviado, e a página recarregará
+        // O código abaixo será executado, mas a página vai recarregar
         setTimeout(() => {
           if (submitBtn.disabled === true && document.body.contains(submitBtn)) {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
           }
-        }, 10000);
+        }, 5000);
       });
     }
+
+    // Verificar se há uma session de sucesso do cadastro e abrir o modal
+    @if(session('cadastro_success'))
+        // Usar múltiplos eventos para garantir
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                showSuccessModal('{{ session('cadastro_email') }}');
+            });
+        } else {
+            // DOM já está carregado
+            showSuccessModal('{{ session('cadastro_email') }}');
+        }
+        
+        // Fallback: tentar novamente após um pequeno delay
+        setTimeout(function() {
+            if (document.getElementById('successModal') && !document.getElementById('successModal').classList.contains('active')) {
+                showSuccessModal('{{ session('cadastro_email') }}');
+            }
+        }, 500);
+    @endif
 
     function showModalMessage(message, isError = false) {
       if (modalMessageDiv) {
         modalMessageDiv.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-circle-check'}"></i> ${message}`;
         modalMessageDiv.classList.add('show');
-        modalMessageDiv.classList.toggle('error', isError);
-        modalMessageDiv.classList.toggle('success', !isError);
+        if (isError) {
+          modalMessageDiv.classList.add('error');
+          modalMessageDiv.classList.remove('success');
+        } else {
+          modalMessageDiv.classList.add('success');
+          modalMessageDiv.classList.remove('error');
+        }
         setTimeout(() => {
           if (modalMessageDiv) modalMessageDiv.classList.remove('show');
         }, 4000);
       }
     }
+
+    // Reenviar e-mail
+    const resendBtn = document.getElementById('resendEmailBtn');
+    if (resendBtn) {
+      resendBtn.addEventListener('click', function() {
+        const email = document.getElementById('successEmail').textContent;
+        // Fazer requisição AJAX para reenviar o e-mail
+        fetch('{{ route('resend.verification') }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message || 'E-mail de confirmação reenviado com sucesso!');
+        })
+        .catch(error => {
+          alert('Erro ao reenviar o e-mail. Tente novamente.');
+        });
+      });
+    }
+
+    // Fechar modal de sucesso e voltar ao login
+    const closeSuccessBtn = document.getElementById('closeSuccessAndGoToLogin');
+    if (closeSuccessBtn) {
+      closeSuccessBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeSuccessModal();
+      });
+    }
+
+    // Clicar fora do modal de sucesso fecha
+    successModal.addEventListener('click', function(e) {
+      if (e.target === successModal) closeSuccessModal();
+    });
 
     function handleOverflow() {
       if (window.innerWidth <= 768) {
@@ -949,6 +1247,8 @@
 
     window.addEventListener('resize', function() {
       if (modal && modal.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else if (successModal && successModal.classList.contains('active')) {
         document.body.style.overflow = 'hidden';
       } else {
         handleOverflow();

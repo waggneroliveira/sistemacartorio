@@ -117,7 +117,12 @@ Route::get('blog', [BlogPageController::class, 'index'])->name('blogAll');
 Route::get('blog/categoria/{category?}', [BlogPageController::class, 'index'])->name('blog');
 Route::post('blog/search', [BlogPageController::class, 'index'])->name('blog-search');
 Route::post('send-newsletter', [NewsletterController::class, 'store'])->name('send-newsletter');
+
 Route::post('cliente/cadastro', [ClientController::class, 'store'])->name('register-client');
+Route::post('cliente/cadastro/verification', [ClientController::class, 'verification'])->name('resend.verification');
+
+
+
 Route::get('/', [HomePageController::class, 'index'])->name('index');
 Route::get('sobre', [AboutPageController::class, 'index'])->name('about');
 Route::get('eventos', [EventPageController::class, 'index'])->name('client.event');

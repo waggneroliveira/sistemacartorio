@@ -49,8 +49,12 @@ class ClientController extends Controller
             DB::commit();
 
             return redirect()
-                ->back()
-                ->with('success', 'Cadastro realizado com sucesso!');
+            ->route('login')  // Vai para a página de login
+            ->with([
+                'cadastro_success' => true,      // Session que o modal espera
+                'cadastro_email' => $validated['email'],  // Email para exibir no modal
+                'success' => 'Pré-cadastro realizado! Verifique seu e-mail para ativar a conta.'
+            ]);
 
         } catch (\Exception $e) {
 
@@ -155,7 +159,9 @@ class ClientController extends Controller
         }
     }
 
-
+    public function verification(){
+        
+    }
     /**
      * Remove the specified resource from storage.
      */

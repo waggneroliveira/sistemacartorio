@@ -17,7 +17,7 @@
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
                 Enviamos um link de confirmação para
-                {{-- <span class="font-medium text-[#0d9488]">{{ session('email') ?? $email }}</span> --}}
+                <span class="font-medium text-[#0d9488]">{{ session('email') ?? $email }}</span>
             </p>
         </div>
         
