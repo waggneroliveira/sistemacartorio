@@ -18,11 +18,18 @@ class Client extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'whatsapp',
         'password',
         'active',
+        'lgpd_accept',
         'path_image',
     ];
 
+    protected $casts = [
+        'lgpd_accept' => 'boolean',
+        'active' => 'boolean',
+    ];
+    
     protected $hidden = [
         'password',
         'remember_token',

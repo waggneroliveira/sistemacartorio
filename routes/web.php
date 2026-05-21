@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthClientController;
 use App\Http\Controllers\Client\AboutPageController;
 use App\Http\Controllers\Client\BenefitPageController;
 use App\Http\Controllers\Client\BlogPageController;
@@ -47,6 +48,16 @@ Route::get('/meus-perfil', function () {
 Route::get('/pagamentos', function () {
     return view('client.blades.payment');
 })->name('payment');
+
+Route::get('/login', function () {
+    return view('client.auth.pre_registration');
+})->name('login');
+Route::get('/login-1', function () {
+    return view('client.auth.verification');
+})->name('login-1');
+Route::get('/login-2', function () {
+    return view('client.auth.complement_registration');
+})->name('login-2');
 
 
 // API Routes para serviços de cartório
@@ -111,6 +122,30 @@ Route::get('blog/filter/{category?}', [HomePageController::class, 'filterByCateg
     ->name('blog.filter');
 Route::post('/download-ficha/store', [DownloadFichaController::class, 'store'])
 ->name('download.ficha.store');
+
+// <?php
+
+// use App\Http\Controllers\Client\Auth\PreRegistrationController;
+// use App\Http\Controllers\Client\Auth\VerificationController;
+// use App\Http\Controllers\Client\Auth\ComplementRegistrationController;
+
+// Route::prefix('client')->name('client.')->group(function() {
+    
+//     // Pré-cadastro
+//     Route::get('pre-registration', [PreRegistrationController::class, 'create'])->name('pre-registration');
+//     Route::post('pre-registration', [PreRegistrationController::class, 'store'])->name('pre-registration.store');
+    
+//     // Verificação
+//     Route::get('email/verify', [VerificationController::class, 'show'])->name('verification.notice');
+//     Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+//     Route::post('email/verification-resend', [VerificationController::class, 'resend'])->name('verification.resend');
+    
+//     // Complementação cadastral
+//     Route::get('complement-registration', [ComplementRegistrationController::class, 'create'])->name('complement-registration')->middleware(['auth', 'verified']);
+//     Route::post('complement-registration', [ComplementRegistrationController::class, 'store'])->name('complement-registration.store')->middleware(['auth', 'verified']);
+    
+// });
+
 
 View::composer('client.blades.index', function ($view) {
     $services = RegistryService::where('is_active', true)

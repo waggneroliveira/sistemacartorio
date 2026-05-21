@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('whatsapp', 20);
             $table->string('email')->unique();
             $table->boolean('active')->default(0);
+            $table->boolean('lgpd_accept')->default(false);
             $table->string('password');
             $table->string('path_image')->nullable();
             $table->timestamp('email_verified_at')->nullable();

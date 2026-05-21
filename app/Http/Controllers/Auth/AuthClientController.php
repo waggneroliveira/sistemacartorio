@@ -14,15 +14,17 @@ class AuthClientController extends Controller
     {
         $credentials = $request->only('email', 'password');
         $credentials['active'] = 1;
-
         // Tenta autenticar
         if (!Auth::guard('client')->attempt($credentials)) {
             $client = Client::where('email', $request->email)->first();
-
+            
             if (!$client || !$client->active) {
-                return back()->withErrors([
-                    'email' => 'E-mail inválido ou usuário inativo.',
-                ])->withInput();
+                // dd($client);
+                // return back()->withErrors([
+                //     'email' => 'E-mail inválido ou usuário inativo.',
+                // ])->withInput();
+                session()->flash('error', __('E-mail inválido ou usuário inativo.'));
+                return redirect()->back();
             }
 
             if (!Hash::check($request->password, $client->password)) {
@@ -33,7 +35,7 @@ class AuthClientController extends Controller
         }
 
         $client = Auth::guard('client')->user();
-
+        
         session()->flash('success', 'Login realizado com sucesso!');
         return redirect()->back();
     }
