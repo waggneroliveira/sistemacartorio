@@ -24,7 +24,7 @@ class ComplementaryRegistrationController extends Controller
             return redirect()->route('index');
         }
 
-        return view('client.auth.complementary-registration', compact('client'));
+        return view('client.auth.complement_registration', compact('client'));
     }
 
     /**

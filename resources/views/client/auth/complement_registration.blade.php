@@ -550,7 +550,7 @@
       </div>
     </div>
 {{-- {{ route('complement-registration.store') }} --}}
-    <form method="POST" action="" enctype="multipart/form-data" id="complementForm">
+    <form method="POST" action="{{ route('complementary-add-on.store') }}" enctype="multipart/form-data" id="complementForm">
       @csrf
       
       @if(session('error'))
@@ -564,7 +564,7 @@
         <!-- ETAPA 1 -->
         <div class="step-pane active-pane" id="step1">
           <div class="info-box"><i class="fas fa-info-circle"></i> Seus dados ficarão protegidos conforme a LGPD.</div>
-          <div class="input-group-friendly"><label><i class="fas fa-user"></i> Nome completo *</label><input type="text" name="full_name" class="input-friendly" required></div>
+          <div class="input-group-friendly"><label><i class="fas fa-user"></i> Nome completo *</label><input type="text" name="name" value="{{$client->name}}" readonly class="input-friendly" required></div>
           <div class="row-2">
             <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> CPF *</label><input type="text" name="cpf" id="cpf" class="input-friendly" required placeholder="000.000.000-00"></div>
             <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> RG *</label><input type="text" name="rg" class="input-friendly" required placeholder="Nº do RG"></div>
