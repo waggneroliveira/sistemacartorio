@@ -18,6 +18,7 @@ class AuthClientController extends Controller
         if (!Auth::guard('client')->attempt($credentials)) {
             $client = Client::where('email', $request->email)->first();
             
+            dd($credentials);
             if (!$client) {
                 session()->flash('error', __('E-mail inválido ou usuário inativo.'));
                 return redirect()->back();
@@ -54,7 +55,7 @@ class AuthClientController extends Controller
         Auth::guard('client')->logout();
 
         session()->flash('success', 'Logout realizado com sucesso!');
-        return redirect()->back();
+        return redirect()->route('login');
     }
 
 }

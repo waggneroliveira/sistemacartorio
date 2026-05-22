@@ -21,6 +21,27 @@
       background: linear-gradient(135deg, #e8f0f5 0%, #d4e2ec 100%);
       min-height: 100vh;
     }
+    .input-friendly:disabled,
+.input-friendly[readonly] {
+    background-color: #f5f5f5;
+    color: #777;
+    border: 1px solid #ddd;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+/* Remove efeitos de foco */
+.input-friendly:disabled:focus,
+.input-friendly[readonly]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Opcional: estilizar o container também */
+.input-group-friendly:has(.input-friendly:disabled),
+.input-group-friendly:has(.input-friendly[readonly]) {
+    opacity: 0.9;
+}
 
     /* Header simplificado */
     .simple-header {
@@ -339,6 +360,16 @@
       gap: 0.8rem;
     }
 
+    .row-3 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .row-3 > * {
+        width: calc(33.333% - 10px);
+    }
+
     /* Upload */
     .upload-box {
       border: 2px dashed #cbd5e1;
@@ -436,8 +467,22 @@
       align-items: center;
       gap: 10px;
     }
+    .col-12 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    @media (min-width: 768px) {
+      .col-md-2 {
+            flex: 0 0 16.66666667%;
+            max-width: 16.66666667%;
+        }
 
-    /* Responsivo */
+        .col-md-5 {
+            flex: 0 0 41.66666667%;
+            max-width: 41.66666667%;
+        }
+    }
+        /* Responsivo */
     @media (max-width: 1024px) {
       .layout-3cols {
         grid-template-columns: 1fr;
@@ -549,61 +594,141 @@
         <div class="step" id="step3Indicator"><div class="step-circle">3</div><div class="step-label">Documentos</div></div>
       </div>
     </div>
-{{-- {{ route('complement-registration.store') }} --}}
+
     <form method="POST" action="{{ route('complementary-add-on.store') }}" enctype="multipart/form-data" id="complementForm">
       @csrf
       
       @if(session('error'))
-        <div class="message-area message-error" style="margin: 0 1.5rem; background:#ffe6e5; color:#b91c1c;"><i class="fas fa-exclamation-triangle"></i> {{ session('error') }}</div>
+        <div class="message-area message-error" style="margin: 0 1.5rem; margin-bottom: 15px; background:#ffe6e5; color:#b91c1c;"><i class="fas fa-exclamation-triangle"></i> {{ session('error') }}</div>
       @endif
       @if(session('success'))
-        <div class="message-area message-success" style="margin: 0 1.5rem; background:#e0f2fe; color:#198754;"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+        <div class="message-area message-success" style="margin: 0 1.5rem; margin-bottom: 15px; background:#e0f2fe; color:#198754;"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
       @endif
 
       <div class="step-content">
         <!-- ETAPA 1 -->
         <div class="step-pane active-pane" id="step1">
-          <div class="info-box"><i class="fas fa-info-circle"></i> Seus dados ficarão protegidos conforme a LGPD.</div>
-          <div class="input-group-friendly"><label><i class="fas fa-user"></i> Nome completo *</label><input type="text" name="name" value="{{$client->name}}" readonly class="input-friendly" required></div>
-          <div class="row-2">
-            <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> CPF *</label><input type="text" name="cpf" id="cpf" class="input-friendly" required placeholder="000.000.000-00"></div>
-            <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> RG *</label><input type="text" name="rg" class="input-friendly" required placeholder="Nº do RG"></div>
-          </div>
-          <div class="row-2">
-            <div class="input-group-friendly"><label><i class="fas fa-building"></i> Órgão emissor *</label><input type="text" name="issuing_body" class="input-friendly" required placeholder="Ex: SSP"></div>
-            <div class="input-group-friendly"><label><i class="fas fa-calendar-alt"></i> Data de nascimento *</label><input type="date" name="birth_date" class="input-friendly" required></div>
-          </div>
-          <div class="row-2">
-            <div class="input-group-friendly"><label><i class="fas fa-globe"></i> Nacionalidade *</label><select name="nationality" class="input-friendly" required><option value="">Selecione</option><option value="brasileiro">Brasileiro</option><option value="naturalizado">Naturalizado</option><option value="estrangeiro">Estrangeiro</option></select></div>
-            <div class="input-group-friendly"><label><i class="fas fa-heart"></i> Estado civil *</label><select name="marital_status" class="input-friendly" required><option value="">Selecione</option><option value="solteiro">Solteiro(a)</option><option value="casado">Casado(a)</option><option value="divorciado">Divorciado(a)</option><option value="viuvo">Viúvo(a)</option><option value="uniao_estavel">União Estável</option></select></div>
-          </div>
-          <div class="input-group-friendly"><label><i class="fas fa-female"></i> Nome da mãe *</label><input type="text" name="mother_name" class="input-friendly" required placeholder="Nome completo da sua mãe"></div>
-          <div class="input-group-friendly"><label><i class="fas fa-male"></i> Nome do pai</label><input type="text" name="father_name" class="input-friendly" placeholder="Nome completo do seu pai (opcional)"></div>
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    <strong><i class="fas fa-exclamation-circle"></i> Erros ao preencher o formulário:</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <div class="info-box"><i class="fas fa-info-circle"></i> Seus dados ficarão protegidos conforme a LGPD.</div>
+            <div class="input-group-friendly"><label><i class="fas fa-user"></i> Nome completo *</label><input type="text" name="name" value="{{$client->name}}" readonly disabled class="input-friendly" required></div>
+            <div class="row-2">
+                <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> CPF *</label><input type="text" name="cpf" id="cpf" maxlength="14" class="input-friendly" required placeholder="000.000.000-00"></div>
+                <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> RG *</label><input type="text" name="rg" id="rg" maxlength="13" class="input-friendly" required placeholder="Nº do RG"></div>
+            </div>
+            <div class="row-3">
+                <div class="input-group-friendly"><label><i class="fas fa-building"></i> Órgão emissor *</label><input type="text" name="issuing_body" class="input-friendly" required placeholder="Ex: SSP"></div>
+                <div class="input-group-friendly"><label><i class="fas fa-calendar-alt"></i> Data de nascimento *</label><input type="date" name="birth_date" class="input-friendly" required></div>
+                <div class="input-group-friendly">
+                  <label for="gender">Gênero</label>
+                  <select id="gender" name="gender" class="input-friendly" required>
+                      <option value="">Selecione...</option>
+                      <option value="male" {{ old('gender', $client->gender) == 'male' ? 'selected' : '' }}>Masculino</option>
+                      <option value="female" {{ old('gender', $client->gender) == 'female' ? 'selected' : '' }}>Feminino</option>
+                      <option value="other" {{ old('gender', $client->gender) == 'other' ? 'selected' : '' }}>Outro</option>
+                  </select>
+                  @error('gender')
+                      <span class="error-text">{{ $message }}</span>
+                  @enderror
+                </div>
+            </div>
+            <div class="row-2">
+                <div class="input-group-friendly">
+                    <label><i class="fas fa-globe"></i> Nacionalidade *</label>
+                    <select name="nationality" class="input-friendly" required>
+                        <option value="">Selecione</option>
+                        <option value="brasileiro">Brasileiro</option>
+                        <option value="naturalizado">Naturalizado</option>
+                        <option value="estrangeiro">Estrangeiro</option>
+                    </select>
+                </div>
+                <div class="input-group-friendly">
+                    <label><i class="fas fa-heart"></i> Estado civil *</label>
+                    <select name="marital_status" class="input-friendly" required>
+                        <option value="">Selecione</option>
+                        <option value="solteiro">Solteiro(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="viuvo">Viúvo(a)</option>
+                        <option value="uniao_estavel">União Estável</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group-friendly"><label><i class="fas fa-female"></i> Nome da mãe *</label><input type="text" name="mother_name" class="input-friendly" required placeholder="Nome completo da sua mãe"></div>
+            <div class="input-group-friendly"><label><i class="fas fa-male"></i> Nome do pai</label><input type="text" name="father_name" class="input-friendly" placeholder="Nome completo do seu pai (opcional)"></div>
         </div>
-
         <!-- ETAPA 2 -->
         <div class="step-pane" id="step2">
-          <div class="info-box"><i class="fas fa-map-marker-alt"></i> Digite seu CEP para preencher automaticamente.</div>
-          <div class="input-group-friendly"><label><i class="fas fa-mail-bulk"></i> CEP *</label><input type="text" name="cep" id="cep" class="input-friendly" required placeholder="00000-000"></div>
-          <div class="input-group-friendly"><label><i class="fas fa-road"></i> Rua *</label><input type="text" name="street" id="street" class="input-friendly" required></div>
-          <div class="row-2">
-            <div class="input-group-friendly"><label><i class="fas fa-hashtag"></i> Número *</label><input type="text" name="number" class="input-friendly" required placeholder="Número"></div>
-            <div class="input-group-friendly"><label><i class="fas fa-building"></i> Complemento</label><input type="text" name="complement" class="input-friendly" placeholder="Apto, bloco"></div>
-          </div>
-          <div class="input-group-friendly"><label><i class="fas fa-location-dot"></i> Bairro *</label><input type="text" name="neighborhood" id="neighborhood" class="input-friendly" required></div>
-          <div class="row-2">
-            <div class="input-group-friendly"><label><i class="fas fa-city"></i> Cidade *</label><input type="text" name="city" id="city" class="input-friendly" required></div>
-            <div class="input-group-friendly"><label><i class="fas fa-map-pin"></i> Estado *</label><select name="state" id="state" class="input-friendly" required><option value="">Selecione</option><option value="AC">Acre</option><option value="SP">São Paulo</option><option value="RJ">Rio de Janeiro</option><option value="MG">Minas Gerais</option></select></div>
-          </div>
+            <div class="info-box"><i class="fas fa-map-marker-alt"></i> Digite seu CEP para preencher automaticamente.</div>
+            <div class="input-group-friendly"><label><i class="fas fa-mail-bulk"></i> CEP *</label><input type="text" name="cep" id="cep" class="input-friendly" required placeholder="00000-000"></div>
+            <div class="input-group-friendly"><label><i class="fas fa-road"></i> Rua *</label><input type="text" name="street" id="street" class="input-friendly" required></div>
+            <div class="row-2">
+                <div class="input-group-friendly"><label><i class="fas fa-hashtag"></i> Número *</label><input type="text" name="number" class="input-friendly" required placeholder="Número"></div>
+                <div class="input-group-friendly"><label><i class="fas fa-building"></i> Complemento</label><input type="text" name="complement" class="input-friendly" placeholder="Apto, bloco"></div>
+            </div>
+            <div class="input-group-friendly"><label><i class="fas fa-location-dot"></i> Bairro *</label><input type="text" name="neighborhood" id="neighborhood" class="input-friendly" required></div>
+            <div class="row-2">
+                <div class="input-group-friendly"><label><i class="fas fa-city"></i> Cidade *</label><input type="text" name="city" id="city" class="input-friendly" required></div>
+                <div class="input-group-friendly">
+                    <label><i class="fas fa-map-pin"></i> Estado *</label>
+                    <select name="state" id="state" class="input-friendly" required>
+                        <option value="">Selecione</option>
+                        <option value="BA">Bahia</option>
+                    </select>
+                </div>
+            </div>
         </div>
-
         <!-- ETAPA 3 -->
         <div class="step-pane" id="step3">
-          <div class="info-box"><i class="fas fa-cloud-upload-alt"></i> Envie fotos legíveis dos seus documentos.</div>
-          <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> Foto do RG *</label><div class="upload-box" onclick="document.getElementById('rg_file').click()"><i class="fas fa-image"></i><div>Clique para enviar</div><div class="btn-upload">Selecionar arquivo</div></div><input type="file" id="rg_file" name="rg_file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required><div class="file-status" id="rg_status"></div></div>
-          <div class="input-group-friendly"><label><i class="fas fa-id-card"></i> Foto do CPF *</label><div class="upload-box" onclick="document.getElementById('cpf_file').click()"><i class="fas fa-image"></i><div>Clique para enviar</div><div class="btn-upload">Selecionar arquivo</div></div><input type="file" id="cpf_file" name="cpf_file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required><div class="file-status" id="cpf_status"></div></div>
-          <div class="input-group-friendly"><label><i class="fas fa-home"></i> Comprovante de residência *</label><div class="upload-box" onclick="document.getElementById('proof_address').click()"><i class="fas fa-file-alt"></i><div>Conta de luz, água ou internet</div><div class="btn-upload">Selecionar arquivo</div></div><input type="file" id="proof_address" name="proof_address" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required><div class="file-status" id="proof_status"></div></div>
-          <div class="input-group-friendly"><label><i class="fas fa-folder-open"></i> Outros documentos (opcional)</label><div class="upload-box" onclick="document.getElementById('other_docs').click()"><i class="fas fa-plus-circle"></i><div>Envie outros documentos se necessário</div><div class="btn-upload">Selecionar arquivos</div></div><input type="file" id="other_docs" name="other_documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none;"><div class="file-status" id="other_status"></div></div>
+            <div class="info-box"><i class="fas fa-cloud-upload-alt"></i> Envie fotos legíveis dos seus documentos.</div>
+            <div class="input-group-friendly">
+                <label><i class="fas fa-id-card"></i> Foto do RG *</label>
+                <div class="upload-box" onclick="document.getElementById('rg_file').click()">
+                    <i class="fas fa-image"></i>
+                    <div>Clique para enviar</div>
+                    <div class="btn-upload">Selecionar arquivo</div>
+                </div>
+                <input type="file" id="rg_file" name="rg_file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required>
+                <div class="file-status" id="rg_status"></div>
+            </div>
+            <div class="input-group-friendly">
+                <label><i class="fas fa-id-card"></i> Foto do CPF *</label>
+                <div class="upload-box" onclick="document.getElementById('cpf_file').click()">
+                    <i class="fas fa-image"></i>
+                    <div>Clique para enviar</div>
+                    <div class="btn-upload">Selecionar arquivo</div>
+                </div>
+                <input type="file" id="cpf_file" name="cpf_file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required>
+                <div class="file-status" id="cpf_status"></div>
+            </div>
+            <div class="input-group-friendly">
+                <label><i class="fas fa-home"></i> Comprovante de residência *</label>
+                <div class="upload-box" onclick="document.getElementById('proof_address').click()">
+                    <i class="fas fa-file-alt"></i>
+                    <div>Conta de luz, água ou internet</div>
+                    <div class="btn-upload">Selecionar arquivo</div>
+                </div>
+                <input type="file" id="proof_address" name="proof_address" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" required>
+                <div class="file-status" id="proof_status"></div>
+            </div>
+            <div class="input-group-friendly">
+                <label><i class="fas fa-folder-open"></i> Outros documentos (opcional)</label>
+                <div class="upload-box" onclick="document.getElementById('other_docs').click()">
+                    <i class="fas fa-plus-circle"></i>
+                    <div>Envie outros documentos se necessário</div>
+                    <div class="btn-upload">Selecionar arquivos</div>
+                </div>
+                <input type="file" id="other_docs" name="other_documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none;">
+                <div class="file-status" id="other_status"></div>
+            </div>
         </div>
 
         <div class="nav-buttons">
@@ -652,6 +777,26 @@
 </div>
 
 <script>
+  // Máscara RG
+  const rgInput = document.getElementById('rg');
+
+  rgInput.addEventListener('input', function (e) {
+      let value = e.target.value;
+
+      // Remove tudo que não for número
+      value = value.replace(/\D/g, '');
+
+      // Limita a 9 números
+      value = value.substring(0, 10);
+
+      // Aplica a máscara
+      value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+      value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      value = value.replace(/\.(\d{3})(\d)/, '.$1-$2');
+
+      e.target.value = value;
+  });
+
   // Máscara CPF
   const cpfInput = document.getElementById('cpf');
   if(cpfInput) {
@@ -736,6 +881,7 @@
   showFileName('rg_file','rg_status'); showFileName('cpf_file','cpf_status'); showFileName('proof_address','proof_status');
   const otherDocs = document.getElementById('other_docs'), otherStatus = document.getElementById('other_status');
   if(otherDocs && otherStatus) otherDocs.addEventListener('change', () => { if(otherDocs.files.length) otherStatus.innerHTML = `<i class="fas fa-check-circle"></i> ${otherDocs.files.length} arquivo(s) selecionado(s)`; else otherStatus.innerHTML = ''; });
+
 </script>
 </body>
 </html>

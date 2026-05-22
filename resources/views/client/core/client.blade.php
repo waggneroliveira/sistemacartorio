@@ -1340,7 +1340,7 @@
                                 <li><a class="dropdown-item" href="{{route('profile')}}"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+                                <li><a class="dropdown-item text-danger" href="{{route('client.user.logout')}}"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
                             </ul>
                         </div>
                         

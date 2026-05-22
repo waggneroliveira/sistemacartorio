@@ -34,6 +34,10 @@ class Client extends Authenticatable
         'path_image',
         'profile_completed',
         'profile_completed_at',
+        'rg_path',
+        'cpf_path', 
+        'proof_address_path', 
+        'other_documents_paths',
     ];
 
     protected $casts = [

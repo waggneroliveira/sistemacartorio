@@ -41,7 +41,7 @@ use Inertia\Inertia;
 require __DIR__ . '/dashboard.php';
 
 Route::get('/', function () {
-    return redirect()->route('index');
+    return redirect()->route('login');
 });
 
 

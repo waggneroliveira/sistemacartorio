@@ -37,7 +37,7 @@ class ComplementaryRegistrationController extends Controller
         if (!$client) {
             return redirect()->route('login');
         }
-
+        
         $validated = $request->validate([
             'cpf' => 'nullable|string|max:14|unique:clients,cpf,' . $client->id,
             'birth_date' => 'nullable|date|before:today',
@@ -48,13 +48,50 @@ class ComplementaryRegistrationController extends Controller
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:2',
             'zip_code' => 'nullable|string|max:10',
+            'rg_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'cpf_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'proof_address' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'other_documents' => 'nullable|array',
+            'other_documents.*' => 'file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
             'cpf.unique' => 'Este CPF já está cadastrado.',
             'birth_date.before' => 'Data de nascimento inválida.',
+            'rg_file.max' => 'O arquivo RG não pode exceder 5MB.',
+            'cpf_file.max' => 'O arquivo CPF não pode exceder 5MB.',
+            'proof_address.max' => 'O comprovante de residência não pode exceder 5MB.',
+            'other_documents.*.max' => 'Os documentos não podem exceder 5MB cada.',
         ]);
 
         try {
             DB::beginTransaction();
+
+            // Upload do RG
+            if ($request->hasFile('rg_file')) {
+                $rgPath = $request->file('rg_file')->store("clients/{$client->id}/documents/rg", 'public');
+                $validated['rg_path'] = $rgPath;
+            }
+
+            // Upload do CPF
+            if ($request->hasFile('cpf_file')) {
+                $cpfPath = $request->file('cpf_file')->store("clients/{$client->id}/documents/cpf", 'public');
+                $validated['cpf_path'] = $cpfPath;
+            }
+
+            // Upload do comprovante de residência
+            if ($request->hasFile('proof_address')) {
+                $proofPath = $request->file('proof_address')->store("clients/{$client->id}/documents/proof_address", 'public');
+                $validated['proof_address_path'] = $proofPath;
+            }
+
+            // Upload de outros documentos
+            $otherDocsPaths = [];
+            if ($request->hasFile('other_documents')) {
+                foreach ($request->file('other_documents') as $file) {
+                    $path = $file->store("clients/{$client->id}/documents/others", 'public');
+                    $otherDocsPaths[] = $path;
+                }
+                $validated['other_documents_paths'] = json_encode($otherDocsPaths);
+            }
 
             $client->update([
                 'cpf' => $validated['cpf'] ?? null,
@@ -68,6 +105,10 @@ class ComplementaryRegistrationController extends Controller
                 'zip_code' => $validated['zip_code'] ?? null,
                 'profile_completed' => true,
                 'profile_completed_at' => now(),
+                'rg_path' => $validated['rg_path'] ?? null,
+                'cpf_path' => $validated['cpf_path'] ?? null,
+                'proof_address_path' => $validated['proof_address_path'] ?? null,
+                'other_documents_paths' => $validated['other_documents_paths'] ?? null,
             ]);
 
             DB::commit();
