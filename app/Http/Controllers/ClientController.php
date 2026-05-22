@@ -50,8 +50,14 @@ class ClientController extends Controller
                 'email' => $validated['email'],
                 'whatsapp' => $validated['whatsapp'] ?? null,
                 'password' => Hash::make($validated['password']),
+                
+                // Campos de status
                 'active' => 0, // Começa inativo até confirmar email
+                'profile_completed' => 0,
                 'lgpd_accept' => $request->has('lgpd_accept'),
+                
+                // Campos de verificação de email
+                'email_verified_at' => null,
                 'email_verification_token' => $token,
                 'email_verification_requested_at' => now(),
             ]);
