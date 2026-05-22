@@ -1,6 +1,27 @@
 @extends('client.core.client')
 @section('content')
 <style>
+        .input-friendly:disabled,
+.input-friendly[readonly] {
+    background-color: #f5f5f5;
+    color: #777;
+    border: 1px solid #ddd;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+/* Remove efeitos de foco */
+.input-friendly:disabled:focus,
+.input-friendly[readonly]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Opcional: estilizar o container também */
+.input-group-friendly:has(.input-friendly:disabled),
+.input-group-friendly:has(.input-friendly[readonly]) {
+    opacity: 0.9;
+}
     p{
         font-size: clamp(0.75rem, 0.938vw, 0.938rem);
         line-height: 23px;
@@ -44,14 +65,14 @@
     }
     
     .step-item.active .step-circle {
-        background-color: #1a3e2f;
+        background-color: #0a2b3e;
         color: white;
-        box-shadow: 0 0 0 4px rgba(26, 62, 47, 0.2);
+        box-shadow: 0 0 0 4px rgba(10, 43, 62, 0.2);
         transform: scale(1.05);
     }
     
     .step-item.completed .step-circle {
-        background-color: #0d9488;
+        background-color: #1b4f6e;
         color: white;
     }
     
@@ -64,12 +85,12 @@
     }
     
     .step-item.active .step-label {
-        color: #1a3e2f;
+        color: #0a2b3e;
         font-weight: 700;
     }
     
     .step-item.completed .step-label {
-        color: #0d9488;
+        color: #1b4f6e;
     }
     
     .step-connector {
@@ -132,7 +153,7 @@
     }
     
     .services-header {
-        background: #1a3e2f;
+        background: #0a2b3e;
         color: white;
         padding: 1rem 1.25rem;
     }
@@ -151,7 +172,7 @@
         border-radius: 10px;
     }
     .services-list::-webkit-scrollbar-thumb {
-        background: #1a3e2f;
+        background: #0a2b3e;
         border-radius: 10px;
     }
     
@@ -170,13 +191,13 @@
     }
     
     .service-item:hover {
-        background: #e8f3ec;
+        background: #e8f0ec;
         transform: translateX(4px);
     }
     
     .service-item.selected {
-        background: linear-gradient(135deg, #e8f3ec 0%, #d4e8db 100%);
-        border-color: #1a3e2f;
+        background: linear-gradient(135deg, #e8f0ec 0%, #d4e0d8 100%);
+        border-color: #0a2b3e;
     }
     
     .service-icon {
@@ -188,12 +209,12 @@
         align-items: center;
         justify-content: center;
         font-size: 1.35rem;
-        color: #1a3e2f;
+        color: #0a2b3e;
         flex-shrink: 0;
     }
     
     .service-item.selected .service-icon {
-        background: #1a3e2f;
+        background: #0a2b3e;
         color: white;
     }
     
@@ -215,7 +236,7 @@
     }
     
     .service-check {
-        color: #1a3e2f;
+        color: #0a2b3e;
         font-size: 1.1rem;
         flex-shrink: 0;
     }
@@ -241,7 +262,7 @@
     }
     
     .documentos-header {
-        background: #0d9488;
+        background: #1b4f6e;
         color: white;
         padding: 1rem 1.25rem;
         border-radius: 20px 20px 0 0;
@@ -281,8 +302,8 @@
     }
     
     .form-control:focus, .form-select:focus {
-        border-color: #1a3e2f;
-        box-shadow: 0 0 0 3px rgba(26, 62, 47, 0.1);
+        border-color: #0a2b3e;
+        box-shadow: 0 0 0 3px rgba(10, 43, 62, 0.1);
         outline: none;
     }
     
@@ -309,13 +330,13 @@
     }
     
     .upload-area:hover {
-        background-color: #f0f9f4;
-        border-color: #1a3e2f;
+        background-color: #f0f7f3;
+        border-color: #0a2b3e;
     }
     
     /* Botão de envio */
     .btn-submit {
-        background: linear-gradient(135deg, #1a3e2f 0%, #2a5e45 100%);
+        background: linear-gradient(135deg, #0a2b3e 0%, #1b4f6e 100%);
         border: none;
         padding: 0.875rem;
         font-size: 1rem;
@@ -326,7 +347,7 @@
     
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(26, 62, 47, 0.3);
+        box-shadow: 0 8px 20px rgba(10, 43, 62, 0.3);
     }
     
     /* Animações */
@@ -395,7 +416,7 @@
 
 <!-- HEADER -->
 <div class="text-center mb-4">
-    <h1 class="display-6 fw-bold" style="color: #1a3e2f;">
+    <h1 class="display-6 fw-bold" style="color: #0a2b3e;">
         <i class="bi bi-building-check"></i> Cartório Online
     </h1>
     <p class="lead text-secondary">Solicite serviços de forma rápida e segura</p>
@@ -479,8 +500,8 @@
     <div class="card form-card">
         <div class="card-header">
             <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-primary bg-opacity-10 p-2">
-                    <i class="bi bi-pencil-square fs-5 text-primary"></i>
+                <div class="rounded-circle p-2" style="background: rgba(10, 43, 62, 0.1);">
+                    <i class="bi bi-pencil-square fs-5" style="color: #0a2b3e;"></i>
                 </div>
                 <div>
                     <h3 class="mb-0 fs-6 fw-bold">2. Preencha seus dados</h3>
@@ -501,8 +522,8 @@
                     <label class="form-label required-field">
                         <i class="bi bi-person-badge"></i> Nome completo
                     </label>
-                    <input type="text" class="form-control" id="nomeCompleto" name="nome" 
-                        placeholder="Digite seu nome completo" required>
+                    <input type="text" class="form-control" id="nomeCompleto" 
+                        placeholder="Digite seu nome completo" readonly disabled value="{{ Auth::guard('client')->user()->name }}" required>
                 </div>
                 
                 <div class="row g-3 mb-3">
@@ -510,14 +531,14 @@
                         <label class="form-label required-field">
                             <i class="bi bi-envelope"></i> E-mail
                         </label>
-                        <input type="email" class="form-control" id="email" name="email" 
+                        <input type="email" class="form-control" id="email" readonly disabled value="{{ Auth::guard('client')->user()->email }}" 
                             placeholder="seuemail@exemplo.com" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label required-field">
                             <i class="bi bi-whatsapp"></i> Telefone/WhatsApp
                         </label>
-                        <input type="tel" class="form-control" id="telefone" name="telefone" 
+                        <input type="tel" class="form-control" id="telefone" readonly disabled value="{{ Auth::guard('client')->user()->whatsapp }}"
                             placeholder="(11) 99999-9999" required>
                     </div>
                 </div>
@@ -558,7 +579,7 @@
                     </small>
                 </div>
 
-                <div class="alert alert-info small rounded-4 d-flex align-items-center gap-2" role="alert">
+                <div class="alert alert-info small rounded-4 d-flex align-items-center gap-2" role="alert" style="background: #e8f0ec; border-color: #0a2b3e; color: #0a2b3e;">
                     <i class="bi bi-shield-lock fs-5"></i>
                     <div>Seus documentos são protegidos e utilizados apenas para finalização do serviço cartorário.</div>
                 </div>
@@ -634,7 +655,7 @@ function renderDynamicFields(fields) {
     }
     
     let html = '<div class="dynamic-fields-wrapper">';
-    html += '<div class="alert alert-success py-2 mb-3 small"><i class="bi bi-file-text"></i> <strong>Dados específicos do serviço selecionado</strong></div>';
+    html += '<div class="alert alert-success py-2 mb-3 small" style="background: #e8f0ec; border-color: #0a2b3e; color: #0a2b3e;"><i class="bi bi-file-text"></i> <strong>Dados específicos do serviço selecionado</strong></div>';
     
     fields.forEach(campo => {
         const obrigatorio = campo.required ? 'required' : '';
@@ -720,7 +741,7 @@ function updateDocuments(documents, serviceName, instructions) {
     
     let docsHtml = `
         <div class="mb-3 pb-2 border-bottom">
-            <strong class="text-success">${serviceName}</strong>
+            <strong class="fw-bold" style="color: #0a2b3e;">${escapeHtml(serviceName)}</strong>
             <p class="small text-muted mt-1 mb-0">${instructions || 'Envie os documentos abaixo:'}</p>
         </div>
         <ul class="list-unstyled mb-3">
@@ -729,7 +750,7 @@ function updateDocuments(documents, serviceName, instructions) {
     docsArray.forEach(doc => {
         if (doc && typeof doc === 'string') {
             docsHtml += `<li class="mb-2 d-flex align-items-start gap-2">
-                            <i class="bi bi-check-circle-fill text-success mt-1" style="font-size: 0.75rem;"></i>
+                            <i class="bi bi-check-circle-fill mt-1" style="font-size: 0.75rem; color: #1b4f6e;"></i>
                             <span>${escapeHtml(doc)}</span>
                         </li>`;
         }
@@ -1055,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropzone.style.backgroundColor = '#e9f3ef';
-            dropzone.style.borderColor = '#1a3e2f';
+            dropzone.style.borderColor = '#0a2b3e';
         });
         dropzone.addEventListener('dragleave', () => {
             dropzone.style.backgroundColor = '#fafcfb';
