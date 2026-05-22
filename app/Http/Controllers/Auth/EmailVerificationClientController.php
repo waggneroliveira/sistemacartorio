@@ -7,6 +7,7 @@ use App\Models\SettingEmail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\ResendConfirmationEmailClient;
@@ -32,7 +33,10 @@ class EmailVerificationClientController extends Controller
             'active' => 1,
         ]);
 
-        return redirect()->route('login')->with('success', 'E-mail verificado com sucesso! Agora você pode fazer login.');
+        // Faz login automático do cliente e redireciona para completar o cadastro
+        Auth::guard('client')->login($client);
+
+        return redirect()->route('complementary-add-on')->with('success', 'E-mail verificado com sucesso! Complete seu cadastro complementar.');
     }
 
     /**
