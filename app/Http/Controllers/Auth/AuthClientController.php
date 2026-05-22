@@ -13,16 +13,12 @@ class AuthClientController extends Controller
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        $credentials['active'] = 1;
+        
         // Tenta autenticar
         if (!Auth::guard('client')->attempt($credentials)) {
             $client = Client::where('email', $request->email)->first();
             
-            if (!$client || !$client->active) {
-                // dd($client);
-                // return back()->withErrors([
-                //     'email' => 'E-mail inválido ou usuário inativo.',
-                // ])->withInput();
+            if (!$client) {
                 session()->flash('error', __('E-mail inválido ou usuário inativo.'));
                 return redirect()->back();
             }
@@ -36,8 +32,21 @@ class AuthClientController extends Controller
 
         $client = Auth::guard('client')->user();
         
+        // Verifica se o email foi confirmado
+        if (!$client->email_verified_at) {
+            Auth::guard('client')->logout();
+            return redirect()->route('client.email.pending')
+                ->with('info', 'Por favor, confirme seu e-mail para continuar.');
+        }
+
+        // Verifica se o perfil foi completado
+        if (!$client->profile_completed) {
+            return redirect()->route('complementary-add-on')
+                ->with('info', 'Complete seu cadastro para continuar.');
+        }
+
         session()->flash('success', 'Login realizado com sucesso!');
-        return redirect()->back();
+        return redirect()->route('index');
     }
 
     public function logout(Request $request)

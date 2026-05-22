@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\SettingEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\ConfirmEmailClient;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
 class ClientController extends Controller
@@ -37,23 +42,46 @@ class ClientController extends Controller
         try {
             DB::beginTransaction();
 
-            Client::create([
+            // Gera um token de verificação
+            $token = Str::random(64);
+
+            $client = Client::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'whatsapp' => $validated['whatsapp'] ?? null,
                 'password' => Hash::make($validated['password']),
-                'active' => $validated['active'] ?? 1,
+                'active' => 0, // Começa inativo até confirmar email
                 'lgpd_accept' => $request->has('lgpd_accept'),
+                'email_verification_token' => $token,
+                'email_verification_requested_at' => now(),
             ]);
+
+            // Configura as credenciais de email
+            $emailSettings = SettingEmail::first();
+            
+            Config::set([
+                'mail.default' => $emailSettings->mail_mailer ?? 'smtp',
+                'mail.mailers.smtp.transport' => $emailSettings->mail_mailer ?? 'smtp',
+                'mail.mailers.smtp.host' => $emailSettings->mail_host ?? 'smtp.gmail.com',
+                'mail.mailers.smtp.port' => $emailSettings->mail_port ?? 465,
+                'mail.mailers.smtp.encryption' => $emailSettings->mail_encryption ?? 'ssl',
+                'mail.mailers.smtp.username' => $emailSettings->mail_username ?? 'waggner.447@gmail.com',
+                'mail.mailers.smtp.password' => $emailSettings->mail_password ?? 'aggd cvvg ljkp gxli',
+                'mail.from.address' => $emailSettings->mail_from_address ?? 'waggner.447@gmail.com',
+                'mail.from.name' => $emailSettings->mail_from_name ?? 'WHI - Web de Alta inspiração',
+            ]);
+
+            // Envia o email de confirmação
+            Mail::to($client->email)->send(new ConfirmEmailClient($client, $token));
 
             DB::commit();
 
             return redirect()
-            ->route('login')  // Vai para a página de login
+            ->route('login')
             ->with([
-                'cadastro_success' => true,      // Session que o modal espera
-                'cadastro_email' => $validated['email'],  // Email para exibir no modal
-                'success' => 'Pré-cadastro realizado! Verifique seu e-mail para ativar a conta.'
+                'cadastro_success' => true,
+                'cadastro_email' => $validated['email'],
+                'success' => 'Pré-cadastro realizado! Verifique seu e-mail para confirmar e ativar a conta.'
             ]);
 
         } catch (\Exception $e) {

@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthClientController;
+use App\Http\Controllers\Auth\EmailVerificationClientController;
+use App\Http\Controllers\Auth\PasswordEmailClientController;
+use App\Http\Controllers\Auth\ResetPasswordClientController;
 use App\Http\Controllers\Client\AboutPageController;
 use App\Http\Controllers\Client\BenefitPageController;
 use App\Http\Controllers\Client\BlogPageController;
@@ -14,6 +17,7 @@ use App\Http\Controllers\Client\ProductPageController;
 use App\Http\Controllers\Client\RegionPageController;
 use App\Http\Controllers\Client\RegistryServicePageController;
 use App\Http\Controllers\Client\RegistryServiceRequestController;
+use App\Http\Controllers\Client\ComplementaryRegistrationController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DownloadFichaController;
@@ -39,7 +43,7 @@ require __DIR__ . '/dashboard.php';
 Route::get('/', function () {
     return redirect()->route('index');
 });
-Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('index');
+
 
 Route::get('/meus-pedidos', [OrdersPageController::class, 'index'])->name('orders');
 Route::get('/meus-perfil', function () {
@@ -58,9 +62,7 @@ Route::get('/login', function () {
 Route::get('/login-1', function () {
     return view('client.auth.verification');
 })->name('login-1');
-Route::get('/login-2', function () {
-    return view('client.auth.complement_registration');
-})->name('login-2');
+
 
 
 // API Routes para serviços de cartório
@@ -77,6 +79,19 @@ Route::get('produtos', [ProductPageController::class, 'productAll'])->name('prod
 
 Route::post('login.do', [AuthClientController::class, 'authenticate'])
 ->name('client.user.authenticate');
+
+// Email Verification Routes
+Route::get('/email/verify/{token}', [EmailVerificationClientController::class, 'verify'])
+    ->name('client.email.verify');
+
+Route::get('/email/verification-pending', [EmailVerificationClientController::class, 'pending'])
+    ->name('client.email.pending');
+
+Route::get('/reenviar-confirmacao', [EmailVerificationClientController::class, 'showResendForm'])
+    ->name('client.email.resend-form');
+
+Route::post('/reenviar-confirmacao', [EmailVerificationClientController::class, 'resend'])
+    ->name('client.email.resend');
 
 // Rota para processar o formulário "Esqueci a senha"
 Route::post('/password/email', [PasswordEmailClientController::class, 'passwordEmail'])
@@ -100,6 +115,17 @@ Route::get('/senha-alterada-com-sucesso', function () {
 
 
 Route::middleware([AuthClientMiddleware::class])->group(function () {
+    Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('index');
+    
+    Route::get('/cadastro-complementar', [ComplementaryRegistrationController::class, 'show'])
+        ->name('complementary-add-on');
+    
+    Route::post('/cadastro-complementar', [ComplementaryRegistrationController::class, 'store'])
+        ->name('complementary-add-on.store');
+    
+    Route::post('/cadastro-complementar/skip', [ComplementaryRegistrationController::class, 'skip'])
+        ->name('complementary-add-on.skip');
+
     Route::put('/client/update', [ClientController::class, 'update'])->name('client.update');
 
     Route::post('/client/comments', [CommentController::class, 'store'])
@@ -122,8 +148,6 @@ Route::post('cliente/cadastro', [ClientController::class, 'store'])->name('regis
 Route::post('cliente/cadastro/verification', [ClientController::class, 'verification'])->name('resend.verification');
 
 
-
-Route::get('/', [HomePageController::class, 'index'])->name('index');
 Route::get('sobre', [AboutPageController::class, 'index'])->name('about');
 Route::get('eventos', [EventPageController::class, 'index'])->name('client.event');
 Route::get('blog/filter/{category?}', [HomePageController::class, 'filterByCategory'])

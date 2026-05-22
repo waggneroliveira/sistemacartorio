@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Spatie\Activitylog\LogOptions;
 use App\Services\ActivityLogService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Notifications\ClientResetPasswordNotification;
@@ -18,16 +17,33 @@ class Client extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'email_verification_token',
         'whatsapp',
+        'cpf',
+        'birth_date',
+        'gender',
+        'street',
+        'number',
+        'complement',
+        'city',
+        'state',
+        'zip_code',
         'password',
         'active',
         'lgpd_accept',
         'path_image',
+        'profile_completed',
+        'profile_completed_at',
     ];
 
     protected $casts = [
         'lgpd_accept' => 'boolean',
         'active' => 'boolean',
+        'profile_completed' => 'boolean',
+        'birth_date' => 'date',
+        'email_verified_at' => 'datetime',
+        'email_verification_requested_at' => 'datetime',
+        'profile_completed_at' => 'datetime',
     ];
     
     protected $hidden = [
