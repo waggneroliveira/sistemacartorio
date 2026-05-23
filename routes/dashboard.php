@@ -27,6 +27,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\RegistryServiceController;
 use App\Http\Controllers\RegistryServiceRequestDashboardController;
+use App\Http\Controllers\RequestStatusController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceLocationController;
@@ -115,12 +116,26 @@ Route::prefix('painel/')->group(function () {
             Route::get('/', [RegistryServiceRequestDashboardController::class, 'index'])->name('index');
             Route::get('/{id}', [RegistryServiceRequestDashboardController::class, 'show'])->name('show');
             Route::patch('/{id}/status', [RegistryServiceRequestDashboardController::class, 'updateStatus'])->name('updateStatus');
-            Route::post('/{id}/observation', [RegistryServiceRequestDashboardController::class, 'addObservation'])->name('addObservation');
+            Route::post('/{id}/internal-note', [RegistryServiceRequestDashboardController::class, 'addInternalNote'])->name('addInternalNote');
+            Route::post('/{id}/assign-user', [RegistryServiceRequestDashboardController::class, 'assignUser'])->name('assignUser');
             Route::post('/{id}/request-documents', [RegistryServiceRequestDashboardController::class, 'requestDocuments'])->name('requestDocuments');
             Route::post('/{id}/approve-documents', [RegistryServiceRequestDashboardController::class, 'approveDocuments'])->name('approveDocuments');
             Route::post('/{id}/close', [RegistryServiceRequestDashboardController::class, 'closeRequest'])->name('closeRequest');
             Route::post('/{id}/reopen', [RegistryServiceRequestDashboardController::class, 'reopenRequest'])->name('reopenRequest');
             Route::post('/bulk-action', [RegistryServiceRequestDashboardController::class, 'bulkAction'])->name('bulkAction');
+            Route::get('/export', [RegistryServiceRequestDashboardController::class, 'export'])->name('export');
+        });
+
+        // STATUS DAS SOLICITAÇÕES (Gerenciamento)
+        Route::prefix('status-solicitacoes')->name('admin.dashboard.requestStatus.')->group(function() {
+            Route::get('/', [RequestStatusController::class, 'index'])->name('index');
+            Route::get('/create', [RequestStatusController::class, 'create'])->name('create');
+            Route::post('/', [RequestStatusController::class, 'store'])->name('store');
+            Route::get('/{requestStatus}/edit', [RequestStatusController::class, 'edit'])->name('edit');
+            Route::put('/{requestStatus}', [RequestStatusController::class, 'update'])->name('update');
+            Route::delete('/{requestStatus}', [RequestStatusController::class, 'destroy'])->name('destroy');
+            Route::post('/{requestStatus}/deactivate', [RequestStatusController::class, 'deactivate'])->name('deactivate');
+            Route::post('/{requestStatus}/activate', [RequestStatusController::class, 'activate'])->name('activate');
         });
 
 

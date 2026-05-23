@@ -44,8 +44,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
-Route::get('/meus-pedidos', [OrdersPageController::class, 'index'])->name('orders');
 Route::get('/meus-perfil', function () {
     return view('client.blades.profile');
 })->name('profile');
@@ -116,6 +114,8 @@ Route::get('/senha-alterada-com-sucesso', function () {
 
 Route::middleware([AuthClientMiddleware::class])->group(function () {
     Route::get('/servicos-cartorio', [RegistryServicePageController::class, 'index'])->name('index');
+
+    Route::get('/meus-pedidos', [OrdersPageController::class, 'index'])->name('orders');
     
     Route::get('/cadastro-complementar', [ComplementaryRegistrationController::class, 'show'])
         ->name('complementary-add-on');
