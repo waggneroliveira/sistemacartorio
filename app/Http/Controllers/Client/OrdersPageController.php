@@ -44,7 +44,7 @@ class OrdersPageController extends Controller
             $requests = $dbRequests->map(function ($request) {
                 // Log para debug
                 \Log::info('Processando request ID: ' . $request->id . ', Status: ' . $request->status);
-                
+                // dd($request);
                 return [
                     'id' => $request->id,
                     'protocolo' => 'CART-' . str_pad($request->id, 5, '0', STR_PAD_LEFT),
@@ -53,7 +53,7 @@ class OrdersPageController extends Controller
                     'status' => $this->mapStatus($request->status),
                     'statusTexto' => $this->getStatusLabel($request->status),
                     'valor' => $this->getValorServico($request->service),
-                    'descricao' => $request->service?->description ?? 'Sem descrição',
+                    'descricao' => $request->service?->name ?? 'Sem descrição',
                     'documentos' => $this->getUploadedFiles($request),
                     'pagamento' => [
                         'status' => $request->payment_status ?? 'pendente',
