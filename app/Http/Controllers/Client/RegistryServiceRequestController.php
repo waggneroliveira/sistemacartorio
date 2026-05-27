@@ -37,7 +37,9 @@ class RegistryServiceRequestController extends Controller
             }
 
             // Buscar serviço
-            $service = RegistryService::find($request->servico_id);
+            $service = RegistryService::with(['requests' => function($query) {
+                $query->select('registry_service_id', 'protocol_number');
+            }])->find($request->servico_id);
 
             if (!$service) {
 
@@ -177,6 +179,7 @@ class RegistryServiceRequestController extends Controller
                 'success'    => true,
                 'message'    => 'Solicitação criada com sucesso!',
                 'request_id' => $registryRequest->id,
+                'protocol_number' => $registryRequest->protocol_number,
             ], 201);
 
         } catch (\Exception $e) {

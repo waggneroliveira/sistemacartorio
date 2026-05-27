@@ -614,7 +614,7 @@ async function submitForm(event) {
                             <p>Você enviou <strong>${uploadedFiles.length} arquivo(s)</strong>.</p>
                             <p>Em breve um atendente entrará em contato.</p>
                             <hr>
-                            <small class="text-muted">Protocolo: <strong>#${result.protocol || result.request_id}</strong></small>
+                            <small class="text-muted">Protocolo: <strong>${result.protocol_number || result.request_id}</strong></small>
                         `,
                         confirmButtonText: 'OK'
                     }).then(() => {

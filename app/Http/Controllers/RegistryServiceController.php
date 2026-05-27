@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\RegistryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RegistryServiceController extends Controller
 {
@@ -64,10 +65,15 @@ class RegistryServiceController extends Controller
             }
         }
         
-        $service = RegistryService::create($validated);
-        
-        return redirect()->route('admin.dashboard.registryService.index')
-            ->with('success', 'Serviço criado com sucesso!');
+        try {
+            DB::beginTransaction();
+                $service = RegistryService::create($validated);
+            DB::commit();
+            return redirect()->route('admin.dashboard.registryService.index')
+                ->with('success', 'Serviço criado com sucesso!');
+        } catch (\Exception $e) {
+            dd($e);
+        }
     }
     
     /**

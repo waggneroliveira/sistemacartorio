@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\RegistryService;
+use App\Models\RequestAuditTrail;
+use App\Models\RequestStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class RegistryServiceRequest extends Model
 {
@@ -43,12 +47,13 @@ class RegistryServiceRequest extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            // Gerar protocolo personalizado se não existir
             if (!$model->protocol_number) {
-                $model->protocol_number = $model->generateProtocolNumber();
+                // Usar lock para evitar concorrência
+                DB::transaction(function () use ($model) {
+                    $model->protocol_number = $model->generateProtocolNumber();
+                });
             }
             
-            // Definir status padrão se não existir
             if (!$model->request_status_id) {
                 $defaultStatus = RequestStatus::getDefault();
                 if ($defaultStatus) {
@@ -58,24 +63,29 @@ class RegistryServiceRequest extends Model
         });
     }
 
-    /**
-     * Gerar número de protocolo personalizado
-     */
     public function generateProtocolNumber()
     {
         $service = $this->service;
         $serviceCode = $service ? strtoupper(substr($service->name, 0, 3)) : 'REQ';
-        $year = date('Y');
+        $year = date('y');
         $month = date('m');
         
-        // Contar quantas solicitações do mesmo serviço foram criadas este mês
-        $count = RegistryServiceRequest::whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->where('registry_service_id', $this->registry_service_id)
-            ->count() + 1;
+        // Lock na tabela para evitar dois inserts simultâneos
+        $lastProtocol = RegistryServiceRequest::where('registry_service_id', $this->registry_service_id)
+            ->whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))
+            ->lockForUpdate()
+            ->orderBy('id', 'desc')
+            ->first();
         
-        // Formato: SRV-YY-MM-NNNNN (Ex: CRT-26-05-00001)
-        return sprintf('%s-%d-%d-%05d', $serviceCode, substr($year, -2), $month, $count);
+        if ($lastProtocol && preg_match('/\d{5}$/', $lastProtocol->protocol_number, $matches)) {
+            $lastNumber = intval($matches[0]);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        
+        return sprintf('%s-%s-%s-%05d', $serviceCode, $year, $month, $newNumber);
     }
 
     /**
