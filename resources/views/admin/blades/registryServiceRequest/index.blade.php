@@ -170,7 +170,7 @@
                                                             value="{{ $request->id }}">
                                                     </td>
                                                     <td>
-                                                        <strong>#{{ $request->id }}</strong>
+                                                        <strong>{{ $request->protocol_number }}</strong>
                                                     </td>
                                                     <td>
                                                         <div>

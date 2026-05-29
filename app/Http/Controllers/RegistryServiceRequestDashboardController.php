@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class RegistryServiceRequestDashboardController extends Controller
 {
@@ -114,11 +113,8 @@ class RegistryServiceRequestDashboardController extends Controller
             ['old_status' => $oldStatus?->label, 'new_status' => $newStatus->label]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Status atualizado com sucesso!',
-            'new_status' => $newStatus->label,
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Status atualizado com sucesso!');
     }
 
     /**
@@ -155,11 +151,8 @@ class RegistryServiceRequestDashboardController extends Controller
             ['note' => $validated['note']]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Observação interna adicionada com sucesso!',
-            'note' => $newNote,
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Observação interna adicionada com sucesso!');
     }
 
     /**
@@ -240,10 +233,8 @@ class RegistryServiceRequestDashboardController extends Controller
             Log::error('Erro ao enviar email de solicitação de documentos', ['error' => $e->getMessage()]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Solicitação de documentos enviada com sucesso!',
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Solicitação de documentos enviada com sucesso!');
     }
 
     /**
@@ -283,10 +274,8 @@ class RegistryServiceRequestDashboardController extends Controller
             ['approval_notes' => $validated['approval_notes']]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Documentos aprovados com sucesso!',
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Documentos aprovados com sucesso!');
     }
 
     /**
@@ -328,10 +317,8 @@ class RegistryServiceRequestDashboardController extends Controller
             ['result' => $validated['result']]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Solicitação encerrada com sucesso!',
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Solicitação encerrada com sucesso!');
     }
 
     /**
@@ -360,10 +347,8 @@ class RegistryServiceRequestDashboardController extends Controller
             ['reopened_by' => Auth::user()->name]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Solicitação reabierta com sucesso!',
-        ]);
+        return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
+            ->with('success', 'Solicitação reabierta com sucesso!');
     }
 
     /**

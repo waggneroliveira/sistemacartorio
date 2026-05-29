@@ -4,6 +4,21 @@
         <div class="content">
             <!-- Start Content-->
             <div class="container-fluid">
+                <!-- Flash Messages -->
+                @if($message = session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle"></i> {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if($message = session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ $message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <!-- start page title -->
                 <div class="row">
                     <div class="col-12">
@@ -175,10 +190,10 @@
                                 </div>
 
                                 <!-- Formulário para adicionar observação -->
-                                <form id="addObservationForm" class="mt-3">
+                                <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.addInternalNote', $request->id) }}" class="mt-3">
                                     @csrf
                                     <div class="mb-3">
-                                        <textarea name="observation" id="observation" class="form-control" 
+                                        <textarea name="note" class="form-control" 
                                             rows="3" placeholder="Adicionar observação..." required></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-sm">
@@ -309,17 +324,20 @@
 
                                 <div id="statusForm" class="d-grid gap-2">
                                     <label class="form-label small text-muted">Alterar para:</label>
-                                    <select id="statusSelect" class="form-select form-select-sm">
-                                        <option value="">-- Selecione --</option>
-                                        @foreach($statuses as $key => $label)
-                                            @if($key != $request->status)
-                                                <option value="{{ $key }}">{{ $label }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="updateStatus()">
-                                        <i class="bi bi-check-circle"></i> Atualizar Status
-                                    </button>
+                                    <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.updateStatus', $request->id) }}" class="d-flex gap-2">
+                                        @csrf
+                                        <select name="request_status_id" class="form-select form-select-sm">
+                                            <option value="">-- Selecione --</option>
+                                            @foreach($statuses as $status)
+                                                @if($status->id != $request->request_status_id)
+                                                    <option value="{{ $status->id }}">{{ $status->label }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-check-circle"></i> Atualizar
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -358,9 +376,12 @@
 
                                 <!-- Reabrir (se encerrada) -->
                                 @if($request->status == 'completed' || $request->status == 'rejected')
-                                    <button type="button" class="btn btn-outline-warning" onclick="reopenRequest()">
-                                        <i class="bi bi-arrow-repeat"></i> Reabrir Solicitação
-                                    </button>
+                                    <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.reopenRequest', $request->id) }}" class="d-grid">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-warning" onclick="return confirm('Tem certeza que deseja reabrir esta solicitação?')">
+                                            <i class="bi bi-arrow-repeat"></i> Reabrir Solicitação
+                                        </button>
+                                    </form>
                                 @endif
                             </div>
                         </div>
@@ -393,7 +414,7 @@
                     <h5 class="modal-title">Solicitar Documentos</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="requestDocumentsForm">
+                <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.requestDocuments', $request->id) }}">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -413,20 +434,11 @@
                                 @endphp
                                 @foreach($commonDocs as $doc)
                                     <div class="form-check">
-                                        <input class="form-check-input required-doc" type="checkbox" 
-                                            value="{{ $doc }}" name="required_documents">
+                                        <input class="form-check-input" type="checkbox" 
+                                            value="{{ $doc }}" name="required_documents[]">
                                         <label class="form-check-label">{{ $doc }}</label>
                                     </div>
                                 @endforeach
-                            </div>
-                            <div class="mt-2">
-                                <small class="text-muted">Ou adicione um documento customizado:</small>
-                                <input type="text" id="customDoc" class="form-control form-control-sm" 
-                                    placeholder="Digite o documento...">
-                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" 
-                                    onclick="addCustomDocument()">
-                                    Adicionar
-                                </button>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -454,7 +466,7 @@
                     <h5 class="modal-title">Aprovar Documentos</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="approveDocumentsForm">
+                <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.approveDocuments', $request->id) }}">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -486,14 +498,14 @@
                     <h5 class="modal-title">Encerrar Solicitação</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="closeRequestForm">
+                <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.closeRequest', $request->id) }}">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="resultSelect" class="form-label">Resultado Final *</label>
                             <select id="resultSelect" name="result" class="form-select" required>
                                 <option value="">-- Selecione --</option>
-                                <option value="approved">
+                                <option value="completed">
                                     <i class="bi bi-check-circle"></i> Aprovado
                                 </option>
                                 <option value="rejected">
@@ -519,220 +531,6 @@
     </div>
 
     @push('scripts')
-    <script>
-        const requestId = {{ $request->id }};
-
-        // Adicionar documento customizado
-        function addCustomDocument() {
-            const input = document.getElementById('customDoc');
-            const value = input.value.trim();
-            
-            if (!value) return;
-
-            const checkbox = document.createElement('div');
-            checkbox.className = 'form-check';
-            checkbox.innerHTML = `
-                <input class="form-check-input required-doc" type="checkbox" 
-                    value="${value}" name="required_documents" checked>
-                <label class="form-check-label">${value}</label>
-            `;
-            
-            document.querySelector('[data-bs-target="#requestDocumentsModal"]')
-                .parentElement.querySelector('.required-doc').parentElement.insertBefore(
-                    checkbox, 
-                    document.querySelector('[data-bs-target="#requestDocumentsModal"]').parentElement.querySelector('.mt-2')
-                );
-            
-            input.value = '';
-        }
-
-        // Atualizar Status
-        function updateStatus() {
-            const status = document.getElementById('statusSelect').value;
-            
-            if (!status) {
-                alert('Selecione um status');
-                return;
-            }
-
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/status`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({ status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Status atualizado com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro ao atualizar status: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // Adicionar Observação
-        document.getElementById('addObservationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const observation = document.getElementById('observation').value;
-            
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/internal-note`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({ observation: observation })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        // Solicitar Documentos
-        document.getElementById('requestDocumentsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const selectedDocs = [];
-            document.querySelectorAll('.required-doc:checked').forEach(checkbox => {
-                selectedDocs.push(checkbox.value);
-            });
-            
-            const message = document.getElementById('messageText').value;
-            
-            if (selectedDocs.length === 0) {
-                alert('Selecione pelo menos um documento');
-                return;
-            }
-
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/request-documents`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({
-                    required_documents: selectedDocs,
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('requestDocumentsModal')).hide();
-                    alert('Documentos solicitados com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        // Aprovar Documentos
-        document.getElementById('approveDocumentsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const notes = document.getElementById('approvalNotes').value;
-            
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/approve-documents`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({ approval_notes: notes })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('approveDocumentsModal')).hide();
-                    alert('Documentos aprovados com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        // Encerrar Solicitação
-        document.getElementById('closeRequestForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const result = document.getElementById('resultSelect').value;
-            const notes = document.getElementById('closingNotes').value;
-            
-            if (!result) {
-                alert('Selecione um resultado');
-                return;
-            }
-
-            if (!notes.trim()) {
-                alert('Digite uma observação');
-                return;
-            }
-
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/close`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                },
-                body: JSON.stringify({
-                    result: result,
-                    closing_notes: notes
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('closeRequestModal')).hide();
-                    alert('Solicitação encerrada com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-        // Reabrir Solicitação
-        function reopenRequest() {
-            if (!confirm('Tem certeza que deseja reabrir esta solicitação?')) {
-                return;
-            }
-
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/reopen`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Solicitação reabierta com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
     @endpush
 
     <style>

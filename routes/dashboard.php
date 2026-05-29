@@ -115,7 +115,7 @@ Route::prefix('painel/')->group(function () {
         Route::prefix('solicitacoes-de-servicos')->name('admin.dashboard.registryServiceRequest.')->group(function() {
             Route::get('/', [RegistryServiceRequestDashboardController::class, 'index'])->name('index');
             Route::get('/{id}', [RegistryServiceRequestDashboardController::class, 'show'])->name('show');
-            Route::patch('/{id}/status', [RegistryServiceRequestDashboardController::class, 'updateStatus'])->name('updateStatus');
+            Route::post('/{id}/status', [RegistryServiceRequestDashboardController::class, 'updateStatus'])->name('updateStatus');
             Route::post('/{id}/internal-note', [RegistryServiceRequestDashboardController::class, 'addInternalNote'])->name('addInternalNote');
             Route::post('/{id}/assign-user', [RegistryServiceRequestDashboardController::class, 'assignUser'])->name('assignUser');
             Route::post('/{id}/request-documents', [RegistryServiceRequestDashboardController::class, 'requestDocuments'])->name('requestDocuments');
