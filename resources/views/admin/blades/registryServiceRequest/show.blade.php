@@ -43,7 +43,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label text-muted">Protocolo</label>
                                         <p class="fw-bold">
-                                            <span class="badge bg-primary">#{{ $request->id }}</span>
+                                            <span class="badge bg-primary">{{ $request->protocol_number }}</span>
                                         </p>
                                     </div>
                                     <div class="col-md-6">
@@ -581,7 +581,7 @@
             
             const observation = document.getElementById('observation').value;
             
-            fetch(`/painel/solicitacoes-de-servicos/${requestId}/observation`, {
+            fetch(`/painel/solicitacoes-de-servicos/${requestId}/internal-note`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
