@@ -253,7 +253,7 @@
 
                                     @if ($request->document_approval)
                                         @php
-                                            $approval = json_decode($request->document_approval, true);
+                                            $approval = $request->document_approval; // Remove o json_decode
                                         @endphp
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-success"></div>
