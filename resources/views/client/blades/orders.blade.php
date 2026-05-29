@@ -138,25 +138,37 @@ let selectedOrderId = null;
 
 // Helper: obter classe de cor do status
 function getStatusClass(status) {
+    const statusInfo = getStatusInfo();
+    if (statusInfo[status]) {
+        return `status-${statusInfo[status].color}`;
+    }
+    
     const classes = {
-        'pendente': 'status-pendente',
-        'analise': 'status-analise',
-        'aguardando_pagamento': 'status-aguardando-pagamento',
-        'andamento': 'status-andamento',
-        'concluido': 'status-concluido',
-        'cancelado': 'status-cancelado'
+        'pendente': 'status-warning',
+        'analise': 'status-info',
+        'aguardando_pagamento': 'status-warning',
+        'andamento': 'status-primary',
+        'concluido': 'status-success',
+        'cancelado': 'status-danger',
+        'rejected': 'status-danger'
     };
-    return classes[status] || 'status-pendente';
+    return classes[status] || 'status-warning';
 }
 
 function getStatusIcon(status) {
+    const statusInfo = getStatusInfo();
+    if (statusInfo[status]) {
+        return statusInfo[status].icon;
+    }
+    
     const icons = {
         'pendente': 'bi-clock',
         'analise': 'bi-search',
         'aguardando_pagamento': 'bi-credit-card',
         'andamento': 'bi-gear',
         'concluido': 'bi-check-circle',
-        'cancelado': 'bi-x-circle'
+        'cancelado': 'bi-x-circle',
+        'rejected': 'bi-x-circle'
     };
     return icons[status] || 'bi-question-circle';
 }
@@ -191,7 +203,7 @@ function renderOrdersList() {
     }
 
     let filtered = requests.filter(request => {
-        if (currentFilter !== "todos" && request.status !== currentFilter) return false;
+        if (currentFilter !== "todos" && request.status !== currentFilter && request.statusTexto !== currentFilter) return false;
         if (currentSearch) {
             const searchLower = currentSearch.toLowerCase();
             return request.protocolo.toLowerCase().includes(searchLower) ||
@@ -229,7 +241,7 @@ function renderOrdersList() {
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
                 <small class="text-muted"><i class="bi bi-calendar3"></i> ${formatDate(request.dataSolicitacao)}</small>
-                <small class="text-success">${request.status === 'aguardando_pagamento' ? formatMoney(request.valor) : 'Ver detalhes →'}</small>
+                <small class="text-success">${request.status === 'pending' ? formatMoney(request.valor) : 'Ver detalhes →'}</small>
             </div>
         </div>
     `).join('');
@@ -253,9 +265,9 @@ function updateStats() {
     }
     
     const total = requests.length;
-    const emAndamento = requests.filter(r => r.status === 'andamento' || r.status === 'analise').length;
-    const concluidos = requests.filter(r => r.status === 'concluido').length;
-    const aguardandoPagamento = requests.filter(r => r.status === 'aguardando_pagamento').length;
+    const emAndamento = requests.filter(r => r.status === 'in_progress' || r.status === 'awaiting_documents' || r.status === 'documents_approved').length;
+    const concluidos = requests.filter(r => r.status === 'completed').length;
+    const aguardandoPagamento = requests.filter(r => r.status === 'pending').length;
     
     const totalEl = document.getElementById('totalPedidos');
     const emAndamentoEl = document.getElementById('emAndamentoCount');
@@ -428,8 +440,8 @@ function confirmarPagamento(requestId, metodo, valor) {
     if (!request) return;
     
     // Atualizar status do pedido
-    request.status = 'analise';
-    request.statusTexto = 'Em análise';
+    request.status = 'in_progress';
+    request.statusTexto = 'Em andamento';
     request.pagamento = {
         status: 'pago',
         data: new Date().toISOString().split('T')[0],
@@ -473,13 +485,12 @@ function selectOrder(orderId) {
 }
 
 // Renderizar detalhes do pedido selecionado
-// Renderizar detalhes do pedido selecionado
 function renderOrderDetails(request) {
     const container = document.getElementById('orderDetailContainer');
     
-    const statusOrder = ['aguardando_pagamento', 'pendente', 'analise', 'andamento', 'concluido'];
-    const currentIndex = statusOrder.indexOf(request.status);
-    const progressPercent = currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 50;
+    const progressPercent = getTimelineProgress(request.status);
+    const statusInfo = getStatusInfo();
+    const currentStatusInfo = statusInfo[request.status] || statusInfo['pending'];
     
     // Garantir que documentos existe
     const documentos = request.documentos || [];
@@ -487,16 +498,51 @@ function renderOrderDetails(request) {
     // Garantir que campos adicionais existe
     const camposAdicionais = request.camposAdicionais || {};
     
-    // Garantir que histórico existe e ordenar cronologicamente (do mais antigo para o mais recente)
+    // Garantir que notas internas existem
+    const internalNotes = request.internalNotes || [];
+    
+    // Garantir que histórico existe
     let historico = request.historico || [];
     
     // Ordenar o histórico por data (do mais antigo para o mais recente)
     historico.sort((a, b) => {
-        // Converter as strings de data para objetos Date para comparação
         const dateA = parseDateString(a.data);
         const dateB = parseDateString(b.data);
         return dateA - dateB;
     });
+    
+    // Construir a timeline com todos os status
+    const allStatuses = ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
+    const currentStatusIndex = allStatuses.indexOf(request.status);
+    
+    const timelineHtml = `
+        <div class="timeline-container">
+            ${allStatuses.map((status, idx) => {
+                const info = statusInfo[status];
+                const isCompleted = idx < currentStatusIndex || (idx === currentStatusIndex && request.status !== 'rejected');
+                const isCurrent = idx === currentStatusIndex && request.status !== 'rejected';
+                const isRejected = request.status === 'rejected';
+                
+                return `
+                    <div class="timeline-step d-flex gap-3">
+                        <div class="timeline-icon ${isCompleted ? 'completed' : isCurrent ? 'active' : ''}" 
+                             style="${isRejected && idx >= currentStatusIndex ? 'opacity: 0.5;' : ''}">
+                            <i class="bi ${info.icon} small"></i>
+                        </div>
+                        <div class="flex-grow-1" style="${isRejected && idx >= currentStatusIndex ? 'opacity: 0.6;' : ''}">
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <strong>${info.label}</strong>
+                                ${isCurrent ? '<span class="d-flex align-items-center justify-content-center text-primary fw-semibold"> <i class="fas fa-circle-check me-1"></i> Atual </span>' : ''}
+                                ${isCompleted && !isCurrent ? '<span class="d-flex align-items-center justify-content-center text-success"> <i class="fas fa-check-circle me-1"></i> Concluído </span>' : ''}
+                            </div>
+                            <p class="mb-0 small text-secondary">${info.description}</p>
+                        </div>                        
+                    </div>
+                    ${idx !== allStatuses.length - 1 ? '<div class="timeline-connector" style="' + (isRejected && idx >= currentStatusIndex ? 'background: rgba(0,0,0,0.1);' : '') + '"></div>' : ''}
+                `;
+            }).join('')}
+        </div>
+    `;
     
     const html = `
         <div class="fade-in">
@@ -511,7 +557,7 @@ function renderOrderDetails(request) {
                 </span>
             </div>
             
-            ${request.status === 'aguardando_pagamento' ? `
+            ${request.status === 'pending' ? `
                 <div class="payment-required-card mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
@@ -608,14 +654,44 @@ function renderOrderDetails(request) {
                 </div>
             ` : ''}
             
+            <!-- Notas Internas do Cartório -->
+            ${internalNotes.length > 0 ? `
+                <div class="detail-card">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-chat-left-text"></i> Comunicados do Cartório</h6>
+                    <div class="notes-container">
+                        ${internalNotes.map((note, idx) => `
+                            <div class="note-item p-3 mb-2 bg-light rounded-3" style="border-left: 4px solid #007bff;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong class="text-primary">${note.user_name || 'Cartório'}</strong>
+                                    <small class="text-muted">${note.timestamp ? new Date(note.timestamp).toLocaleDateString('pt-BR', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) : 'Data não informada'}</small>
+                                </div>
+                                <p class="mb-0 text-secondary">${note.text || note}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <!-- Timeline com todos os status -->
+            <div class="detail-card">
+                <h6 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Linha do tempo de progresso</h6>
+                ${timelineHtml}
+            </div>
+            
             ${historico.length > 0 ? `
                 <div class="detail-card">
-                    <h6 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Linha do tempo</h6>
+                    <h6 class="fw-bold mb-3"><i class="bi bi-list-check"></i> Histórico de eventos</h6>
                     <div class="timeline-container">
                         ${historico.map((item, idx) => `
-                            <div class="timeline-step d-flex gap-3 ${idx === historico.length-1 ? 'mb-0' : ''}">
-                                <div class="timeline-icon ${idx === historico.length-1 ? 'active' : 'completed'}">
-                                    <i class="bi ${idx === historico.length-1 ? 'bi-hourglass-split' : 'bi-check2'} small"></i>
+                            <div class="timeline-step d-flex gap-3">
+                                <div class="timeline-icon completed">
+                                    <i class="bi bi-check2 small"></i>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between flex-wrap">
@@ -661,6 +737,56 @@ function parseDateString(dateStr) {
     
     // Se não conseguir, retorna data atual
     return new Date();
+}
+
+// Mapa de status do BD para informações de timeline
+function getStatusInfo() {
+    return {
+        'pending': {
+            label: 'Pendente',
+            icon: 'bi-clock',
+            color: 'warning',
+            description: 'Solicitação recebida e aguardando processamento'
+        },
+        'in_progress': {
+            label: 'Em Andamento',
+            icon: 'bi-hourglass-split',
+            color: 'primary',
+            description: 'Seu pedido está sendo processado'
+        },
+        'awaiting_documents': {
+            label: 'Aguardando Documentos',
+            icon: 'bi-file-earmark-arrow-down',
+            color: 'info',
+            description: 'Documentos foram solicitados'
+        },
+        'documents_approved': {
+            label: 'Documentos Aprovados',
+            icon: 'bi-check-circle',
+            color: 'success',
+            description: 'Documentos foram analisados e aprovados'
+        },
+        'completed': {
+            label: 'Concluído',
+            icon: 'bi-check2-circle',
+            color: 'success',
+            description: 'Seu pedido foi concluído com sucesso'
+        },
+        'rejected': {
+            label: 'Rejeitado',
+            icon: 'bi-x-circle',
+            color: 'danger',
+            description: 'Sua solicitação foi rejeitada'
+        }
+    };
+}
+
+// Determinar progresso na timeline
+function getTimelineProgress(currentStatus) {
+    const statusOrder = ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    
+    return currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 20;
 }
 
 function formatLabel(key) {

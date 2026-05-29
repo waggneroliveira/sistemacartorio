@@ -236,7 +236,7 @@
 
                                     @if ($request->document_requests)
                                         @php
-                                            $docRequests = json_decode($request->document_requests, true);
+                                            $docRequests = $request->document_requests; // Already an array, no need to decode
                                         @endphp
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-warning"></div>

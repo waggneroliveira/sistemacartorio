@@ -50,7 +50,7 @@ class OrdersPageController extends Controller
                     'protocolo' => 'CART-' . str_pad($request->id, 5, '0', STR_PAD_LEFT),
                     'servico' => $request->service?->name ?? 'Serviço indisponível',
                     'dataSolicitacao' => $request->created_at->format('Y-m-d'),
-                    'status' => $this->mapStatus($request->status),
+                    'status' => $request->status, // Passar status bruto do BD
                     'statusTexto' => $this->getStatusLabel($request->status),
                     'valor' => $this->getValorServico($request->service),
                     'descricao' => $request->service?->name ?? 'Sem descrição',
@@ -65,6 +65,7 @@ class OrdersPageController extends Controller
                     'clienteNome' => $request->full_name ?? 'Cliente',
                     'clienteEmail' => $request->email ?? 'email@exemplo.com',
                     'clienteTelefone' => $request->phone ?? '(00) 00000-0000',
+                    'internalNotes' => $this->getInternalNotes($request),
                 ];
             });
 
@@ -298,5 +299,21 @@ class OrdersPageController extends Controller
         });
 
         return $historico;
+    }
+
+    /**
+     * Obter notas internas (observações do cartório)
+     */
+    private function getInternalNotes($request)
+    {
+        if (!isset($request->internal_notes) || !$request->internal_notes) {
+            return [];
+        }
+
+        $notes = is_string($request->internal_notes)
+            ? json_decode($request->internal_notes, true)
+            : $request->internal_notes;
+
+        return is_array($notes) ? $notes : [];
     }
 }
