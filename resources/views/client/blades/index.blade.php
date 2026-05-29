@@ -8,82 +8,131 @@
     <p class="lead text-secondary">Solicite serviços de forma rápida e segura</p>
 </div>
 
-<!-- STEP INDICATOR - PASSO A PASSO VISUAL -->
-<div class="step-wrapper">
-    <div class="step-indicator" id="stepIndicator">
-        <div class="step-item" data-step="1">
-            <div class="step-circle">1</div>
-            <span class="step-label">Escolher serviço</span>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step-item" data-step="2">
-            <div class="step-circle">2</div>
-            <span class="step-label">Ver documentos</span>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step-item" data-step="3">
-            <div class="step-circle">3</div>
-            <span class="step-label">Preencher dados</span>
-        </div>
-        <div class="step-connector"></div>
-        <div class="step-item" data-step="4">
-            <div class="step-circle">4</div>
-            <span class="step-label">Enviar</span>
-        </div>
-    </div>
-    
-    <div class="guide-tip mt-2" id="guideTip">
-        <i class="bi bi-lightbulb"></i>
-        <span>✨ <strong>Dica:</strong> Comece clicando em um serviço na lista ao lado →</span>
-    </div>
-</div>
-
 <!-- LAYOUT PRINCIPAL - 3 COLUNAS -->
 <div class="services-layout">
     
-    <!-- COLUNA 1: LISTA DE SERVIÇOS -->
-    <div class="services-card">
-        <div class="services-header">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
-                <span class="fw-bold">1. Escolha o serviço</span>
+    <aside class="sidebar">
+        <!-- COLUNA 1: LISTA DE SERVIÇOS -->
+        <div class="services-card">
+            <div class="services-header">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+                    <span class="fw-bold">1. Escolha o serviço</span>
+                </div>
+                <div class="scroll-hint">
+                    <i class="bi bi-arrow-down-short"></i> Role para ver mais serviços
+                </div>
             </div>
-            <div class="scroll-hint">
-                <i class="bi bi-arrow-down-short"></i> Role para ver mais serviços
-            </div>
-        </div>
-        <div class="services-list" id="servicesContainer">
-            @forelse($services as $service)
-                <div class="service-item" data-id="{{ $service->id }}" data-name="{{ $service->name }}">
-                    <div class="service-icon">
-                        <i class="bi {{ $service->icon ?? 'bi-file-text' }}"></i>
-                    </div>
-                    <div class="service-info">
-                        <div class="service-name">{{ $service->name }}</div>
-                        <div class="service-desc">
-                            {{ Str::limit($service->instructions ?? 'Clique para ver detalhes', 50) }}
+            <div class="services-list" id="servicesContainer">
+                @forelse($services as $service)
+                    <div class="service-item" data-id="{{ $service->id }}" data-name="{{ $service->name }}">
+                        <div class="service-icon">
+                            <i class="bi {{ $service->icon ?? 'bi-file-text' }}"></i>
+                        </div>
+                        <div class="service-info">
+                            <div class="service-name">{{ $service->name }}</div>
+                            <div class="service-desc">
+                                {{ Str::limit($service->instructions ?? 'Clique para ver detalhes', 50) }}
+                            </div>
+                        </div>
+                        <div class="service-check" style="display: none;">
+                            <i class="bi bi-check-circle-fill text-success"></i>
                         </div>
                     </div>
-                    <div class="service-check" style="display: none;">
-                        <i class="bi bi-check-circle-fill text-success"></i>
+                @empty
+                    <div class="text-center py-4 text-secondary">
+                        <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+                        <span>Nenhum serviço disponível no momento</span>
                     </div>
-                </div>
-            @empty
-                <div class="text-center py-4 text-secondary">
-                    <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
-                    <span>Nenhum serviço disponível no momento</span>
-                </div>
-            @endforelse
+                @endforelse
+            </div>
+            <div class="p-2 text-center border-top bg-light">
+                <small class="text-muted">
+                    <i class="bi bi-hand-index-thumb"></i> Clique no serviço desejado
+                </small>
+            </div>
         </div>
-        <div class="p-2 text-center border-top bg-light">
-            <small class="text-muted">
-                <i class="bi bi-hand-index-thumb"></i> Clique no serviço desejado
-            </small>
+
+        <div class="sidebar-card mt-3">
+            <div class="sidebar-title">
+                <i class="fas fa-gem"></i> Benefícios do cadastro
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <div class="benefit-text">
+                <h4>Atendimento prioritário</h4>
+                <p>Agende seus serviços com antecedência</p>
+                </div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-file-signature"></i></div>
+                <div class="benefit-text">
+                <h4>Certidões online</h4>
+                <p>Solicite certidões sem sair de casa</p>
+                </div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-bell"></i></div>
+                <div class="benefit-text">
+                <h4>Acompanhamento em tempo real</h4>
+                <p>Receba notificações sobre seus processos</p>
+                </div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="benefit-text">
+                <h4>Segurança garantida</h4>
+                <p>Dados protegidos conforme a LGPD</p>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="sidebar-card">
+        <div class="sidebar-title">
+            <i class="fas fa-clock"></i> Prazo de análise
+        </div>
+        <div class="benefit-text" style="text-align: center; padding: 0.5rem 0;">
+            <p style="font-size: 1.3rem; font-weight: 700; color: #1b4f6e;">24h úteis</p>
+            <p style="font-size: 0.7rem;">Seus documentos serão analisados em até 24 horas úteis</p>
+            <div style="margin-top: 0.8rem;">
+            <span class="badge-security"><i class="fas fa-lock"></i> Ambiente 100% seguro</span>
+            </div>
+        </div>
+        </div>
+    </aside>
     
     <!-- COLUNA 2: FORMULÁRIO PRINCIPAL -->
     <div class="card form-card">
+        <!-- STEP INDICATOR - PASSO A PASSO VISUAL -->
+        <div class="step-wrapper mt-3">
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step-item" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Escolher serviço</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Ver documentos</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Preencher dados</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step-item" data-step="4">
+                    <div class="step-circle">4</div>
+                    <span class="step-label">Enviar</span>
+                </div>
+            </div>
+            
+            <div class="guide-tip mt-2" id="guideTip">
+                <i class="bi bi-lightbulb"></i>
+                <span>✨ <strong>Dica:</strong> Comece clicando em um serviço na lista ao lado →</span>
+            </div>
+        </div>
+
         <div class="card-header">
             <div class="d-flex align-items-center gap-2">
                 <div class="rounded-circle p-2" style="background: rgba(10, 43, 62, 0.1);">
@@ -113,14 +162,14 @@
                 </div>
                 
                 <div class="row g-3 mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                         <label class="form-label required-field">
                             <i class="bi bi-envelope"></i> E-mail
                         </label>
                         <input type="email" class="form-control" id="email" readonly disabled value="{{ Auth::guard('client')->user()->email }}" 
                             placeholder="seuemail@exemplo.com" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <label class="form-label required-field">
                             <i class="bi bi-whatsapp"></i> Telefone/WhatsApp
                         </label>
@@ -177,29 +226,65 @@
         </div>
     </div>
     
-    <!-- COLUNA 3: DOCUMENTOS NECESSÁRIOS -->
-    <div class="documentos-card" id="documentosCard">
-        <div class="documentos-header">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-file-earmark-check fs-5"></i>
-                <span class="fw-bold">Documentos necessários</span>
+    <!-- SIDEBAR DIREITA - Contato e Ajuda -->
+    <aside class="sidebar">
+        <!-- COLUNA 3: DOCUMENTOS NECESSÁRIOS -->
+        <div class="documentos-card" id="documentosCard">
+            <div class="documentos-header">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-check fs-5"></i>
+                    <span class="fw-bold">2. Documentos necessários</span>
+                </div>
+                <div class="small mt-1 opacity-75">
+                    <i class="bi bi-info-circle"></i> Tenha estes documentos em mãos
+                </div>
             </div>
-            <div class="small mt-1 opacity-75">
-                <i class="bi bi-info-circle"></i> Tenha estes documentos em mãos
+            <div class="documentos-content" id="docsExplanation">
+                <div class="text-center py-4 text-secondary">
+                    <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                    <span>Selecione um serviço<br>para ver os documentos necessários</span>
+                </div>
+            </div>
+            <div class="p-2 text-center border-top bg-light">
+                <small class="text-muted">
+                    <i class="bi bi-camera"></i> Tire foto ou digitalize os documentos
+                </small>
             </div>
         </div>
-        <div class="documentos-content" id="docsExplanation">
-            <div class="text-center py-4 text-secondary">
-                <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
-                <span>Selecione um serviço<br>para ver os documentos necessários</span>
+
+        <div class="sidebar-card mt-3">
+            <div class="sidebar-title"><i class="fas fa-headset"></i> Precisa de ajuda?</div>
+            <div class="contact-item"><i class="fab fa-whatsapp"></i> <a href="#">(11) 99999-1234</a></div>
+            <div class="contact-item"><i class="fas fa-phone-alt"></i> (11) 3456-7890</div>
+            <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:suporte@cartoriocentral.com.br">suporte@cartoriocentral.com.br</a></div>
+            <div class="hours"><i class="fas fa-clock"></i> Segunda a Sexta: 9h às 18h</div>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title"><i class="fas fa-question-circle"></i> Dúvidas frequentes</div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-file"></i></div>
+                <div class="benefit-text"><h4>Quais documentos enviar?</h4><p>RG, CPF e comprovante de residência</p></div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+                <div class="benefit-text"><h4>Quanto tempo demora?</h4><p>Análise em até 24h úteis</p></div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-icon"><i class="fas fa-lock"></i></div>
+                <div class="benefit-text"><h4>Meus dados estão seguros?</h4><p>Sim, seguimos a LGPD</p></div>
             </div>
         </div>
-        <div class="p-2 text-center border-top bg-light">
-            <small class="text-muted">
-                <i class="bi bi-camera"></i> Tire foto ou digitalize os documentos
-            </small>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title"><i class="fas fa-star"></i> Avaliação do serviço</div>
+            <div style="text-align: center;">
+                <div style="color: #ffc107; font-size: 1rem;">★★★★★</div>
+                <p style="font-size: 0.7rem; margin-top: 0.3rem;">4.9 de 5 - Baseado em 2.500+ avaliações</p>
+            </div>
         </div>
-    </div>
+    </aside>
+
 </div>
 
 <script>
