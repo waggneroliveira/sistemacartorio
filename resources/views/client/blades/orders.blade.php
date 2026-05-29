@@ -508,7 +508,7 @@ function renderOrderDetails(request) {
     historico.sort((a, b) => {
         const dateA = parseDateString(a.data);
         const dateB = parseDateString(b.data);
-        return dateA - dateB;
+        return dateB - dateA;
     });
     
     // Construir a timeline com todos os status
