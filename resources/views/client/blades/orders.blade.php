@@ -241,7 +241,7 @@ function renderOrdersList() {
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
                 <small class="text-muted"><i class="bi bi-calendar3"></i> ${formatDate(request.dataSolicitacao)}</small>
-                <small class="text-success">${request.status === 'pending' ? formatMoney(request.valor) : 'Ver detalhes →'}</small>
+                <small class="text-success">${request.status === 'pending' ? formatMoney('R$ ' + request.valor) : 'Ver detalhes →'}</small>
             </div>
         </div>
     `).join('');

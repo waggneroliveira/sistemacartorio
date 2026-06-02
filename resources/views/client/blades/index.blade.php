@@ -416,12 +416,12 @@ function updateDocuments(documents, serviceName, instructions, valorServico) {
     
     let docsHtml = `
         <div class="mb-3 pb-2 border-bottom">
-            <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex justify-content-between flex-column align-items-start mb-2">
                 <div>
                     <strong class="fw-bold" style="color: #0a2b3e;">${escapeHtml(serviceName)}</strong>
                     <p class="small text-muted mt-1 mb-0">${instructions || 'Envie os documentos abaixo:'}</p>
                 </div>
-                <div class="text-end">
+                <div class="text-end mt-2">
                     <div class="badge ${valorServico && valorServico > 0 ? 'bg-success' : 'bg-secondary'} fs-6">
                         ${valorFormatado}
                     </div>
