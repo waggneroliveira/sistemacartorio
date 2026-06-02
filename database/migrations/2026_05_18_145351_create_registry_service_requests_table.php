@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone');
             $table->json('dynamic_fields_data')->nullable(); // Dados dos campos dinâmicos
             $table->json('uploaded_files')->nullable(); // Informações dos arquivos
-            $table->enum('status', ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'awaiting_payment',  'completed', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'awaiting_payment', 'payment_approved', 'completed', 'rejected'])->default('pending');
             $table->text('admin_notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -83,9 +83,6 @@ class AuthController extends Controller
         }
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
         session()->flash('success', 'Logout realizado com sucesso!');
         return redirect('/painel/success-logout');
     }

@@ -32,6 +32,7 @@ class RegistryServiceRequest extends Model
         'document_requests',
         'document_approval',
         'awaiting_payment',
+        'payment_approved',
         'closing_data',
         'assigned_to',
     ];

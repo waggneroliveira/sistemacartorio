@@ -267,13 +267,25 @@
                                         </div>
                                     @endif
 
-                                    @if ($request->status == 'awaiting_payment' || $request->status == 'in_progress' || $request->status == 'awaiting_documents' || $request->status == 'documents_approved' || $request->status == 'completed')
+                                    @if ($request->status == 'awaiting_payment' || $request->status == 'payment_approved' || $request->status == 'in_progress' || $request->status == 'awaiting_documents' || $request->status == 'documents_approved' || $request->status == 'completed')
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-warning"></div>
                                             <div class="timeline-content">
                                                 <h6 class="mb-1">Aguardando Pagamento</h6>
                                                 <p class="text-muted mb-2">
                                                     Solicitação aguardando confirmação do pagamento
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if ($request->status == 'payment_approved' || $request->status == 'in_progress' || $request->status == 'awaiting_documents' || $request->status == 'documents_approved' || $request->status == 'completed')
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker bg-success"></div>
+                                            <div class="timeline-content">
+                                                <h6 class="mb-1">Pagamento Aprovado</h6>
+                                                <p class="text-muted mb-2">
+                                                    Pagamento recebido e confirmado
                                                 </p>
                                             </div>
                                         </div>
@@ -324,6 +336,7 @@
                                         'awaiting_documents' => 'secondary',
                                         'documents_approved' => 'success',
                                         'awaiting_payment' => 'warning',
+                                        'payment_approved' => 'success',
                                         'completed' => 'success',
                                         'rejected' => 'danger',
                                     ];
@@ -385,6 +398,17 @@
                                         @csrf
                                         <button type="submit" class="btn btn-success" onclick="return confirm('Deseja confirmar o recebimento do pagamento?')">
                                             <i class="bi bi-credit-card-fill"></i> Confirmar Pagamento
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <!-- Iniciar Processamento -->
+                                @if($request->status == 'payment_approved')
+                                    <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.updateStatus', $request->id) }}" class="d-grid">
+                                        @csrf
+                                        <input type="hidden" name="request_status_id" value="{{ $statuses->where('name', 'in_progress')->first()->id ?? '' }}">
+                                        <button type="submit" class="btn btn-info" onclick="return confirm('Iniciar processamento do serviço?')">
+                                            <i class="bi bi-play-circle-fill"></i> Iniciar Processamento
                                         </button>
                                     </form>
                                 @endif

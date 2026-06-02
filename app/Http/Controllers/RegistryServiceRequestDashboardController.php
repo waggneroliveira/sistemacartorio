@@ -328,16 +328,16 @@ class RegistryServiceRequestDashboardController extends Controller
     {
         $registryRequest = RegistryServiceRequest::findOrFail($id);
 
-        // Mudança para o novo status de "Em Progresso" após confirmação de pagamento
-        $inProgressStatus = RequestStatus::where('name', 'in_progress')->first();
-        if ($inProgressStatus) {
+        // Mudança para o novo status de "Pagamento Aprovado" após confirmação de pagamento
+        $paymentApprovedStatus = RequestStatus::where('name', 'payment_approved')->first();
+        if ($paymentApprovedStatus) {
             $registryRequest->update([
-                'request_status_id' => $inProgressStatus->id,
-                'status' => $inProgressStatus->name,
+                'request_status_id' => $paymentApprovedStatus->id,
+                'status' => $paymentApprovedStatus->name,
             ]);
         }
 
-        // Registrar que pagamento foi confirmado (pode armazenar em internal_notes)
+        // Registrar que pagamento foi confirmado
         $paymentData = [
             'timestamp' => now()->toIso8601String(),
             'confirmed_by_id' => Auth::id(),
@@ -353,7 +353,7 @@ class RegistryServiceRequestDashboardController extends Controller
         );
 
         return redirect()->route('admin.dashboard.registryServiceRequest.show', $id)
-            ->with('success', 'Pagamento confirmado! Status alterado para "Em Progresso".');
+            ->with('success', 'Pagamento confirmado! Status alterado para "Pagamento Aprovado".');
     }
 
     /**
