@@ -23,6 +23,7 @@
                                             <th>Nome</th>
                                             <th>Campos</th>
                                             <th>Documentos</th>
+                                            <th>Valor</th>
                                             <th>Ordem</th>
                                             <th>Status</th>
                                             <th>Ações</th>
@@ -46,6 +47,13 @@
                                                 @endphp
                                                 <span class="badge bg-warning">{{ $docsCount }} docs</span>
                                              </td>
+                                            <td>
+                                                @if($service->service_value)
+                                                    <span class="badge bg-success">R$ {{ number_format($service->service_value, 2, ',', '.') }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Gratuito</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $service->display_order }}</td>
                                             <td>
                                                 <span class="badge bg-{{ $service->is_active ? 'success' : 'danger' }}">

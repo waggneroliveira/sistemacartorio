@@ -65,6 +65,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => 'Nome completo como consta no registro'
                     ]
                 ]),
+                'service_value' => 45.00,
                 'is_active' => true,
                 'display_order' => 1,
             ],
@@ -128,6 +129,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => ''
                     ]
                 ]),
+                'service_value' => 45.00,
                 'is_active' => true,
                 'display_order' => 2,
             ],
@@ -215,6 +217,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => ''
                     ]
                 ]),
+                'service_value' => 45.00,
                 'is_active' => true,
                 'display_order' => 3,
             ],
@@ -262,6 +265,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => 'Número de assinaturas a serem reconhecidas'
                     ]
                 ]),
+                'service_value' => 30.00,
                 'is_active' => true,
                 'display_order' => 4,
             ],
@@ -341,6 +345,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => ''
                     ]
                 ]),
+                'service_value' => 150.00,
                 'is_active' => true,
                 'display_order' => 5,
             ],
@@ -379,6 +384,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => 'Número total de páginas'
                     ]
                 ]),
+                'service_value' => 40.00,
                 'is_active' => true,
                 'display_order' => 6,
             ],
@@ -425,6 +431,7 @@ class RegistryServiceSeeder extends Seeder
                         'placeholder' => 'Valor em reais (R$)'
                     ]
                 ]),
+                'service_value' => 250.00,
                 'is_active' => true,
                 'display_order' => 7,
             ],

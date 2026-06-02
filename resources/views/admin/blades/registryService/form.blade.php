@@ -75,14 +75,21 @@
     </div>
     
     <!-- Ordem de Exibição -->
-    <div class="mb-3 col-12 col-md-6">
+    <div class="mb-3 col-12 col-md-2">
         <label for="display_order" class="form-label">Ordem de Exibição</label>
         <input type="number" name="display_order" class="form-control" id="display_order" value="{{ old('display_order', $service->display_order ?? 0) }}">
         <small class="text-muted">Números menores aparecem primeiro</small>
     </div>
     
+    <!-- Valor do Serviço -->
+    <div class="mb-3 col-12 col-md-5">
+        <label for="service_value" class="form-label">Valor do Serviço (R$)</label>
+        <input type="number" name="service_value" class="form-control" id="service_value" step="0.01" min="0" value="{{ old('service_value', $service->service_value ?? '') }}" placeholder="0.00">
+        <small class="text-muted">Deixe em branco se o serviço for gratuito</small>
+    </div>
+    
     <!-- Status -->
-    <div class="mb-3 col-12 col-md-6">
+    <div class="mb-3 col-12 col-md-5">
         <label for="is_active" class="form-label">Status</label>
         <select name="is_active" class="form-select" id="is_active">
             <option value="1" {{ old('is_active', $service->is_active ?? 1) == 1 ? 'selected' : '' }}>Ativo</option>

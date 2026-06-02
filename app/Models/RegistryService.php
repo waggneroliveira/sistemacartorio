@@ -17,13 +17,15 @@ class RegistryService extends Model
         'required_documents',
         'instructions',
         'dynamic_fields',
+        'service_value',
         'is_active',
         'display_order'
     ];
     
     protected $casts = [
         'required_documents' => 'array', 
-        'dynamic_fields' => 'array',     
+        'dynamic_fields' => 'array',
+        'service_value' => 'decimal:2',
         'is_active' => 'boolean'
     ];
     
