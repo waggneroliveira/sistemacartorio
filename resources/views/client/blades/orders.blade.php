@@ -557,7 +557,7 @@ function renderOrderDetails(request) {
                 </span>
             </div>
             
-            ${request.status === 'pending' ? `
+            ${request.status === 'awaiting_payment' ? `
                 <div class="payment-required-card mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
