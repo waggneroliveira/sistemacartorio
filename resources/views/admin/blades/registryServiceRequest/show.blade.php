@@ -267,6 +267,18 @@
                                         </div>
                                     @endif
 
+                                    @if ($request->status == 'awaiting_payment' || $request->status == 'in_progress' || $request->status == 'awaiting_documents' || $request->status == 'documents_approved' || $request->status == 'completed')
+                                        <div class="timeline-item">
+                                            <div class="timeline-marker bg-warning"></div>
+                                            <div class="timeline-content">
+                                                <h6 class="mb-1">Aguardando Pagamento</h6>
+                                                <p class="text-muted mb-2">
+                                                    Solicitação aguardando confirmação do pagamento
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     @if ($request->closing_data)
                                         @php
                                             $closing = json_decode($request->closing_data, true);
@@ -311,6 +323,7 @@
                                         'in_progress' => 'info',
                                         'awaiting_documents' => 'secondary',
                                         'documents_approved' => 'success',
+                                        'awaiting_payment' => 'warning',
                                         'completed' => 'success',
                                         'rejected' => 'danger',
                                     ];
@@ -366,6 +379,16 @@
                                     </button>
                                 @endif
 
+                                <!-- Confirmar Pagamento -->
+                                @if($request->status == 'awaiting_payment')
+                                    <form method="POST" action="{{ route('admin.dashboard.registryServiceRequest.confirmPayment', $request->id) }}" class="d-grid">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success" onclick="return confirm('Deseja confirmar o recebimento do pagamento?')">
+                                            <i class="bi bi-credit-card-fill"></i> Confirmar Pagamento
+                                        </button>
+                                    </form>
+                                @endif
+
                                 <!-- Encerrar Solicitação -->
                                 @if($request->status != 'completed' && $request->status != 'rejected')
                                     <button type="button" class="btn btn-outline-danger" 
@@ -395,7 +418,9 @@
                                 <ul class="small text-muted mb-0">
                                     <li>Adicione observações para comunicar com sua equipe</li>
                                     <li>Solicite documentos quando necessário</li>
-                                    <li>Aprove os documentos antes de finalizar</li>
+                                    <li>Aprove os documentos antes de solicitar pagamento</li>
+                                    <li>Marque como "Aguardando Pagamento" após aprovação</li>
+                                    <li>Confirme o pagamento quando recebido</li>
                                     <li>Sempre deixe uma nota ao encerrar</li>
                                 </ul>
                             </div>

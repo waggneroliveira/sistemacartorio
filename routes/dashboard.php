@@ -120,6 +120,7 @@ Route::prefix('painel/')->group(function () {
             Route::post('/{id}/assign-user', [RegistryServiceRequestDashboardController::class, 'assignUser'])->name('assignUser');
             Route::post('/{id}/request-documents', [RegistryServiceRequestDashboardController::class, 'requestDocuments'])->name('requestDocuments');
             Route::post('/{id}/approve-documents', [RegistryServiceRequestDashboardController::class, 'approveDocuments'])->name('approveDocuments');
+            Route::post('/{id}/confirm-payment', [RegistryServiceRequestDashboardController::class, 'confirmPayment'])->name('confirmPayment');
             Route::post('/{id}/close', [RegistryServiceRequestDashboardController::class, 'closeRequest'])->name('closeRequest');
             Route::post('/{id}/reopen', [RegistryServiceRequestDashboardController::class, 'reopenRequest'])->name('reopenRequest');
             Route::post('/bulk-action', [RegistryServiceRequestDashboardController::class, 'bulkAction'])->name('bulkAction');
