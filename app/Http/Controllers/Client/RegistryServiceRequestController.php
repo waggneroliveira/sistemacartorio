@@ -283,4 +283,86 @@ class RegistryServiceRequestController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Upload de documentos para uma solicitação existente (cliente)
+     */
+    public function uploadDocuments(Request $request, int $id): JsonResponse
+    {
+        try {
+            $registryRequest = RegistryServiceRequest::findOrFail($id);
+
+            $files = $request->file('documentos');
+            if (!$files || count($files) === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nenhum arquivo enviado',
+                ], 422);
+            }
+
+            $uploadedFilesInfo = $this->getUploadedFilesInfo($registryRequest);
+
+            foreach ($files as $file) {
+                if (!$file || !$file->isValid()) continue;
+
+                if (!$this->isValidFile($file)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Arquivo '{$file->getClientOriginalName()}' inválido. Permitidos: PDF, JPG e PNG. Máx: 10MB",
+                    ], 422);
+                }
+
+                $storedPath = $file->store('uploads/registry-requests', 'public');
+
+                $uploadedFilesInfo[] = [
+                    'original_name' => $file->getClientOriginalName(),
+                    'stored_name' => $storedPath,
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ];
+            }
+
+            // Atualizar registro
+            $registryRequest->update(['uploaded_files' => $uploadedFilesInfo]);
+
+            // Registrar auditoria
+            if (class_exists('\App\Models\RequestAuditTrail')) {
+                \App\Models\RequestAuditTrail::logAction(
+                    $id,
+                    'documents_uploaded',
+                    null,
+                    $uploadedFilesInfo,
+                    ['files_count' => count($uploadedFilesInfo)]
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Documentos enviados com sucesso',
+                'uploaded_files' => $uploadedFilesInfo,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar documentos para solicitação', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar upload de documentos',
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper: retorna os arquivos já enviados (array)
+     */
+    private function getUploadedFilesInfo($registryRequest)
+    {
+        if (isset($registryRequest->uploaded_files) && $registryRequest->uploaded_files) {
+            if (is_string($registryRequest->uploaded_files)) {
+                $files = json_decode($registryRequest->uploaded_files, true);
+                return is_array($files) ? $files : [];
+            }
+            return is_array($registryRequest->uploaded_files) ? $registryRequest->uploaded_files : [];
+        }
+        return [];
+    }
 }

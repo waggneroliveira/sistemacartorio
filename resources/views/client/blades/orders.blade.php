@@ -75,6 +75,7 @@
             <button class="btn btn-outline-secondary filter-btn" data-filter="pendente">📋 Pendente</button>
             <button class="btn btn-outline-secondary filter-btn" data-filter="analise">🔍 Em análise</button>
             <button class="btn btn-outline-secondary filter-btn" data-filter="aguardando_pagamento">💰 Aguardando pagamento</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="pagamento_realizado">✅ Pagamento realizado</button>
             <button class="btn btn-outline-secondary filter-btn" data-filter="andamento">⚙️ Em andamento</button>
             <button class="btn btn-outline-secondary filter-btn" data-filter="concluido">✅ Concluído</button>
         </div>
@@ -147,6 +148,7 @@ function getStatusClass(status) {
         'pendente': 'status-warning',
         'analise': 'status-info',
         'aguardando_pagamento': 'status-warning',
+        'pagamento_realizado': 'status-success',
         'andamento': 'status-primary',
         'concluido': 'status-success',
         'cancelado': 'status-danger',
@@ -165,6 +167,7 @@ function getStatusIcon(status) {
         'pendente': 'bi-clock',
         'analise': 'bi-search',
         'aguardando_pagamento': 'bi-credit-card',
+        'pagamento_realizado': 'bi-check-circle',
         'andamento': 'bi-gear',
         'concluido': 'bi-check-circle',
         'cancelado': 'bi-x-circle',
@@ -494,6 +497,8 @@ function renderOrderDetails(request) {
     
     // Garantir que documentos existe
     const documentos = request.documentos || [];
+    // Documentos solicitados pelo admin
+    const requestedDocuments = request.documentosSolicitados || null;
     
     // Garantir que campos adicionais existe
     const camposAdicionais = request.camposAdicionais || {};
@@ -628,6 +633,22 @@ function renderOrderDetails(request) {
                 <p class="mb-0">${request.descricao || 'Sem descrição'}</p>
             </div>
             
+            ${requestedDocuments ? `
+                <div class="detail-card">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text"></i> Documentos solicitados</h6>
+                    ${requestedDocuments.message ? `<p class="mb-2 small text-muted">${requestedDocuments.message}</p>` : ''}
+                    <ul class="mb-2">
+                        ${(requestedDocuments.documents || []).map(d => `<li>${d}</li>`).join('')}
+                    </ul>
+                    ${request.status === 'awaiting_documents' ? `
+                        <div class="mt-3">
+                            <input type="file" id="uploadInput-${request.id}" multiple accept=".pdf,.jpg,.jpeg,.png" class="form-control form-control-sm" />
+                            <button class="btn btn-primary btn-sm mt-2" onclick="submitRequestedDocuments(${request.id})">Enviar Documentos</button>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+
             ${documentos.length > 0 ? `
                 <div class="detail-card">
                     <h6 class="fw-bold mb-2"><i class="bi bi-file-earmark-text"></i> Documentos enviados</h6>
@@ -821,6 +842,53 @@ function formatLabel(key) {
         tipoAutenticacao: "Tipo de autenticação"
     };
     return labels[key] || key;
+}
+
+// Enviar documentos solicitados pelo admin (cliente)
+function submitRequestedDocuments(requestId) {
+    const input = document.getElementById(`uploadInput-${requestId}`);
+    if (!input || !input.files || input.files.length === 0) {
+        alert('Selecione ao menos um arquivo para envio.');
+        return;
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < input.files.length; i++) {
+        formData.append('documentos[]', input.files[i]);
+    }
+    // CSRF token
+    formData.append('_token', '{{ csrf_token() }}');
+
+    const url = `/api/registry-service-requests/${requestId}/upload-documents`;
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+    }).then(res => res.json())
+    .then(data => {
+        if (!data || !data.success) {
+            alert(data.message || 'Erro ao enviar documentos');
+            return;
+        }
+
+        // Atualizar dados locais e re-renderizar
+        const idx = requests.findIndex(r => r.id === requestId);
+        if (idx !== -1) {
+            requests[idx].documentos = data.uploaded_files || [];
+            renderOrdersList();
+            if (selectedOrderId === requestId) selectOrder(requestId);
+        } else {
+            location.reload();
+        }
+
+        alert('Documentos enviados com sucesso.');
+    }).catch(err => {
+        console.error(err);
+        alert('Erro ao enviar documentos');
+    });
 }
 
 // Eventos de filtro e busca

@@ -55,6 +55,7 @@ class OrdersPageController extends Controller
                     'valor' => $this->getValorServico($request->service),
                     'descricao' => $request->service?->name ?? 'Sem descrição',
                     'documentos' => $this->getUploadedFiles($request),
+                    'documentosSolicitados' => $this->getRequestedDocuments($request),
                     'pagamento' => [
                         'status' => $request->payment_status ?? 'pendente',
                         'data' => $request->payment_date ?? null,
@@ -163,6 +164,22 @@ class OrdersPageController extends Controller
             return is_array($request->dynamic_fields_data) ? $request->dynamic_fields_data : [];
         }
         return [];
+    }
+
+    /**
+     * Obter documentos solicitados pelo admin (document_requests)
+     */
+    private function getRequestedDocuments($request)
+    {
+        if (!isset($request->document_requests) || !$request->document_requests) {
+            return null;
+        }
+
+        $docRequest = is_string($request->document_requests)
+            ? json_decode($request->document_requests, true)
+            : $request->document_requests;
+
+        return is_array($docRequest) ? $docRequest : null;
     }
 
     /**

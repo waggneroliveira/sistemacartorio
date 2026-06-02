@@ -70,6 +70,7 @@ Route::get('/api/registry-services/{id}', [RegistryServicePageController::class,
 // API Routes para solicitações de serviço
 Route::post('/api/registry-service-requests', [RegistryServiceRequestController::class, 'store'])->name('api.registry-service-requests.store');
 Route::get('/api/registry-service-requests/{id}', [RegistryServiceRequestController::class, 'show'])->name('api.registry-service-requests.show');
+Route::post('/api/registry-service-requests/{id}/upload-documents', [RegistryServiceRequestController::class, 'uploadDocuments'])->name('api.registry-service-requests.upload');
 Route::get('/api/user-requests/{email}', [RegistryServiceRequestController::class, 'getUserRequests'])->name('api.user-requests');
 
 Route::get('produto/{category}/{slug}', [ProductPageController::class, 'productView'])->name('client.product');
