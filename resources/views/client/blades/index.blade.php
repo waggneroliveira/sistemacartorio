@@ -376,7 +376,7 @@ function renderDynamicFields(fields) {
 }
 
 // ==================== ATUALIZAR DOCUMENTOS ====================
-function updateDocuments(documents, serviceName, instructions) {
+function updateDocuments(documents, serviceName, instructions, valorServico) {
     const docsDiv = document.getElementById('docsExplanation');
     const uploadSection = document.getElementById('uploadSection');
     
@@ -410,10 +410,23 @@ function updateDocuments(documents, serviceName, instructions) {
     // Com documentos necessários - mostrar upload
     uploadSection.style.display = 'block';
     
+    const valorFormatado = valorServico && valorServico > 0 
+        ? `R$ ${parseFloat(valorServico).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : 'Gratuito';
+    
     let docsHtml = `
         <div class="mb-3 pb-2 border-bottom">
-            <strong class="fw-bold" style="color: #0a2b3e;">${escapeHtml(serviceName)}</strong>
-            <p class="small text-muted mt-1 mb-0">${instructions || 'Envie os documentos abaixo:'}</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <strong class="fw-bold" style="color: #0a2b3e;">${escapeHtml(serviceName)}</strong>
+                    <p class="small text-muted mt-1 mb-0">${instructions || 'Envie os documentos abaixo:'}</p>
+                </div>
+                <div class="text-end">
+                    <div class="badge ${valorServico && valorServico > 0 ? 'bg-success' : 'bg-secondary'} fs-6">
+                        ${valorFormatado}
+                    </div>
+                </div>
+            </div>
         </div>
         <ul class="list-unstyled mb-3">
     `;
@@ -504,7 +517,7 @@ async function selectService(serviceId, serviceName) {
             }
             
             // Atualizar documentos
-            updateDocuments(documentos, service.nome, service.instrucoes);
+            updateDocuments(documentos, service.nome, service.instrucoes, service.valor);
             
             // Renderizar campos dinâmicos
             dynamicContainer.innerHTML = renderDynamicFields(campos);

@@ -512,7 +512,7 @@ function renderOrderDetails(request) {
     });
     
     // Construir a timeline com todos os status
-    const allStatuses = ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
+    const allStatuses = ['pending', 'awaiting_payment', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
     const currentStatusIndex = allStatuses.indexOf(request.status);
     
     const timelineHtml = `
@@ -754,6 +754,12 @@ function getStatusInfo() {
             color: 'primary',
             description: 'Seu pedido está sendo processado'
         },
+        'awaiting_payment': {
+            label: 'Aguardando Pagamento',
+            icon: 'bi-credit-card',
+            color: 'warning',
+            description: 'Aguardando confirmação do pagamento'
+        },
         'awaiting_documents': {
             label: 'Aguardando Documentos',
             icon: 'bi-file-earmark-arrow-down',
@@ -783,7 +789,7 @@ function getStatusInfo() {
 
 // Determinar progresso na timeline
 function getTimelineProgress(currentStatus) {
-    const statusOrder = ['pending', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
+    const statusOrder = ['pending', 'awaiting_payment', 'in_progress', 'awaiting_documents', 'documents_approved', 'completed'];
     const currentIndex = statusOrder.indexOf(currentStatus);
     
     return currentIndex >= 0 ? ((currentIndex + 1) / statusOrder.length) * 100 : 20;

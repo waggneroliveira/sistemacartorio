@@ -71,9 +71,9 @@ class OrdersPageController extends Controller
 
             // Calcular estatísticas
             $stats['total'] = $requests->count();
-            $stats['emAndamento'] = $requests->filter(fn($r) => in_array($r['status'], ['analise', 'andamento']))->count();
-            $stats['concluidos'] = $requests->filter(fn($r) => $r['status'] === 'concluido')->count();
-            $stats['aguardandoPagamento'] = $requests->filter(fn($r) => $r['status'] === 'aguardando_pagamento')->count();
+            $stats['emAndamento'] = $requests->filter(fn($r) => in_array($r['status'], ['in_progress', 'awaiting_documents', 'documents_approved']))->count();
+            $stats['concluidos'] = $requests->filter(fn($r) => $r['status'] === 'completed')->count();
+            $stats['aguardandoPagamento'] = $requests->filter(fn($r) => $r['status'] === 'pending' || $r['status'] === 'awaiting_payment')->count();
         }
 
         // Log para debug
@@ -97,6 +97,7 @@ class OrdersPageController extends Controller
             'in_progress' => 'andamento',
             'awaiting_documents' => 'analise',
             'documents_approved' => 'andamento',
+            'awaiting_payment' => 'aguardando_pagamento',
             'completed' => 'concluido',
             'rejected' => 'cancelado',
         ];
@@ -114,6 +115,7 @@ class OrdersPageController extends Controller
             'in_progress' => 'Em andamento',
             'awaiting_documents' => 'Em análise',
             'documents_approved' => 'Em andamento',
+            'awaiting_payment' => 'Aguardando Pagamento',
             'completed' => 'Concluído',
             'rejected' => 'Cancelado',
         ];
@@ -127,25 +129,10 @@ class OrdersPageController extends Controller
     private function getValorServico($service)
     {
         if (!$service) {
-            return 89.90;
+            return 0;
         }
 
-        $precos = [
-            'Certidão' => 89.90,
-            'Escritura' => 450.00,
-            'Reconhecimento' => 35.90,
-            'Casamento' => 89.90,
-            'Inventário' => 580.00,
-            'Autenticação' => 25.90,
-        ];
-
-        foreach ($precos as $palavra => $preco) {
-            if (stripos($service->name, $palavra) !== false) {
-                return $preco;
-            }
-        }
-
-        return 150.00;
+        return $service->service_value ?? 0;
     }
 
     /**

@@ -31,6 +31,7 @@ class RegistryServiceRequest extends Model
         'internal_notes',
         'document_requests',
         'document_approval',
+        'awaiting_payment',
         'closing_data',
         'assigned_to',
     ];
