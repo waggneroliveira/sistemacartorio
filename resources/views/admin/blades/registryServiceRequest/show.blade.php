@@ -29,7 +29,7 @@
                                     <li class="breadcrumb-item">
                                         <a href="{{ route('admin.dashboard.registryServiceRequest.index') }}">Solicitações</a>
                                     </li>
-                                    <li class="breadcrumb-item active">Protocolo #{{ $request->id }}</li>
+                                    <li class="breadcrumb-item active">Protocolo: {{ $request->protocol_number }}</li>
                                 </ol>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">

@@ -72,12 +72,13 @@
     <div class="col-md-7">
         <div class="d-flex flex-wrap gap-2">
             <button class="btn btn-outline-secondary filter-btn active" data-filter="todos">Todos</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="pendente">📋 Pendente</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="analise">🔍 Em análise</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="aguardando_pagamento">💰 Aguardando pagamento</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="pagamento_realizado">✅ Pagamento realizado</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="andamento">⚙️ Em andamento</button>
-            <button class="btn btn-outline-secondary filter-btn" data-filter="concluido">✅ Concluído</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="awaiting_documents">📋 Aguardando documentos</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="in_progress">⚙️ Em andamento</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="pending">📋 Pendente</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="awaiting_payment">💰 Aguardando pagamento</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="payment_approved">✅ Pagamento aprovado</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="completed">✅ Concluído</button>
+            <button class="btn btn-outline-secondary filter-btn" data-filter="rejected">❌ Rejeitado</button>
         </div>
     </div>
 </div>
@@ -146,13 +147,19 @@ function getStatusClass(status) {
     
     const classes = {
         'pendente': 'status-warning',
-        'analise': 'status-info',
         'aguardando_pagamento': 'status-warning',
         'pagamento_realizado': 'status-success',
         'andamento': 'status-primary',
         'concluido': 'status-success',
         'cancelado': 'status-danger',
-        'rejected': 'status-danger'
+        'rejected': 'status-danger',
+        'pending': 'status-warning',
+        'in_progress': 'status-primary',
+        'awaiting_payment': 'status-warning',
+        'payment_approved': 'status-success',
+        'awaiting_documents': 'status-info',
+        'documents_approved': 'status-success',
+        'completed': 'status-success'
     };
     return classes[status] || 'status-warning';
 }
@@ -165,15 +172,40 @@ function getStatusIcon(status) {
     
     const icons = {
         'pendente': 'bi-clock',
-        'analise': 'bi-search',
         'aguardando_pagamento': 'bi-credit-card',
         'pagamento_realizado': 'bi-check-circle',
         'andamento': 'bi-gear',
         'concluido': 'bi-check-circle',
         'cancelado': 'bi-x-circle',
-        'rejected': 'bi-x-circle'
+        'rejected': 'bi-x-circle',
+        'pending': 'bi-clock',
+        'in_progress': 'bi-gear',
+        'awaiting_payment': 'bi-credit-card',
+        'payment_approved': 'bi-check-circle',
+        'awaiting_documents': 'bi-file-earmark-arrow-down',
+        'documents_approved': 'bi-check-circle',
+        'completed': 'bi-check2-circle'
     };
     return icons[status] || 'bi-question-circle';
+}
+
+function getStatusTexto(status) {
+    const statusMap = {
+        'pendente': 'Pendente',
+        'aguardando_pagamento': 'Aguardando pagamento',
+        'pagamento_realizado': 'Pagamento realizado',
+        'andamento': 'Em andamento',
+        'concluido': 'Concluído',
+        'pending': 'Pendente',
+        'in_progress': 'Em andamento',
+        'awaiting_payment': 'Aguardando pagamento',
+        'payment_approved': 'Pagamento aprovado',
+        'awaiting_documents': 'Aguardando documentos',
+        'documents_approved': 'Documentos aprovados',
+        'completed': 'Concluído',
+        'rejected': 'Rejeitado'
+    };
+    return statusMap[status] || status;
 }
 
 // Helper: formatação de data
@@ -244,7 +276,7 @@ function renderOrdersList() {
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
                 <small class="text-muted"><i class="bi bi-calendar3"></i> ${formatDate(request.dataSolicitacao)}</small>
-                <small class="text-success">${request.status === 'pending' ? formatMoney('R$ ' + request.valor) : 'Ver detalhes →'}</small>
+                <small class="text-success">${request.status === 'pending' || request.status === 'aguardando_pagamento' ? formatMoney(request.valor) : 'Ver detalhes →'}</small>
             </div>
         </div>
     `).join('');
@@ -268,9 +300,9 @@ function updateStats() {
     }
     
     const total = requests.length;
-    const emAndamento = requests.filter(r => r.status === 'in_progress' || r.status === 'awaiting_documents' || r.status === 'documents_approved').length;
-    const concluidos = requests.filter(r => r.status === 'completed').length;
-    const aguardandoPagamento = requests.filter(r => r.status === 'pending').length;
+    const emAndamento = requests.filter(r => r.status === 'in_progress' || r.status === 'awaiting_documents' || r.status === 'documents_approved' || r.status === 'andamento').length;
+    const concluidos = requests.filter(r => r.status === 'completed' || r.status === 'concluido').length;
+    const aguardandoPagamento = requests.filter(r => r.status === 'pending' || r.status === 'aguardando_pagamento' || r.status === 'awaiting_payment').length;
     
     const totalEl = document.getElementById('totalPedidos');
     const emAndamentoEl = document.getElementById('emAndamentoCount');
@@ -438,13 +470,15 @@ function mostrarFormularioPagamento(metodo, request, container) {
     }
 }
 
+// CORREÇÃO: Função confirmarPagamento atualizada para manter o status correto
 function confirmarPagamento(requestId, metodo, valor) {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
     
-    // Atualizar status do pedido
-    request.status = 'in_progress';
-    request.statusTexto = 'Em andamento';
+    // CORREÇÃO: Mudar status para 'pagamento_realizado' em vez de 'in_progress' ou 'andamento'
+    request.status = 'pagamento_realizado';
+    request.statusTexto = 'Pagamento realizado';
+    
     request.pagamento = {
         status: 'pago',
         data: new Date().toISOString().split('T')[0],
@@ -474,7 +508,7 @@ function confirmarPagamento(requestId, metodo, valor) {
     }
     
     // Mostrar mensagem de sucesso
-    alert(`✅ Pagamento confirmado!\n\nPedido: ${request.protocolo}\nValor: ${formatMoney(valor)}\nMétodo: ${metodo.toUpperCase()}\n\nSeu pedido agora está em análise.`);
+    alert(`✅ Pagamento confirmado!\n\nPedido: ${request.protocolo}\nValor: ${formatMoney(valor)}\nMétodo: ${metodo.toUpperCase()}\n\nSeu pedido agora está com status "Pagamento realizado".`);
 }
 
 // Selecionar pedido e exibir detalhes
@@ -562,7 +596,7 @@ function renderOrderDetails(request) {
                 </span>
             </div>
             
-            ${request.status === 'awaiting_payment' ? `
+            ${request.status === 'aguardando_pagamento' || request.status === 'awaiting_payment' ? `
                 <div class="payment-required-card mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
@@ -737,7 +771,7 @@ function renderOrderDetails(request) {
 function parseDateString(dateStr) {
     // Tenta diferentes formatos de data
     // Formato: DD/MM/YYYY HH:MM ou DD/MM/YYYY
-    if (dateStr.includes('/')) {
+    if (dateStr && dateStr.includes('/')) {
         const parts = dateStr.split(/[\s\/:]+/);
         if (parts.length >= 3) {
             // Formato brasileiro: dia/mês/ano
@@ -751,9 +785,11 @@ function parseDateString(dateStr) {
     }
     
     // Tenta formato ISO
-    const isoDate = new Date(dateStr);
-    if (!isNaN(isoDate.getTime())) {
-        return isoDate;
+    if (dateStr) {
+        const isoDate = new Date(dateStr);
+        if (!isNaN(isoDate.getTime())) {
+            return isoDate;
+        }
     }
     
     // Se não conseguir, retorna data atual
@@ -810,6 +846,12 @@ function getStatusInfo() {
             icon: 'bi-x-circle',
             color: 'danger',
             description: 'Sua solicitação foi rejeitada'
+        },
+        'pagamento_realizado': {
+            label: 'Pagamento Realizado',
+            icon: 'bi-check-circle',
+            color: 'success',
+            description: 'Pagamento confirmado, aguardando processamento'
         }
     };
 }
@@ -941,5 +983,170 @@ function init() {
 // Aguardar o DOM carregar
 document.addEventListener('DOMContentLoaded', init);
 </script>
+
+<style>
+/* Estilos adicionais para melhor visualização */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-info {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.status-primary {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.status-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.order-card:hover {
+    border-color: #28a745;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.order-card.selected {
+    border-color: #28a745;
+    background-color: #f8fff9;
+    box-shadow: 0 2px 8px rgba(40,167,69,0.2);
+}
+
+.detail-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.payment-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.payment-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.payment-methods {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.payment-method-btn {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-method-btn:hover {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.payment-method-btn.selected {
+    border-color: #28a745;
+    background-color: #d1e7dd;
+}
+
+.btn-pagar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    width: 100%;
+    transition: transform 0.2s ease;
+}
+
+.btn-pagar:hover {
+    transform: translateY(-2px);
+}
+
+.timeline-container {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-step {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    background: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.timeline-icon.completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.timeline-icon.active {
+    background: #cfe2ff;
+    color: #084298;
+    animation: pulse 2s infinite;
+}
+
+.timeline-connector {
+    position: absolute;
+    left: 27px;
+    width: 2px;
+    height: 24px;
+    background: #dee2e6;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+</style>
 
 @endsection
