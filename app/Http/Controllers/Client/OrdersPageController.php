@@ -47,9 +47,9 @@ class OrdersPageController extends Controller
                 // dd($request);
                 return [
                     'id' => $request->id,
-                    'protocolo' => 'CART-' . str_pad($request->id, 5, '0', STR_PAD_LEFT),
+                    'protocolo' => $request->protocol_number,
                     'servico' => $request->service?->name ?? 'Serviço indisponível',
-                    'dataSolicitacao' => $request->created_at->format('Y-m-d'),
+                    'dataSolicitacao' => $request->created_at->format('d/m/Y'),
                     'status' => $request->status, // Passar status bruto do BD
                     'statusTexto' => $this->getStatusLabel($request->status),
                     'valor' => $this->getValorServico($request->service),
