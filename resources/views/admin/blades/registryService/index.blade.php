@@ -5,10 +5,24 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
+                    <div class="page-title-box">
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{{route('admin.dashboard')}}">{{__('dashboard.title_dashboard')}}</a>
+                                </li>
+                                <li class="breadcrumb-item active">Serviços</li>
+                            </ol>
+                        </div>
+                        <h4 class="page-title">Serviços do Cartório</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between mb-3">
-                                <h4>Serviços do Cartório</h4>
+                            <div class="d-flex justify-content-end mb-3">
                                 <a href="{{ route('admin.dashboard.registryService.create') }}" class="btn btn-primary">
                                     <i class="mdi mdi-plus"></i> Novo Serviço
                                 </a>
@@ -24,7 +38,6 @@
                                             <th>Campos</th>
                                             <th>Documentos</th>
                                             <th>Valor</th>
-                                            <th>Ordem</th>
                                             <th>Status</th>
                                             <th>Ações</th>
                                         </tr>
@@ -54,7 +67,6 @@
                                                     <span class="badge bg-secondary">Gratuito</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $service->display_order }}</td>
                                             <td>
                                                 <span class="badge bg-{{ $service->is_active ? 'success' : 'danger' }}">
                                                     {{ $service->is_active ? 'Ativo' : 'Inativo' }}

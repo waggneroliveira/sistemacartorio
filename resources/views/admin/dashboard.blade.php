@@ -7,6 +7,7 @@
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item active">{{__('dashboard.title_dashboard')}}</li>
+                        <li class="breadcrumb-item">Home</li>
                     </ol>
                 </div>
                 <h4 class="page-title">{{__('dashboard.title_dashboard')}}</h4>
@@ -43,37 +44,124 @@
         ])
     </div>
 
-    @if (Auth::user()->hasRole('Super') || 
-    Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-    Auth::user()->hasPermissionTo('slide.visualizar') || 
-    Auth::user()->hasPermissionTo('topico.visualizar') || 
-    Auth::user()->hasPermissionTo('passo a passo.visualizar') || 
-    Auth::user()->hasPermissionTo('sesssao lets go.visualizar') ||  
-    Auth::user()->hasPermissionTo('sesssao faq.visualizar') ||  
-    Auth::user()->hasPermissionTo('perguntas e respostas.visualizar') ||  
-    Auth::user()->hasPermissionTo('depoimento.visualizar'))
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <h4 class="page-title">
-                        <i class="mdi mdi-home"></i> Serviços
-                    </h4>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <!-- Portlet card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-widgets">
+                        <a href="javascript: void(0);" data-bs-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                        <a data-bs-toggle="collapse" href="#cardCollpase4" role="button" aria-expanded="false" aria-controls="cardCollpase4"><i class="mdi mdi-minus"></i></a>
+                        <a href="javascript: void(0);" data-bs-toggle="remove"><i class="mdi mdi-close"></i></a>
+                    </div>
+                    <h4 class="header-title mb-0">Últimas solicitações</h4>
 
-            @include('admin.components.dashboard-card', [
-                'route' => route('admin.dashboard.registryService.index'),
-                'icon' => 'mdi-format-list-bulleted',
-                'title' => 'Serviços'
-            ])
+                    <div id="cardCollpase4" class="collapse show">
+                        <div class="table-responsive pt-3">
+                            <table class="table table-centered table-nowrap table-borderless mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Protocolo</th>
+                                        <th>Serviço</th>
+                                        <th>Data da solicitação</th>
+                                        <th>Data da conclusão</th>
+                                        <th>Imagem</th>
+                                        <th>Status</th>
+                                        <th>Clients</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ESC-26-06-00001</td>
+                                        <td>App design and development</td>
+                                        <td>Jan 03, 2015</td>
+                                        <td>Oct 12, 2018</td>
+                                        <td id="tooltip-container">
+                                            <div class="avatar-group">
+                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-container="#tooltip-container" data-bs-toggle="tooltip" data-bs-placement="top" title="Mat Helme">
+                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
+                                                </a>
 
-            @include('admin.components.dashboard-card', [
-                'route' => route('admin.dashboard.registryServiceRequest.index'),
-                'icon' => 'mdi-file-document-multiple',
-                'title' => 'Solicitações'
-            ])
-        </div>
-    @endif
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-soft-info text-info p-1">Work in Progress</span></td>
+                                        <td>Halette Boivin</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ESC-26-06-00001</td>
+                                        <td>Coffee detail page - Main Page</td>
+                                        <td>Sep 21, 2016</td>
+                                        <td>May 05, 2018</td>
+                                        <td>
+                                            <div class="avatar-group">
+                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="James Anderson">
+                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-soft-warning text-warning p-1">Pending</span></td>
+                                        <td>Durandana Jolicoeur</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ESC-26-06-00001</td>
+                                        <th>Poster illustation design</th>
+                                        <td>Mar 08, 2018</td>
+                                        <td>Sep 22, 2018</td>
+                                        <td>
+                                            <div class="avatar-group">
+                                                
+                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Michael Zenaty">
+                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
+                                                </a>
+
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-soft-success text-success p-1">Completed</span></td>
+                                        <td>Lucas Sabourin</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ESC-26-06-00001</td>
+                                        <td>Drinking bottle graphics</td>
+                                        <td>Oct 10, 2017</td>
+                                        <td>May 07, 2018</td>
+                                        <td>
+                                            <div class="avatar-group">
+                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Mat Helme">
+                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
+                                                </a>
+        
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-soft-info text-info p-1">Work in Progress</span></td>
+                                        <td>Donatien Brunelle</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ESC-26-06-00001</td>
+                                        <td>Landing page design - Home</td>
+                                        <td>Coming Soon</td>
+                                        <td>May 25, 2021</td>
+                                        <td>
+                                            <div class="avatar-group">
+        
+                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Michael Zenaty">
+                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
+                                                </a>
+        
+                                            </div>
+                                        </td>
+                                        <td><span class="badge bg-soft-dark text-dark p-1">Coming Soon</span></td>
+                                        <td>Karel Auberjo</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div> <!-- .table-responsive -->
+                    </div> <!-- end collapse-->
+                </div> <!-- end card-body-->
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
+    <!-- end row -->
 
     {{-- CONTATO --}}
     @if (Auth::user()->hasRole('Super') || 

@@ -1,5 +1,5 @@
 <div class="col-12 col-sm-6 col-md-5 col-xl-3">
-    <div class="card borda-cx ratio ratio-4x3 border-whi">
+    <div class="card borda-cx ratio ratio-16x9 border-whi">
         <div class="d-flex align-items-center justify-content-center">
             <a href="{{ $route }}">
                 <div class="row">

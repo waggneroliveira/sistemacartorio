@@ -1,19 +1,19 @@
-<div class="col-12 col-sm-6 col-md-5 col-xl-3">
-    <div class="card borda-cx ratio ratio-21x9 border-whi">
-        <div class="d-flex align-items-center justify-content-center">
+<div class="col-lg-6 col-xl-3">
+    <div class="card border-whi">
+        <div class="card-body">
             <a href="{{ $route }}">
-                <div class="d-flex">
-                    <div class="text-center text-md-start">
-                        <h5 class="text-uppercase text-muted">{{ $title }}</h5>
-                        <h2 class="count">{{$count}}</h2>
+                <div class="row">
+                    <div class="col-3">
+                        <i class="avatar-md mdi {{ $icon }} font-48 text-muted"></i>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center">
-                        <div class="avatar-xl bg-hoom rounded-circle text-center">
-                            <i class="avatar-md mdi {{ $icon }} font-48 text-muted"></i>
+                    <div class="col-9">
+                        <div class="text-end">
+                            <h3 class="text-dark my-1"><span data-plugin="counterup">{{$count}}</span></h3>
+                            <p class="text-muted mb-0">{{ $title }}</p>
                         </div>
                     </div>
                 </div>
             </a>
         </div>
-    </div>
+    </div> <!-- end card-->
 </div>

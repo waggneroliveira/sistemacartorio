@@ -417,7 +417,17 @@
                                 <i class="mdi mdi-menu"></i>
                             </button>
                         </div>
-
+                        <ul class="nav nav-pills">
+                            <li class="nav-item me-3 active">
+                                <a href="{{route('admin.dashboard')}}"><i class="mdi mdi-home me-1"></i>Início</a>
+                            </li>
+                            <li class="nav-item me-3">
+                                <a href="{{route('admin.dashboard.registryService.index')}}"><i class="mdi mdi-hammer-wrench me-1"></i>Serviços</a>
+                            </li>
+                            <li class="nav-item me-3">
+                                <a href="{{route('admin.dashboard.registryServiceRequest.index')}}"><i class="mdi mdi-file-document-multiple me-1"></i>Solicitações</a>
+                            </li>
+                        </ul>
                         <ul class="topbar-menu d-flex align-items-center">
                             <!-- Fullscreen Button -->
                             <li class="d-none d-md-inline-block">

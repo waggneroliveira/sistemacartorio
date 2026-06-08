@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\RegistryServiceRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrdersPageController extends Controller
 {
@@ -28,6 +29,7 @@ class OrdersPageController extends Controller
         } else {
             $dbRequests = RegistryServiceRequest::where('email', $clientEmail)
                 ->with('service')
+                // ->where('clients.id', '=', Auth::guard('client')->user()->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
