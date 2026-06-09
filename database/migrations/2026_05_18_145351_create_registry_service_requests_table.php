@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('registry_service_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registry_service_id')->constrained('registry_services')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->string('full_name');
             $table->string('email');
             $table->string('phone');

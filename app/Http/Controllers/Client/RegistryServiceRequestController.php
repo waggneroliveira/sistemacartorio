@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\RegistryService;
 use App\Models\RegistryServiceRequest;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -165,7 +166,10 @@ class RegistryServiceRequestController extends Controller
             /**
              * Criar solicitação
              */
+            $client = Auth::guard('client')->user()->id;
+            
             $registryRequest = RegistryServiceRequest::create([
+                'client_id' => $client,
                 'registry_service_id' => $request->servico_id,
                 'full_name'           => $request->nome,
                 'email'               => $request->email,
@@ -174,7 +178,7 @@ class RegistryServiceRequestController extends Controller
                 'uploaded_files'      => $uploadedFilesInfo,
                 'status'              => 'pending',
             ]);
-
+            
             return response()->json([
                 'success'    => true,
                 'message'    => 'Solicitação criada com sucesso!',

@@ -14,32 +14,33 @@
             </div>
         </div>
     </div>
+    
     <div class="row">
         @include('admin.components.dashboard-card-info', [
             'route' => route('admin.dashboard.slide.index'),
             'icon' => 'mdi mdi-file-multiple-outline',
-            'count' => 2,
+            'count' => $stats['total'],
             'title' => 'Total de pedidos'
         ])
 
         @include('admin.components.dashboard-card-info', [
             'route' => route('admin.dashboard.slide.index'),
             'icon' => 'mdi mdi-timer-sand',
-            'count' => 1,
+            'count' => $stats['emAndamento'],
             'title' => 'Em andamento'
         ])
-        
+
         @include('admin.components.dashboard-card-info', [
             'route' => route('admin.dashboard.slide.index'),
             'icon' => 'mdi mdi-check-circle-outline',
-            'count' => 1,
+            'count' => $stats['concluidos'],
             'title' => 'Concluído'
         ])
 
         @include('admin.components.dashboard-card-info', [
             'route' => route('admin.dashboard.slide.index'),
             'icon' => 'mdi mdi-credit-card-outline',
-            'count' => 1,
+            'count' => $stats['aguardandoPagamento'],
             'title' => 'Aguardando pagamento'
         ])
     </div>
@@ -65,94 +66,43 @@
                                         <th>Serviço</th>
                                         <th>Data da solicitação</th>
                                         <th>Data da conclusão</th>
-                                        <th>Imagem</th>
                                         <th>Status</th>
                                         <th>Clients</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>ESC-26-06-00001</td>
-                                        <td>App design and development</td>
-                                        <td>Jan 03, 2015</td>
-                                        <td>Oct 12, 2018</td>
-                                        <td id="tooltip-container">
-                                            <div class="avatar-group">
-                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-container="#tooltip-container" data-bs-toggle="tooltip" data-bs-placement="top" title="Mat Helme">
-                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
-                                                </a>
+                                    @foreach ($lastRequestServices as $lastRequestService)                                        
+                                        <tr>
+                                            <td>{{ $lastRequestService->protocol_number }}</td>
+                                            <td>{{ $lastRequestService->service->name }}</td>
+                                            <td>{{ $lastRequestService->created_at->format('d/m/Y H:i') }}</td>
+                                            <td>Oct 12, 2018</td>
+                                            @php
+                                                $statusConfig = [
+                                                    'pending' => ['class' => 'bg-soft-warning text-warning', 'text' => 'Pendente'],
+                                                    'in_progress' => ['class' => 'bg-soft-primary text-primary', 'text' => 'Em andamento'],
+                                                    'awaiting_documents' => ['class' => 'bg-soft-secondary text-secondary', 'text' => 'Aguardando documentos'],
+                                                    'documents_approved' => ['class' => 'bg-soft-success text-success', 'text' => 'Documentos aprovados'],
+                                                    'awaiting_payment' => ['class' => 'bg-soft-info text-info', 'text' => 'Aguardando pagamento'],
+                                                    'payment_approved' => ['class' => 'bg-soft-success text-success', 'text' => 'Pagamento aprovado'],
+                                                    'completed' => ['class' => 'bg-soft-success text-success', 'text' => 'Concluído'],
+                                                    'rejected' => ['class' => 'bg-soft-danger text-danger', 'text' => 'Rejeitado'],
+                                                ];
 
-                                            </div>
-                                        </td>
-                                        <td><span class="badge bg-soft-info text-info p-1">Work in Progress</span></td>
-                                        <td>Halette Boivin</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ESC-26-06-00001</td>
-                                        <td>Coffee detail page - Main Page</td>
-                                        <td>Sep 21, 2016</td>
-                                        <td>May 05, 2018</td>
-                                        <td>
-                                            <div class="avatar-group">
-                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="James Anderson">
-                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge bg-soft-warning text-warning p-1">Pending</span></td>
-                                        <td>Durandana Jolicoeur</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ESC-26-06-00001</td>
-                                        <th>Poster illustation design</th>
-                                        <td>Mar 08, 2018</td>
-                                        <td>Sep 22, 2018</td>
-                                        <td>
-                                            <div class="avatar-group">
-                                                
-                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Michael Zenaty">
-                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
-                                                </a>
+                                                $config = $statusConfig[$lastRequestService->status] ?? [
+                                                    'class' => 'bg-soft-dark text-dark',
+                                                    'text' => $lastRequestService->status
+                                                ];
+                                            @endphp
 
-                                            </div>
-                                        </td>
-                                        <td><span class="badge bg-soft-success text-success p-1">Completed</span></td>
-                                        <td>Lucas Sabourin</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ESC-26-06-00001</td>
-                                        <td>Drinking bottle graphics</td>
-                                        <td>Oct 10, 2017</td>
-                                        <td>May 07, 2018</td>
-                                        <td>
-                                            <div class="avatar-group">
-                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Mat Helme">
-                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
-                                                </a>
-        
-                                            </div>
-                                        </td>
-                                        <td><span class="badge bg-soft-info text-info p-1">Work in Progress</span></td>
-                                        <td>Donatien Brunelle</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ESC-26-06-00001</td>
-                                        <td>Landing page design - Home</td>
-                                        <td>Coming Soon</td>
-                                        <td>May 25, 2021</td>
-                                        <td>
-                                            <div class="avatar-group">
-        
-                                                <a href="javascript: void(0);" class="avatar-group-item" data-bs-toggle="tooltip" data-bs-placement="top" title="Michael Zenaty">
-                                                    <img src="{{asset('build/admin/images/users/user-3.jpg')}}" class="rounded-circle avatar-xs" alt="friend">
-                                                </a>
-        
-                                            </div>
-                                        </td>
-                                        <td><span class="badge bg-soft-dark text-dark p-1">Coming Soon</span></td>
-                                        <td>Karel Auberjo</td>
-                                    </tr>
-
+                                            <td>
+                                                <span class="badge {{ $config['class'] }} p-1">
+                                                    {{ $config['text'] }}
+                                                </span>
+                                            </td>                                            
+                                            <td>{{ $lastRequestService->client->name }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div> <!-- .table-responsive -->

@@ -60,6 +60,11 @@ class Client extends Authenticatable
     public function scopeActive($query){
         return $query->where('active', 1);
     }
+    
+    public function serviceRequests()
+    {
+        return $this->belongsToMany(RegistryServiceRequest::class, 'registry_service_id');
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

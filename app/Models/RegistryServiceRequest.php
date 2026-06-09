@@ -19,6 +19,7 @@ class RegistryServiceRequest extends Model
 
     protected $fillable = [
         'protocol_number',
+        'client_id',
         'registry_service_id',
         'request_status_id',
         'full_name',
@@ -88,6 +89,16 @@ class RegistryServiceRequest extends Model
         }
         
         return sprintf('%s-%s-%s-%05d', $serviceCode, $year, $month, $newNumber);
+    }
+
+    // public function clients()
+    // {
+    //     return $this->belongsToMany(Client::class, 'client_id');
+    // }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 
     /**

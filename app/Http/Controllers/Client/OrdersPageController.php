@@ -22,14 +22,16 @@ class OrdersPageController extends Controller
         // OU você pode definir um email fixo para teste
         if (!$clientEmail) {
             // Opção 1: Retornar todos os pedidos (para desenvolvimento)
-            $dbRequests = RegistryServiceRequest::with('service')->orderBy('created_at', 'desc')->get();
+            $dbRequests = RegistryServiceRequest::with('service')
+            ->where('client_id', '=', Auth::guard('client')->user()->id)
+            ->orderBy('created_at', 'desc')->get();
             
             // Opção 2: Usar um email fixo para teste (descomente a linha abaixo e comente a de cima)
             // $dbRequests = RegistryServiceRequest::where('email', 'teste@teste.com')->with('service')->orderBy('created_at', 'desc')->get();
         } else {
             $dbRequests = RegistryServiceRequest::where('email', $clientEmail)
                 ->with('service')
-                // ->where('clients.id', '=', Auth::guard('client')->user()->id)
+                ->where('client_id', '=', Auth::guard('client')->user()->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
