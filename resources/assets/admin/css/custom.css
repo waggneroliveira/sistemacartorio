@@ -1,3 +1,86 @@
+/* Mantém o gráfico no tamanho original */
+#chart {
+    height: 300px !important;
+    flex: 1;
+}
+
+/* Estilo da legenda personalizada - discreta e alinhada */
+.custom-legend {
+    width: auto;
+    min-width: 180px;
+    max-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilo do item da legenda */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.legend-item:hover {
+    transform: translateX(3px);
+}
+
+/* Quadrado de cor */
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+/* Informações da legenda */
+.legend-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+/* Nome da categoria */
+.legend-category {
+    color: #6c757d;
+    font-size: 13px;
+}
+
+/* Detalhes de valor e porcentagem */
+.legend-details {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+/* Valor quantitativo */
+.legend-value {
+    font-weight: 600;
+    color: #495057;
+    font-size: 13px;
+}
+
+/* Item do total */
+.total-item {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e9ecef;
+}
+
+.total-item .legend-category {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Remove borda do total-item no hover */
+.total-item:hover {
+    transform: none;
+}
 body.loaded {
     opacity: 1;
 }

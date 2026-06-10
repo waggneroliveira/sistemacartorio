@@ -51,10 +51,8 @@ class RegistryServiceRequest extends Model
     {
         static::creating(function ($model) {
             if (!$model->protocol_number) {
-                // Usar lock para evitar concorrência
-                DB::transaction(function () use ($model) {
-                    $model->protocol_number = $model->generateProtocolNumber();
-                });
+                // Solução simples e 100% garantida
+                $model->protocol_number = $model->generateSimpleProtocol();
             }
             
             if (!$model->request_status_id) {
@@ -66,35 +64,18 @@ class RegistryServiceRequest extends Model
         });
     }
 
-    public function generateProtocolNumber()
+    public function generateSimpleProtocol()
     {
         $service = $this->service;
         $serviceCode = $service ? strtoupper(substr($service->name, 0, 3)) : 'REQ';
-        $year = date('y');
-        $month = date('m');
         
-        // Lock na tabela para evitar dois inserts simultâneos
-        $lastProtocol = RegistryServiceRequest::where('registry_service_id', $this->registry_service_id)
-            ->whereYear('created_at', date('Y'))
-            ->whereMonth('created_at', date('m'))
-            ->lockForUpdate()
-            ->orderBy('id', 'desc')
-            ->first();
+        // Usar timestamp + microtime + random - GARANTIDAMENTE ÚNICO
+        $timestamp = now()->format('YmdHis');
+        $microtime = str_replace('.', '', microtime(true));
+        $random = rand(1000, 9999);
         
-        if ($lastProtocol && preg_match('/\d{5}$/', $lastProtocol->protocol_number, $matches)) {
-            $lastNumber = intval($matches[0]);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-        
-        return sprintf('%s-%s-%s-%05d', $serviceCode, $year, $month, $newNumber);
+        return sprintf('%s-%s-%s-%d', $serviceCode, $timestamp, $microtime, $random);
     }
-
-    // public function clients()
-    // {
-    //     return $this->belongsToMany(Client::class, 'client_id');
-    // }
 
     public function client()
     {

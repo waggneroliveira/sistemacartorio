@@ -178,7 +178,8 @@ class RegistryServiceRequestController extends Controller
                 'uploaded_files'      => $uploadedFilesInfo,
                 'status'              => 'pending',
             ]);
-            
+
+
             return response()->json([
                 'success'    => true,
                 'message'    => 'Solicitação criada com sucesso!',

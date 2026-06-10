@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RegistryService;
 use App\Models\RegistryServiceRequest;
 use App\Models\User;
 use App\Repositories\SettingThemeRepository;
@@ -48,7 +49,7 @@ class DashboardController extends Controller
             return view('admin.dashboard', compact(
                 'settingTheme',
                 'lastRequestServices',
-                'stats'
+                'stats',
             ));
         }
 

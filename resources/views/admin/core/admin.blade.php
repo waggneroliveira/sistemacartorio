@@ -47,6 +47,10 @@
         <link href="{{ asset('build/admin/css/app.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('build/admin/js/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('build/admin/js/libs/dropify/css/dropify.min.css') }}" rel="stylesheet" type="text/css" />
+
+        <!-- C3 Chart css -->
+        <link href="{{ asset('build/admin/js/libs/c3/c3.min.css') }}" rel="stylesheet" type="text/css" />
+
         <!-- Icons css -->
         <link href="{{ asset('build/admin/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
         
@@ -874,6 +878,138 @@
         <script src="{{ asset('build/admin/js/libs/dropzone/min/dropzone.min.js') }}"></script>
         <script src="{{ asset('build/admin/js/libs/dropify/js/dropify.min.js') }}"></script>
         <script src="{{ asset('build/admin/js/pages/form-fileuploads.init.js') }}"></script>
+
+        <!--C3 Chart-->
+        <script src="{{ asset('build/admin/js/libs/d3/d3.min.js') }}"></script>
+        <script src="{{ asset('build/admin/js/libs/c3/c3.min.js') }}"></script>
+        {{-- <script>
+            var chartData = @json($chartData);
+
+            var chart = c3.generate({
+                bindto: '#chart',
+                data: {
+                    columns: chartData,
+                    type: 'donut'
+                }
+            });
+        </script> --}}
+
+        <script>
+            // Seus dados vindos do PHP
+            var chartData = @json($chartData);
+            
+            // Calcula o total para exibir no centro do donut
+            var total = chartData.reduce(function(sum, item) {
+                return sum + item[1];
+            }, 0);
+            
+            // Paleta de cores baseada no seu data-colors original
+            var colorPalette = ['#4a81d4', '#1abc9c', '#dcdcdc', '#f39c12', '#e74c3c', '#9b59b6', '#34495e', '#95a5a6'];
+            
+            // Objeto para mapear categorias às suas cores
+            var categoryColors = {};
+            chartData.forEach(function(item, index) {
+                categoryColors[item[0]] = colorPalette[index % colorPalette.length];
+            });
+            
+            // Função para construir a legenda personalizada
+            function buildCustomLegend(data) {
+                var legendContainer = document.getElementById('customLegend');
+                if (!legendContainer) return;
+                
+                legendContainer.innerHTML = '';
+                
+                data.forEach(function(item, index) {
+                    var category = item[0];
+                    var value = item[1];
+                    var color = categoryColors[category];
+                    var percentage = Math.round((value / total) * 100);
+                    
+                    var legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    legendItem.setAttribute('data-category', category);
+                    
+                    legendItem.innerHTML = `
+                        <div class="legend-color" style="background-color: ${color};"></div>
+                        <div class="legend-info">
+                            <div class="legend-category">${category}</div>
+                            <div class="legend-details">
+                                <span class="legend-value">Solicitações: ${value}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Evento de hover para destacar a fatia correspondente no gráfico
+                    legendItem.addEventListener('mouseenter', function() {
+                        var arcs = document.querySelectorAll('.c3-arc');
+                        arcs.forEach(function(arc) {
+                            var arcData = arc.__data__;
+                            if (arcData && arcData.data && arcData.data.id === category) {
+                                arc.style.opacity = '0.8';
+                                arc.style.stroke = '#333';
+                                arc.style.strokeWidth = '2px';
+                            }
+                        });
+                    });
+                    
+                    legendItem.addEventListener('mouseleave', function() {
+                        var arcs = document.querySelectorAll('.c3-arc');
+                        arcs.forEach(function(arc) {
+                            arc.style.opacity = '1';
+                            arc.style.stroke = 'none';
+                            arc.style.strokeWidth = '0';
+                        });
+                    });
+                    
+                    legendContainer.appendChild(legendItem);
+                });
+                
+                // Adiciona o item do total no final da legenda
+                var totalItem = document.createElement('div');
+                totalItem.className = 'legend-item total-item';
+                totalItem.innerHTML = `
+                    <div class="legend-info">
+                        <div class="legend-category"><strong>Total de solicitações</strong></div>
+                        <div class="legend-details">
+                            <span><strong>${total}</strong></span>
+                        </div>
+                    </div>
+                `;
+                legendContainer.appendChild(totalItem);
+            }
+            
+            // Gera o gráfico C3 (mantendo o estilo original)
+            var chart = c3.generate({
+                bindto: '#chart',
+                data: {
+                    columns: chartData,
+                    type: 'donut',
+                    colors: categoryColors
+                },
+                legend: {
+                    show: false  // Desativa a legenda padrão
+                },
+                donut: {
+                    title: total,  // Exibe o total no centro
+                    label: {
+                        show: true
+                    },
+                    width: 60
+                },
+                tooltip: {
+                    show: true
+                },
+                size: {
+                    height: 300  // Mantém a altura original do seu container
+                }
+            });
+            
+            // Constrói a legenda após o gráfico ser renderizado
+            setTimeout(function() {
+                buildCustomLegend(chartData);
+            }, 100);
+        </script>
+
         <script src="{{ asset('build/admin/js/main.js') }}"></script>
 
 

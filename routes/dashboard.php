@@ -27,8 +27,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductGalleryController;
 use App\Http\Controllers\RegistryServiceController;
 use App\Http\Controllers\RegistryServiceRequestDashboardController;
-use App\Http\Controllers\RequestStatusController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RequestStatusController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceLocationController;
 use App\Http\Controllers\SessaoFaqController;
@@ -40,6 +40,7 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VideoController;
 use App\Http\Middleware\Authenticate;
+use App\Models\RegistryServiceRequest;
 use App\Models\User;
 use App\Repositories\AuditCountRepository;
 use App\Repositories\SettingThemeRepository;
@@ -424,5 +425,23 @@ View::composer('admin.core.admin', function ($view) {
     $auditCount = $notifications->auditCount();
     $settingTheme = (new SettingThemeRepository())->settingTheme();
 
-    return $view->with('settingTheme', $settingTheme)->with('user', $user)->with('auditorias', $auditorias)->with('auditCount', $auditCount);
+    $services = RegistryServiceRequest::selectRaw('registry_service_id, COUNT(*) as total')
+    ->with('service:id,name')
+    ->groupBy('registry_service_id')
+    ->get();
+
+    $chartData = [];
+
+    foreach ($services as $item) {
+        $chartData[] = [
+            $item->service->name,
+            $item->total
+        ];
+    }
+
+    return $view->with('settingTheme', $settingTheme)
+    ->with('user', $user)
+    ->with('auditorias', $auditorias)
+    ->with('chartData', $chartData)
+    ->with('auditCount', $auditCount);
 });

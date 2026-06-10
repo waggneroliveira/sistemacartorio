@@ -11,6 +11,7 @@ class RegistryServiceRequestController extends Controller
 {
     public function apiStore(Request $request)
     {
+
         // Validar dados básicos
         $validated = $request->validate([
             'nome' => 'required|string|max:255',

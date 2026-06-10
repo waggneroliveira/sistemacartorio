@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         @include('admin.components.dashboard-card-info', [
             'route' => route('admin.dashboard.slide.index'),
@@ -112,6 +112,32 @@
         </div> <!-- end col-->
     </div>
     <!-- end row -->
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3 text-center"> Solicitações por Serviço </h4>
+                    <div class="d-flex flex-row-reverse">
+                        <div id="chart" style="height: 300px;" data-colors="#dcdcdc,#4a81d4,#1abc9c" dir="ltr"></div>
+                        <div class="custom-legend" id="customLegend"></div>
+                    </div>
+                </div>
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+               
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3">Stacked Area Chart</h4>
+                    <div id="chart-stacked" style="height: 300px;" data-colors="#1abc9c,#4a81d4" dir="ltr"></div>
+                </div>
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
+    <!-- End row -->
+{{-- {{dd($chartData);}} --}}
+  
 
     {{-- CONTATO --}}
     @if (Auth::user()->hasRole('Super') || 
