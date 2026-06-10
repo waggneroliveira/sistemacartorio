@@ -220,40 +220,6 @@
                     </h4>
                 </div>
             </div>
-
-            {{-- Auditoria --}}
-            @if (Auth::user()->hasRole('Super') || 
-            Auth::user()->can('usuario.tornar usuario master') || 
-            Auth::user()->can('auditoria.visualizar'))
-                @include('admin.components.dashboard-card', [
-                    'route' => route('admin.dashboard.audit.index'),
-                    'icon' => 'mdi-clipboard-text',
-                    'title' => __('dashboard.audit')
-                ])
-            @endif
-
-            {{-- Grupos --}}
-            @if (Auth::user()->hasRole('Super') || 
-            Auth::user()->can('usuario.tornar usuario master') || 
-            Auth::user()->can('grupo.visualizar'))
-                @include('admin.components.dashboard-card', [
-                    'route' => route('admin.dashboard.group.index'),
-                    'icon' => 'mdi-account-group',
-                    'title' => __('dashboard.group_and_permission')
-                ])
-            @endif
-
-            {{-- Usuários --}}
-            @if (Auth::user()->hasRole('Super') || 
-            Auth::user()->can('usuario.tornar usuario master') || 
-            Auth::user()->can('usuario.visualizar'))
-                @include('admin.components.dashboard-card', [
-                    'route' => route('admin.dashboard.user.index'),
-                    'icon' => 'mdi-account-multiple',
-                    'title' => __('dashboard.users')
-                ])
-            @endif
-
         </div>
     @endif
     <!-- Footer Start -->

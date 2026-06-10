@@ -422,14 +422,62 @@
                             </button>
                         </div>
                         <ul class="nav nav-pills">
-                            <li class="nav-item me-3 active">
-                                <a href="{{route('admin.dashboard')}}"><i class="mdi mdi-home me-1"></i>Início</a>
+                            <li class="nav-item me-2">
+                                <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                    <i class="mdi mdi-home me-1"></i> Início
+                                </a>
                             </li>
-                            <li class="nav-item me-3">
-                                <a href="{{route('admin.dashboard.registryService.index')}}"><i class="mdi mdi-hammer-wrench me-1"></i>Serviços</a>
+
+                            <li class="nav-item me-2">
+                                <a class="nav-link" href="{{ route('admin.dashboard.registryService.index') }}">
+                                    <i class="mdi mdi-hammer-wrench me-1"></i> Serviços
+                                </a>
                             </li>
-                            <li class="nav-item me-3">
-                                <a href="{{route('admin.dashboard.registryServiceRequest.index')}}"><i class="mdi mdi-file-document-multiple me-1"></i>Solicitações</a>
+
+                            <li class="nav-item me-2">
+                                <a class="nav-link" href="{{ route('admin.dashboard.registryServiceRequest.index') }}">
+                                    <i class="mdi mdi-file-document-multiple me-1"></i> Solicitações
+                                </a>
+                            </li>
+
+                            <!-- DROPDOWN -->
+                            <li class="nav-item dropdown me-2">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="mdi mdi-shield-account me-1"></i> Segurança e Controle de Acesso
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->can('usuario.tornar usuario master') || 
+                                    Auth::user()->can('auditoria.visualizar'))
+                                        
+                                            <li>
+                                                <a class="dropdown-item" href="{{route('admin.dashboard.audit.index')}}">
+                                                    Auditoria
+                                                </a>
+                                            </li>
+                                    @endif
+
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->can('usuario.tornar usuario master') || 
+                                    Auth::user()->can('grupo.visualizar'))                                        
+                                        <li>
+                                            <a class="dropdown-item" href="{{route('admin.dashboard.group.index')}}">
+                                                Grupos de Permissões
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->can('usuario.tornar usuario master') || 
+                                    Auth::user()->can('usuario.visualizar'))                                        
+                                        <li>
+                                            <a class="dropdown-item" href="{{route('admin.dashboard.user.index')}}">
+                                                Usuários
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
                             </li>
                         </ul>
                         <ul class="topbar-menu d-flex align-items-center">
