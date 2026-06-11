@@ -422,26 +422,26 @@
                             </button>
                         </div>
                         <ul class="nav nav-pills">
-                            <li class="nav-item me-2">
+                            {{-- <li class="nav-item me-0">
                                 <a class="nav-link" href="{{ route('admin.dashboard') }}">
                                     <i class="mdi mdi-home me-1"></i> Início
                                 </a>
-                            </li>
+                            </li> --}}
 
-                            <li class="nav-item me-2">
+                            <li class="nav-item me-0">
                                 <a class="nav-link" href="{{ route('admin.dashboard.registryService.index') }}">
                                     <i class="mdi mdi-hammer-wrench me-1"></i> Serviços
                                 </a>
                             </li>
 
-                            <li class="nav-item me-2">
+                            <li class="nav-item me-0">
                                 <a class="nav-link" href="{{ route('admin.dashboard.registryServiceRequest.index') }}">
                                     <i class="mdi mdi-file-document-multiple me-1"></i> Solicitações
                                 </a>
                             </li>
 
                             <!-- DROPDOWN -->
-                            <li class="nav-item dropdown me-2">
+                            <li class="nav-item dropdown me-0">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="mdi mdi-shield-account me-1"></i> Segurança e Controle de Acesso
                                 </a>
@@ -479,6 +479,55 @@
                                     @endif
                                 </ul>
                             </li>
+
+                            <!-- DROPDOWN -->
+                            <li class="nav-item dropdown me-0">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="mdi mdi-card-account-mail-outline me-1"></i> Contato
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
+                                    Auth::user()->hasPermissionTo('contato.visualizar'))
+                                        
+                                            <li>
+                                                <a class="dropdown-item" href="{{route('admin.dashboard.contact.index')}}">
+                                                    Contato
+                                                </a>
+                                            </li>
+                                    @endif
+
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
+                                    Auth::user()->hasPermissionTo('lead contato.visualizar'))                                        
+                                        <li>
+                                            <a class="dropdown-item" href="{{route('admin.dashboard.formIndex.index')}}">
+                                                Lead Contato
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    @if (Auth::user()->hasRole('Super') || 
+                                    Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
+                                    Auth::user()->hasPermissionTo('lead contato.visualizar'))                                        
+                                        <li>
+                                            <a class="dropdown-item" href="{{route('admin.dashboard.leadDownload.index')}}">
+                                                Lead Download
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
+                            @if (Auth::user()->hasRole('Super') || 
+                            Auth::user()->can('usuario.tornar usuario master') || 
+                            Auth::user()->can('email.visualizar'))
+                                <li class="nav-item me-0">
+                                    <a class="nav-link" href="{{ route('admin.dashboard.settingEmail.index') }}">
+                                        <i class="mdi mdi-email-edit me-1"></i> {{__('dashboard.setting_smtp')}}
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                         <ul class="topbar-menu d-flex align-items-center">
                             <!-- Fullscreen Button -->
@@ -930,18 +979,8 @@
         <!--C3 Chart-->
         <script src="{{ asset('build/admin/js/libs/d3/d3.min.js') }}"></script>
         <script src="{{ asset('build/admin/js/libs/c3/c3.min.js') }}"></script>
-        {{-- <script>
-            var chartData = @json($chartData);
 
-            var chart = c3.generate({
-                bindto: '#chart',
-                data: {
-                    columns: chartData,
-                    type: 'donut'
-                }
-            });
-        </script> --}}
-
+        <!-- Dolicitacoes por servicos -->
         <script>
             // Seus dados vindos do PHP
             var chartData = @json($chartData);
@@ -1058,8 +1097,48 @@
             }, 100);
         </script>
 
-        <script src="{{ asset('build/admin/js/main.js') }}"></script>
+        <!-- Solicitacoes por mes -->
+        <script>
+            var chartStacked = @json($requestsByMonth);
 
+            console.log(chartStacked)
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                var months = chartStacked.map(item => item.month);
+                var values = chartStacked.map(item => item.total);
+
+                var chart = c3.generate({
+                    bindto: '#chart-stacked',
+                    data: {
+                        columns: [
+                            ['Solicitações', ...values]
+                        ],
+                        type: 'bar'
+                    },
+                    axis: {
+                        x: {
+                            type: 'category',
+                            categories: months
+                        }
+                    },
+                    bar: {
+                        width: {
+                            ratio: 0.4
+                        }
+                    },
+                    color: {
+                        pattern: ['#1abc9c']
+                    },
+                    tooltip: {
+                        grouped: false
+                    }
+                });
+
+            });
+        </script>
+
+        <script src="{{ asset('build/admin/js/main.js') }}"></script>
 
         <!-- Dashboard 2 init -->
         <script src="{{ asset('build/admin/js/pages/dashboard-2.init.js') }}"></script>       

@@ -51,7 +51,6 @@ class RegistryServiceRequest extends Model
     {
         static::creating(function ($model) {
             if (!$model->protocol_number) {
-                // Solução simples e 100% garantida
                 $model->protocol_number = $model->generateSimpleProtocol();
             }
             
@@ -66,15 +65,39 @@ class RegistryServiceRequest extends Model
 
     public function generateSimpleProtocol()
     {
-        $service = $this->service;
-        $serviceCode = $service ? strtoupper(substr($service->name, 0, 3)) : 'REQ';
+        $maxAttempts = 5;
+        $attempt = 0;
         
-        // Usar timestamp + microtime + random - GARANTIDAMENTE ÚNICO
-        $timestamp = now()->format('YmdHis');
-        $microtime = str_replace('.', '', microtime(true));
-        $random = rand(1000, 9999);
+        do {
+            $service = $this->service;
+            $serviceCode = $service ? strtoupper(substr($service->name, 0, 3)) : 'REQ';
+            
+            // Timestamp reduzido (ano-mes-dia-hora-minuto-segundo)
+            $timestamp = now()->format('ymdHis'); // Ex: 2401151430 (12 chars)
+            
+            // Microtime com 4 dígitos
+            $microtime = substr(str_replace('.', '', microtime(true)), -4);
+            
+            // Random com 4 dígitos (boa variedade)
+            $random = rand(1000, 9999);
+            
+            $protocol = sprintf('%s-%s%s%d', $serviceCode, $timestamp, $microtime, $random);
+            // Exemplo: REQ-240115143087421234
+            
+            $attempt++;
+            
+            // Verifica se já existe (ajuste conforme seu banco/modelo)
+            $exists = RegistryServiceRequest::where('protocol_number', $protocol)->exists();
+            
+            if ($attempt >= $maxAttempts) {
+                // Fallback: adiciona um sufixo único
+                $protocol = $protocol . '-' . uniqid();
+                break;
+            }
+            
+        } while ($exists);
         
-        return sprintf('%s-%s-%s-%d', $serviceCode, $timestamp, $microtime, $random);
+        return $protocol;
     }
 
     public function client()

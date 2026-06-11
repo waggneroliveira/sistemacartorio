@@ -7,6 +7,7 @@ use App\Models\RegistryServiceRequest;
 use App\Models\User;
 use App\Repositories\SettingThemeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -27,6 +28,8 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        $todayRequestServices = RegistryServiceRequest::whereDate('created_at', Carbon::today())->count();
+
         $stats = [
             'total' => RegistryServiceRequest::count(),
 
@@ -43,6 +46,10 @@ class DashboardController extends Controller
                 'pending',
                 'awaiting_payment'
             ])->count(),
+
+            'aguardandoDocumento' => RegistryServiceRequest::whereIn('status', [
+                'awaiting_documents'
+            ])->count(),
         ];
 
         if (isset($user)) {
@@ -50,6 +57,7 @@ class DashboardController extends Controller
                 'settingTheme',
                 'lastRequestServices',
                 'stats',
+                'todayRequestServices',
             ));
         }
 

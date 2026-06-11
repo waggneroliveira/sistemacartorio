@@ -24,21 +24,21 @@
         ])
 
         @include('admin.components.dashboard-card-info', [
-            'route' => route('admin.dashboard.slide.index'),
+            'route' => route('admin.dashboard.registryServiceRequest.index'),
             'icon' => 'mdi mdi-timer-sand',
             'count' => $stats['emAndamento'],
             'title' => 'Em andamento'
         ])
 
         @include('admin.components.dashboard-card-info', [
-            'route' => route('admin.dashboard.slide.index'),
+            'route' => route('admin.dashboard.registryServiceRequest.index'),
             'icon' => 'mdi mdi-check-circle-outline',
             'count' => $stats['concluidos'],
             'title' => 'Concluído'
         ])
 
         @include('admin.components.dashboard-card-info', [
-            'route' => route('admin.dashboard.slide.index'),
+            'route' => route('admin.dashboard.registryServiceRequest.index'),
             'icon' => 'mdi mdi-credit-card-outline',
             'count' => $stats['aguardandoPagamento'],
             'title' => 'Aguardando pagamento'
@@ -46,16 +46,22 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
+        <div class="col-lg-9">
             <!-- Portlet card -->
             <div class="card">
-                <div class="card-body">
-                    <div class="card-widgets">
-                        <a href="javascript: void(0);" data-bs-toggle="reload"><i class="mdi mdi-refresh"></i></a>
+                <div class="card-body px-2">
+                    <div class="card-widgets mt-2 me-1">
+                        {{-- <a href="javascript: void(0);" data-bs-toggle="reload"><i class="mdi mdi-refresh"></i></a> --}}
                         <a data-bs-toggle="collapse" href="#cardCollpase4" role="button" aria-expanded="false" aria-controls="cardCollpase4"><i class="mdi mdi-minus"></i></a>
-                        <a href="javascript: void(0);" data-bs-toggle="remove"><i class="mdi mdi-close"></i></a>
+                        {{-- <a href="javascript: void(0);" data-bs-toggle="remove"><i class="mdi mdi-close"></i></a> --}}
                     </div>
-                    <h4 class="header-title mb-0">Últimas solicitações</h4>
+
+                    <div class="border-start border-4 border-primary bg-light px-3 py-2 mb-3">
+                        <h4 class="header-title mb-0">
+                            <i class="mdi mdi-file-document-multiple-outline text-primary me-1"></i>
+                            Últimas Solicitações
+                        </h4>
+                    </div>
 
                     <div id="cardCollpase4" class="collapse show">
                         <div class="table-responsive pt-3">
@@ -65,7 +71,6 @@
                                         <th>Protocolo</th>
                                         <th>Serviço</th>
                                         <th>Data da solicitação</th>
-                                        <th>Data da conclusão</th>
                                         <th>Status</th>
                                         <th>Clients</th>
                                     </tr>
@@ -73,10 +78,9 @@
                                 <tbody>
                                     @foreach ($lastRequestServices as $lastRequestService)                                        
                                         <tr>
-                                            <td>{{ $lastRequestService->protocol_number }}</td>
+                                            <td style="font-size: 0.75rem;">{{ $lastRequestService->protocol_number }}</td>
                                             <td>{{ $lastRequestService->service->name }}</td>
                                             <td>{{ $lastRequestService->created_at->format('d/m/Y H:i') }}</td>
-                                            <td>Oct 12, 2018</td>
                                             @php
                                                 $statusConfig = [
                                                     'pending' => ['class' => 'bg-soft-warning text-warning', 'text' => 'Pendente'],
@@ -110,6 +114,90 @@
                 </div> <!-- end card-body-->
             </div> <!-- end card-->
         </div> <!-- end col-->
+
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-body px-2">
+                    <div class="alert alert-warning d-flex align-items-center mb-3 px-2">
+                        <i class="mdi mdi-alert-outline fs-3 me-2"></i>
+
+                        <div>
+                            <h4 class="mb-0 fw-bold">Alertas do Sistema</h4>
+                            <small>Solicitações que exigem atenção imediata.</small>
+                        </div>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+
+                        @if (isset($todayRequestServices) && $todayRequestServices != null)                            
+                            <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                            data-bs-toggle="tooltip"
+                            title="Solicitações recebidas recentemente que ainda não foram analisadas pela equipe.">
+                                <div>
+                                    <i class="mdi mdi-bell-outline text-primary me-2"></i>
+                                    Novas Solicitações
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ $todayRequestServices }}</span>
+                            </a>
+                        @endif
+
+                        @if (isset($stats) && $stats['aguardandoPagamento'] != null)  
+                            <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                            data-bs-toggle="tooltip"
+                            title="Solicitações aguardando confirmação ou compensação do pagamento.">
+                                <div>
+                                    <i class="mdi mdi-cash text-warning me-2"></i>
+                                    Pagamentos Pendentes
+                                </div>
+                                <span class="badge bg-warning text-dark rounded-pill">{{ $stats['aguardandoPagamento'] }}</span>
+                            </a>
+                        @endif
+
+                        @if (isset($stats) && $stats['aguardandoDocumento'] != null)
+                            <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                            data-bs-toggle="tooltip"
+                            title="Processos que aguardam envio de documentos, correções de informações ou retorno do cliente para continuidade da solicitação.">
+                                <div>
+                                    <i class="mdi mdi-file-alert-outline text-info me-2"></i>
+                                    Pendências do Cliente
+                                </div>
+                                <span class="badge bg-info rounded-pill">
+                                    {{ $stats['aguardandoDocumento'] }}
+                                </span>
+                            </a>
+                        @endif
+
+                        {{-- @if (isset($stats) && $stats != null) 
+                            <a href="#"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                            data-bs-toggle="tooltip"
+                            title="Solicitações atualmente em conferência, análise ou validação interna.">
+                                <div>
+                                    <i class="mdi mdi-magnify text-secondary me-2"></i>
+                                    Em Análise
+                                </div>
+                                <span class="badge bg-secondary rounded-pill">8</span>
+                            </a>
+                        @endif
+
+                        <a href="#"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                        data-bs-toggle="tooltip"
+                        title="Solicitações próximas da data prevista de entrega ou conclusão.">
+                            <div>
+                                <i class="mdi mdi-clock-alert-outline text-danger me-2"></i>
+                                Prazos Próximos
+                            </div>
+                            <span class="badge bg-danger rounded-pill">2</span>
+                        </a> --}}
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- end row -->
 
@@ -118,7 +206,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title mb-3 text-center"> Solicitações por Serviço </h4>
-                    <div class="d-flex flex-row-reverse">
+                    <div class="d-flex flex-column">
                         <div id="chart" style="height: 300px;" data-colors="#dcdcdc,#4a81d4,#1abc9c" dir="ltr"></div>
                         <div class="custom-legend" id="customLegend"></div>
                     </div>
@@ -129,99 +217,14 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title mb-3">Stacked Area Chart</h4>
+                    <h4 class="header-title mb-3 text-center">Solicitações por mês</h4>
                     <div id="chart-stacked" style="height: 300px;" data-colors="#1abc9c,#4a81d4" dir="ltr"></div>
                 </div>
             </div> <!-- end card-->
         </div> <!-- end col-->
     </div>
-    <!-- End row -->
-{{-- {{dd($chartData);}} --}}
-  
+    <!-- End row -->  
 
-    {{-- CONTATO --}}
-    @if (Auth::user()->hasRole('Super') || 
-    Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-    Auth::user()->hasPermissionTo('contato.visualizar') || 
-    Auth::user()->hasPermissionTo('lead contato.visualizar'))
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <h4 class="page-title">
-                        <i class="mdi mdi-card-account-mail-outline"></i> Contato
-                    </h4>
-                </div>
-            </div>
-
-            {{-- Contato --}}
-            @if (Auth::user()->hasRole('Super') || 
-            Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-            Auth::user()->hasPermissionTo('contato.visualizar'))
-                @include('admin.components.dashboard-card', [
-                    'route' => route('admin.dashboard.contact.index'),
-                    'icon' => 'mdi-card-account-mail-outline',
-                    'title' => 'Contato'
-                ])
-            @endif
-
-            {{-- Lead Contato --}}
-            @if (Auth::user()->hasRole('Super') || 
-            Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-            Auth::user()->hasPermissionTo('lead contato.visualizar'))
-                @include('admin.components.dashboard-card', [
-                    'route' => route('admin.dashboard.formIndex.index'),
-                    'icon' => 'mdi-account-box-outline',
-                    'title' => 'Lead Contato'
-                ])
-            @endif
-            @include('admin.components.dashboard-card', [
-                'route' => route('admin.dashboard.leadDownload.index'),
-                'icon' => 'mdi-account-box-outline',
-                'title' => 'Lead Download'
-            ])
-
-        </div>
-    @endif
-
-    {{-- SMTP --}}
-    @if (Auth::user()->hasRole('Super') || 
-    Auth::user()->can('usuario.tornar usuario master') || 
-    Auth::user()->can('email.visualizar'))
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <h4 class="page-title">
-                        <i class="mdi mdi-email-edit"></i> {{__('dashboard.setting_smtp')}}
-                    </h4>
-                </div>
-            </div>
-
-            @include('admin.components.dashboard-card', [
-                'route' => route('admin.dashboard.settingEmail.index'),
-                'icon' => 'mdi-email',
-                'title' => __('dashboard.setting_email')
-            ])
-
-        </div>
-    @endif
-
-    {{-- SEGURANÇA --}}
-    @if (Auth::user()->hasRole('Super') || 
-    Auth::user()->can('usuario.tornar usuario master') || 
-    Auth::user()->can('auditoria.visualizar') || 
-    Auth::user()->can('usuario.visualizar') || 
-    Auth::user()->can('grupo.visualizar'))
-
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box">
-                    <h4 class="page-title">
-                        <i class="mdi mdi-security"></i> {{__('dashboard.security_and_access_control')}}
-                    </h4>
-                </div>
-            </div>
-        </div>
-    @endif
     <!-- Footer Start -->
     <footer class="footer">
         <div class="container-fluid">

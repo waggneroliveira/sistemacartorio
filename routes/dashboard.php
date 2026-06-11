@@ -439,9 +439,38 @@ View::composer('admin.core.admin', function ($view) {
         ];
     }
 
+    $requestsByMonth = RegistryServiceRequest::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+    ->whereYear('created_at', date('Y'))
+    ->groupBy('month')
+    ->orderBy('month')
+    ->get();
+
+    $monthsPt = [
+        1 => 'Jan',
+        2 => 'Fev',
+        3 => 'Mar',
+        4 => 'Abr',
+        5 => 'Mai',
+        6 => 'Jun',
+        7 => 'Jul',
+        8 => 'Ago',
+        9 => 'Set',
+        10 => 'Out',
+        11 => 'Nov',
+        12 => 'Dez',
+    ];
+
+    $requestsByMonth = $requestsByMonth->map(function ($item) use ($monthsPt) {
+        return [
+            'month' => $monthsPt[$item->month],
+            'total' => $item->total
+        ];
+    });
+
     return $view->with('settingTheme', $settingTheme)
     ->with('user', $user)
     ->with('auditorias', $auditorias)
     ->with('chartData', $chartData)
+    ->with('requestsByMonth', $requestsByMonth)
     ->with('auditCount', $auditCount);
 });
