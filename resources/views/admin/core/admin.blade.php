@@ -549,9 +549,9 @@
                                 </div>
                             </li>
                             <!-- Language flag dropdown  -->
-                            <li class="dropdown d-none d-md-inline-block">
+                            {{-- <li class="dropdown d-none d-md-inline-block">
                                 <a class="nav-link dropdown-toggle waves-effect waves-light arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                                    {{-- @php
+                                    @php
                                         $locales = [
                                             'pt' => 'br.jpg',
                                             'en' => 'us.jpg',
@@ -564,10 +564,9 @@
                                         <img src="{{ asset('build/admin/images/flags/' . $locales[$locale]) }}" alt="user-image" class="me-0 me-sm-1" height="18">
                                         @else
                                         <img src="{{ asset('build/admin/images/flags/br.jpg') }}" alt="user-image" class="me-0 me-sm-1" height="18">
-                                    @endif --}}
-                                    <img src="{{ asset('build/admin/images/flags/br.jpg') }}" alt="user-image" class="me-0 me-sm-1" height="18">
+                                    @endif
                                 </a>
-                                {{-- <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated">
+                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated">
                                     <!-- item-->
                                     <a href="{{ route('change.language', 'pt') }}" class="dropdown-item">
                                         <img src="{{asset('build/admin/images/flags/br.jpg')}}" alt="user-image" class="me-1" height="12"> <span class="align-midle">BR</span>
@@ -582,8 +581,8 @@
                                     <a href="{{ route('change.language', 'es') }}" class="dropdown-item">
                                         <img src="{{asset('build/admin/images/flags/spain.jpg')}}" alt="user-image" class="me-1" height="12"> <span class="align-midle">ES</span>
                                     </a>
-                                </div> --}}
-                            </li>
+                                </div>
+                            </li> --}}
                             @if (Auth::user()->hasRole('Super') || Auth::user()->can('usuario.tornar usuario master') || Auth::user()->can('notificacao.visualizar'))
                                 <!-- Notofication dropdown -->
                                 <li class="dropdown notification-list">
