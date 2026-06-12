@@ -76,18 +76,6 @@ class DashboardController extends Controller
             $crescimentoAnual = 100; // Crescimento de 100% se não havia registros no ano anterior
         }
 
-        $topServicesMonth = RegistryServiceRequest::selectRaw("
-        registry_services.name as service,
-        COUNT(*) as total
-        ")
-        ->join('registry_services', 'registry_services.id', '=', 'registry_service_requests.registry_service_id')
-        ->whereMonth('registry_service_requests.created_at', now()->month)
-        ->whereYear('registry_service_requests.created_at', now()->year)
-        ->groupBy('registry_services.id', 'registry_services.name')
-        ->orderByDesc('total')
-        ->limit(10)
-        ->get();
-
         if (isset($user)) {
             return view('admin.dashboard', compact(
                 'settingTheme',
@@ -95,7 +83,6 @@ class DashboardController extends Controller
                 'stats',
                 'todayRequestServices',
                 'crescimentoAnual',
-                'topServicesMonth',
             ));
         }
 

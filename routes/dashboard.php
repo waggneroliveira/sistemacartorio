@@ -472,6 +472,18 @@ View::composer('admin.core.admin', function ($view) {
         ];
     }
 
+    $topServicesMonth = RegistryServiceRequest::selectRaw("
+    registry_services.name as service,
+    COUNT(*) as total
+    ")
+    ->join('registry_services', 'registry_services.id', '=', 'registry_service_requests.registry_service_id')
+    ->whereMonth('registry_service_requests.created_at', now()->month)
+    ->whereYear('registry_service_requests.created_at', now()->year)
+    ->groupBy('registry_services.id', 'registry_services.name')
+    ->orderByDesc('total')
+    ->limit(10)
+    ->get();
+
     return $view->with('settingTheme', $settingTheme)
     ->with('user', $user)
     ->with('auditorias', $auditorias)
@@ -479,5 +491,6 @@ View::composer('admin.core.admin', function ($view) {
     ->with('chartYear', $chartYear)
     ->with('currentYear', $currentYear)
     ->with('previousYear', $previousYear)
+    ->with('topServicesMonth', $topServicesMonth)
     ->with('auditCount', $auditCount);
 });
