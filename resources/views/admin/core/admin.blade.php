@@ -108,7 +108,7 @@
                             <li class="menu-item">
                                 <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
                                     <span class="menu-icon"><i class="mdi mdi-home"></i></span>
-                                    <span class="menu-text"> Home </span>
+                                    <span class="menu-text"> Início </span>
                                     <span class="badge bg-success rounded-pill ms-auto">7</span>
                                 </a>
                                 <div class="collapse" id="menuDashboards">
@@ -178,145 +178,6 @@
                                         @endif
                                     </ul>
                                 </div>
-                            </li>
-                        @endif
-                        @if (Auth::user()->hasRole('Super') || 
-                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                        Auth::user()->hasPermissionTo('sobre nos.visualizar') || 
-                        Auth::user()->hasPermissionTo('parametro.visualizar') || 
-                        Auth::user()->hasPermissionTo('missao visao e valores.visualizar') || 
-                        Auth::user()->hasPermissionTo('representantes.visualizar') || 
-                        Auth::user()->hasPermissionTo('video.visualizar') || 
-                        Auth::user()->hasPermissionTo('onde atendemos.visualizar'))
-                            <li class="menu-item">
-                                <a href="#about" data-bs-toggle="collapse" class="menu-link">
-                                    <span class="menu-icon"><i class="mdi mdi-help-circle"></i></span>
-                                    <span class="menu-text"> Sobre Nós </span>
-                                    <span class="badge bg-success rounded-pill ms-auto">6</span>
-                                </a>
-                                <div class="collapse" id="about">
-                                    <ul class="sub-menu">
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('sobre nos.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.about.index')}}" class="menu-link">
-                                                    <span class="menu-text">Sobre Nós</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('parametro.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.benefitTopic.index')}}" class="menu-link">
-                                                    <span class="menu-text">Parametro</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('missao visao e valores.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.report.index')}}" class="menu-link">
-                                                    <span class="menu-text">Missão Visão e Valores</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('representantes.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.direction.index')}}" class="menu-link">
-                                                    <span class="menu-text">Representantes</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('video.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.video.index')}}" class="menu-link">
-                                                    <span class="menu-text">Vídeo</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('onde atendemos.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.serviceLocation.index')}}" class="menu-link">
-                                                    <span class="menu-text">Sessão onde atendemos</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                       
-                                    </ul>
-                                </div>
-                            </li>
-                        @endif
-                        @if (Auth::user()->hasRole('Super') || 
-                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') ||
-                        Auth::user()->hasPermissionTo('produtos.visualizar') ||
-                        Auth::user()->hasPermissionTo('marcas.visualizar') ||
-                        Auth::user()->hasPermissionTo('categorias de produtos.visualizar'))
-                            <li class="menu-item">
-                                <a href="#menuDashboardsP" data-bs-toggle="collapse" class="menu-link">
-                                    <span class="menu-icon"><i class="mdi mdi-toolbox"></i></span>
-                                    <span class="menu-text"> Produtos </span>
-                                    <span class="badge bg-success rounded-pill ms-auto">3</span>
-                                </a>
-                                <div class="collapse" id="menuDashboardsP">
-                                    <ul class="sub-menu">
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('marcas.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.brand.index')}}" class="menu-link">
-                                                    <span class="menu-text">Marcas</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('categorias de produtos.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.productCategory.index')}}" class="menu-link">
-                                                    <span class="menu-text">Categorias dos produtos</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('produtos.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.product.index')}}" class="menu-link">
-                                                    <span class="menu-text">Produtos</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </div>
-                            </li>
-                        @endif
-                        @if (Auth::user()->hasRole('Super') || 
-                        Auth::user()->can('usuario.tornar usuario master') || 
-                        Auth::user()->can('categorias de noticias.visualizar'))
-                            <li class="menu-item">
-                                <a href="{{route('admin.dashboard.blogCategory.index')}}" class="menu-link">
-                                    <span class="menu-icon"><i class="mdi mdi-tag-multiple "></i></span>
-                                    <span class="menu-text"> Categoria de notícias </span>
-                                </a>
-                            </li>
-                        @endif
-                        @if (Auth::user()->hasRole('Super') || 
-                        Auth::user()->can('usuario.tornar usuario master') || 
-                        Auth::user()->can('noticias.visualizar'))
-                            <li class="menu-item">
-                                <a href="{{route('admin.dashboard.blog.index')}}" class="menu-link">
-                                    <span class="menu-icon"><i class="mdi mdi-newspaper-variant"></i></span>
-                                    <span class="menu-text"> Notícias </span>
-                                </a>
                             </li>
                         @endif
                         @if (Auth::user()->hasRole('Super') || 
@@ -990,7 +851,7 @@
             }, 0);
             
             // Paleta de cores baseada no seu data-colors original
-            var colorPalette = ['#4a81d4', '#1abc9c', '#dcdcdc', '#f39c12', '#e74c3c', '#9b59b6', '#34495e', '#95a5a6'];
+            var colorPalette = ['#4a81d4', '#1abc9c', '#212121', '#f39c12', '#e74c3c', '#9b59b6', '#34495e', '#95a5a6'];
             
             // Objeto para mapear categorias às suas cores
             var categoryColors = {};
@@ -1095,42 +956,142 @@
                 buildCustomLegend(chartData);
             }, 100);
         </script>
-
-        <!-- Solicitacoes por mes -->
+        <!-- Dolicitacoes por mes -->
         <script>
-            var chartStacked = @json($requestsByMonth);
-
-            console.log(chartStacked)
-
-            document.addEventListener("DOMContentLoaded", function () {
-
-                var months = chartStacked.map(item => item.month);
-                var values = chartStacked.map(item => item.total);
-
-                var chart = c3.generate({
-                    bindto: '#chart-stacked',
+            var chartYear = @json($chartYear);
+            var currentYear = @json($currentYear);
+            var previousYear = @json($previousYear);
+            
+            if (chartYear && Array.isArray(chartYear) && chartYear.length > 0) {
+                var months = chartYear.map(item => item.month);
+                
+                // Nomes das colunas com os anos dinâmicos
+                var previousYearData = [previousYear.toString()];
+                var currentYearData = [currentYear.toString()];
+                
+                chartYear.forEach(item => {
+                    previousYearData.push(item.previous_year);
+                    currentYearData.push(item.current_year);
+                });
+                
+                c3.generate({
+                    bindto: '#chartYear',
                     data: {
                         columns: [
-                            ['Solicitações', ...values]
+                            previousYearData,
+                            currentYearData
                         ],
-                        type: 'bar'
+                        type: 'spline',
+                        colors: {
+                            [previousYear]: '#ff7f0e',  // Laranja para ano anterior
+                            [currentYear]: '#1f77b4'     // Azul para ano atual
+                        },
+                        names: {
+                            [previousYear]: previousYear.toString(),
+                            [currentYear]: currentYear.toString()
+                        }
                     },
                     axis: {
                         x: {
                             type: 'category',
-                            categories: months
+                            categories: months,
+                            label: {
+                                text: 'Meses',
+                                position: 'outer-right'
+                            }
+                        },
+                        y: {
+                            label: {
+                                text: 'Quantidade de solicitações',
+                                position: 'outer-top'
+                            }
                         }
                     },
-                    bar: {
-                        width: {
-                            ratio: 0.4
-                        }
+                    point: {
+                        show: true,
+                        r: 5  // Tamanho dos pontos
                     },
-                    color: {
-                        pattern: ['#1abc9c']
+                    grid: {
+                        y: {
+                            show: true
+                        }
                     },
                     tooltip: {
+                        format: {
+                            title: function(x) {
+                                return months[x];
+                            },
+                            value: function(value, ratio, id) {
+                                return value + ' solicitações';
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'inset',
+                        title: {
+                            text: 'Anos'
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('chartYear').innerHTML = 
+                    '<div style="text-align: center; padding: 50px;">Sem dados disponíveis para ' + 
+                    previousYear + ' e ' + currentYear + '</div>';
+            }
+        </script>
+
+        <script>
+            var topServicesMonth = @json($topServicesMonth);
+            document.addEventListener("DOMContentLoaded", function () {
+
+                var services = topServicesMonth.map(item => item.service);
+                var totals = ['Solicitações'];
+
+                topServicesMonth.forEach(item => {
+                    totals.push(item.total);
+                });
+
+                c3.generate({
+                    bindto: '#chart-top-services',
+
+                    data: {
+                        columns: [
+                            totals
+                        ],
+                        type: 'bar'
+                    },
+
+                    axis: {
+                        rotated: true,
+
+                        x: {
+                            type: 'category',
+                            categories: services
+                        }
+                    },
+
+                    bar: {
+                        width: {
+                            ratio: 0.7
+                        }
+                    },
+
+                    grid: {
+                        y: {
+                            show: true
+                        }
+                    },
+
+                    tooltip: {
                         grouped: false
+                    },
+
+                    legend: {
+                        show: false
+                    },
+
+                    color: {
+                        pattern: ['#4a81d4']
                     }
                 });
 

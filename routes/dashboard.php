@@ -46,6 +46,7 @@ use App\Repositories\AuditCountRepository;
 use App\Repositories\SettingThemeRepository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
@@ -439,38 +440,44 @@ View::composer('admin.core.admin', function ($view) {
         ];
     }
 
-    $requestsByMonth = RegistryServiceRequest::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-    ->whereYear('created_at', date('Y'))
-    ->groupBy('month')
-    ->orderBy('month')
-    ->get();
+    // Pega os anos dinamicamente
+    $currentYear = date('Y');  // 2026
+    $previousYear = $currentYear - 1;  // 2025
 
-    $monthsPt = [
-        1 => 'Jan',
-        2 => 'Fev',
-        3 => 'Mar',
-        4 => 'Abr',
-        5 => 'Mai',
-        6 => 'Jun',
-        7 => 'Jul',
-        8 => 'Ago',
-        9 => 'Set',
-        10 => 'Out',
-        11 => 'Nov',
-        12 => 'Dez',
-    ];
+    $requests = RegistryServiceRequest::selectRaw("
+        YEAR(created_at) as year,
+        MONTH(created_at) as month,
+        COUNT(*) as total")
+        ->whereIn(DB::raw('YEAR(created_at)'), [$previousYear, $currentYear])
+        ->groupBy('year', 'month')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get();
 
-    $requestsByMonth = $requestsByMonth->map(function ($item) use ($monthsPt) {
-        return [
-            'month' => $monthsPt[$item->month],
-            'total' => $item->total
+    $months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+    $chartYear = [];
+
+    foreach ($months as $index => $month) {
+        $monthNumber = $index + 1;
+        
+        $chartYear[] = [
+            'month' => $month,
+            'previous_year' => optional(
+                $requests->where('year', $previousYear)->where('month', $monthNumber)->first()
+            )->total ?? 0,
+            'current_year' => optional(
+                $requests->where('year', $currentYear)->where('month', $monthNumber)->first()
+            )->total ?? 0,
         ];
-    });
+    }
 
     return $view->with('settingTheme', $settingTheme)
     ->with('user', $user)
     ->with('auditorias', $auditorias)
     ->with('chartData', $chartData)
-    ->with('requestsByMonth', $requestsByMonth)
+    ->with('chartYear', $chartYear)
+    ->with('currentYear', $currentYear)
+    ->with('previousYear', $previousYear)
     ->with('auditCount', $auditCount);
 });

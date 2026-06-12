@@ -216,14 +216,42 @@
                
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-body">
-                    <h4 class="header-title mb-3 text-center">Solicitações por mês</h4>
-                    <div id="chart-stacked" style="height: 300px;" data-colors="#1abc9c,#4a81d4" dir="ltr"></div>
+                <div class="card-body text-center">
+                    <h4 class="header-title mb-2"> Solicitações por mês (2025 x 2026)</h4>
+                    <h5 class="text-muted mt-0 mb-1">Crescimento Anual</h5>
+                    
+                    <h3 class="{{ $crescimentoAnual >= 0 ? 'text-success' : 'text-danger' }}">
+                        {{ $crescimentoAnual >= 0 ? '+' : '' }}{{ $crescimentoAnual }}%
+                    </h3>
+
+                    <small class="text-muted">
+                        <i class="bi bi-graph-up"></i> Comparado ao ano anterior
+                    </small>
+
+                    <div class="d-flex flex-column">
+                        <div id="chartYear" style="height: 300px;" data-colors="#dcdcdc,#4a81d4,#1abc9c" dir="ltr"></div>
+                        <div class="custom-legend" id="customLegend"></div>
+                    </div>
                 </div>
             </div> <!-- end card-->
         </div> <!-- end col-->
     </div>
     <!-- End row -->  
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="header-title mb-3 text-center"> Top 10 Serviços do Mês </h4>
+                    </div>
+                    <div id="chart-top-services"
+                    style="height: 300px;"
+                    data-colors="#4a81d4">
+                    </div>
+                </div>
+            </div> <!-- end card-->
+        </div> <!-- end col-->
+    </div>
 
     <!-- Footer Start -->
     <footer class="footer">
