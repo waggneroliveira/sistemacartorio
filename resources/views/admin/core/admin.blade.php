@@ -97,87 +97,13 @@
 
                         <li class="menu-title">Listagem</li>
                         @if (Auth::user()->hasRole('Super') || 
-                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') ||
-                        Auth::user()->hasPermissionTo('slide.visualizar') ||
-                        Auth::user()->hasPermissionTo('topico.visualizar') ||
-                        Auth::user()->hasPermissionTo('passo a passo.visualizar') ||
-                        Auth::user()->hasPermissionTo('sesssao lets go.visualizar') ||
-                        Auth::user()->hasPermissionTo('sesssao faq.visualizar') ||
-                        Auth::user()->hasPermissionTo('perguntas e respostas.visualizar') ||
-                        Auth::user()->hasPermissionTo('depoimento.visualizar'))
+                        Auth::user()->hasPermissionTo('usuario.tornar usuario master'))
                             <li class="menu-item">
                                 <a href="#menuDashboards" data-bs-toggle="collapse" class="menu-link">
                                     <span class="menu-icon"><i class="mdi mdi-home"></i></span>
                                     <span class="menu-text"> Início </span>
                                     <span class="badge bg-success rounded-pill ms-auto">7</span>
                                 </a>
-                                <div class="collapse" id="menuDashboards">
-                                    <ul class="sub-menu">
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('slide.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.slide.index')}}" class="menu-link">
-                                                    <span class="menu-text">Slides</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('topico.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.topic.index')}}" class="menu-link">
-                                                    <span class="menu-text">Tópicos</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('passo a passo.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.statute.index')}}" class="menu-link">
-                                                    <span class="menu-text">Passo a passo</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('sesssao lets go.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.letsgo.index')}}" class="menu-link">
-                                                    <span class="menu-text">Sessão Lets Go</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('sesssao faq.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.sessaoFaq.index')}}" class="menu-link">
-                                                    <span class="menu-text">Sessão Faq</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('perguntas e respostas.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.faq.index')}}" class="menu-link">
-                                                    <span class="menu-text">Perguntas/Respostas</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                        @if (Auth::user()->hasRole('Super') || 
-                                        Auth::user()->hasPermissionTo('usuario.tornar usuario master') || 
-                                        Auth::user()->hasPermissionTo('depoimento.visualizar'))
-                                            <li class="menu-item">
-                                                <a href="{{route('admin.dashboard.depoiment.index')}}" class="menu-link">
-                                                    <span class="menu-text">Depoimentos</span>
-                                                </a>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </div>
                             </li>
                         @endif
                         @if (Auth::user()->hasRole('Super') || 

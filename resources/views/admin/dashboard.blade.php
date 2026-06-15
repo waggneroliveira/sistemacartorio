@@ -17,7 +17,7 @@
 
     <div class="row">
         @include('admin.components.dashboard-card-info', [
-            'route' => route('admin.dashboard.slide.index'),
+            'route' => '#',
             'icon' => 'mdi mdi-file-multiple-outline',
             'count' => $stats['total'],
             'title' => 'Total de pedidos'
